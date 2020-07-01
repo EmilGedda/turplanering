@@ -1,0 +1,37 @@
+{
+  "name": "turplan",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "prod": "parcel build src/index.html",
+    "tsc": "tsc --noEmit",
+    "lint": "eslint src/**/*.tsx",
+    "fix": "eslint src/**/*.tsx --fix"
+  },
+  "keywords": [],
+  "author": "Emil Gedda <emil.gedda@emilgedda.se>",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@types/react-leaflet": "^2.5.2",
+    "leaflet": "^1.6.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-leaflet": "^2.7.0",
+    "tslib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.41",
+    "@types/react-dom": "^16.9.8",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
+    "eslint": "^7.3.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.20.2",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^2.0.5",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5"
+  }
+}
