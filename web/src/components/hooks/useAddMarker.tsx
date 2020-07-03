@@ -1,11 +1,11 @@
 import React from 'react';
 import { useContext, useEffect, useState, useCallback } from 'react';
-import L, { LeafletMouseEvent } from 'leaflet';
+import { LeafletMouseEvent } from 'leaflet';
 import { useLeaflet, Marker } from 'react-leaflet';
 import { LayerContext } from '../context/LayerContext';
 
 // the hook Effect will be activated by the click on the button
-function useAddMarker(selected:boolean) {
+function useAddMarker(selected: boolean) {
 
 // The hook 'useLeaflet' is provided by the react-leaflet library.
 // This hook allow to access to the Leaflet Context and its variables.

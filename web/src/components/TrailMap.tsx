@@ -6,20 +6,16 @@ import AddMarkerButton from './MarkerButton';
 import BufferedTileLayer from './BufferedTileLayer';
 
 const defaultLatLng: LatLngTuple = [59.334591, 18.06324];
-const zoom = 8;
 
 const TrailMap: React.FC = () => {
     const { point } = React.useContext(LayerContext);
 
     return (
-        <Map id="trailmap" center={defaultLatLng} zoom={zoom}>
-            <AddMarkerButton />
-
-            <LayerGroup>{point}</LayerGroup>
+        <Map id="trailmap" center={defaultLatLng} zoom={8} preferCanvas={true}>
             <BufferedTileLayer
                 url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                keepRadius={4}
+                keepBuffer={4}
             ></BufferedTileLayer>
         </Map>
     );

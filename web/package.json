@@ -13,6 +13,7 @@
   "author": "Emil Gedda <emil.gedda@emilgedda.se>",
   "license": "AGPL-3.0",
   "dependencies": {
+    "@types/leaflet": "^1.5.13",
     "@types/react-leaflet": "^2.5.2",
     "leaflet": "^1.6.0",
     "react": "^16.13.1",
