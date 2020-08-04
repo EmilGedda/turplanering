@@ -1,13 +1,7 @@
-import React from 'react';
-import { LayerContextProvider } from './context/LayerContext';
-import TrailMap from './TrailMap';
+import { FunctionalComponent } from 'preact';
 
-const App: React.FC = () => {
-    return (
-        <LayerContextProvider>
-            <TrailMap />
-        </LayerContextProvider>
-    );
+const App: FunctionalComponent = () => {
+    return <h1>Hello</h1>;
 };
 
 export default App;

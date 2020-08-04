@@ -1,15 +1,12 @@
 {
     "compilerOptions": {
-        "outDir": "./bin/",
-        "target": "es5",
-        "allowSyntheticDefaultImports": true,
+        "target": "es6",
         "moduleResolution": "node",
         "esModuleInterop": true,
-        "lib": ["dom", "es2015.promise", "es2015"],
         "sourceMap": true,
         "noImplicitAny": true,
-        "suppressImplicitAnyIndexErrors": true,
         "jsx": "react",
+        "jsxFactory": "h",
         "experimentalDecorators": true,
         "baseUrl": "./src",
         "paths": {
