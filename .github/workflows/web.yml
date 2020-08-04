@@ -1,5 +1,5 @@
 on: [push]
-name: Web tests
+name: Web
 
 defaults:
   run:
@@ -7,26 +7,43 @@ defaults:
 
 jobs:
 
-    build:
-        name: Building dist
+    deploy:
+        name: Build
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-node@v1
         - run: npm ci
         - run: npm run prod
+        - name: Deploy
+          if: github.ref == 'refs/heads/master'
+          needs: [tests, lint]
+          uses: peaceiris/actions-gh-pages@v2.10.1
+          env:
+              ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+              PUBLISH_BRANCH: gh-pages
+              PUBLISH_DIR: ./dist/
+              with:
+                  commitMessage: ${{ github.event.head_commit.message }}
+                  username: "Github Actions"
+                  useremail: "actions@github"
 
     tests:
-        name: Running tests
+        name: Tests
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-node@v1
         - run: npm ci
         - run: npm test
+        - uses: codecov/codecov-action@v1
+          with:
+              token: ${{ secrets.CODECOV_TOKEN }}
+              file: ./web/coverage/clover.xml
+              fail_ci_if_error: true
 
     lint:
-        name: Running linter
+        name: Linter
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2

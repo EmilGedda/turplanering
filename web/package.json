@@ -1,44 +1,78 @@
 {
-  "name": "turplan",
-  "version": "1.0.0",
-  "description": "Hike map for Sweden",
-  "scripts": {
-    "dev": "parcel src/index.html",
-    "prod": "parcel build src/index.html --experimental-scope-hoisting",
-    "tsc": "tsc --noEmit",
-    "lint": "eslint src/**/*.tsx",
-    "fix": "eslint src/**/*.tsx --fix",
-    "test": "jest"
-  },
-  "keywords": [],
-  "author": "Emil Gedda <emil.gedda@emilgedda.se>",
-  "license": "AGPL-3.0",
-  "dependencies": {
-    "leaflet": "^1.6.0",
-    "preact": "^10.4.6"
-  },
-  "devDependencies": {
-    "@types/enzyme": "^3.10.5",
-    "@types/jest": "^26.0.8",
-    "@types/leaflet": "^1.5.17",
-    "@typescript-eslint/eslint-plugin": "^3.8.0",
-    "@typescript-eslint/parser": "^3.8.0",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-preact-pure": "^2.2.1",
-    "eslint": "^6.8.0",
-    "eslint-config-preact": "^1.1.1",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "jest": "^26.2.2",
-    "parcel-bundler": "^1.12.4",
-    "prettier": "^2.0.5",
-    "sass": "^1.26.10",
-    "ts-jest": "^26.1.4",
-    "typescript": "^3.9.7"
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+    "name": "turplan",
+    "version": "1.0.0",
+    "description": "Hike map for Sweden",
+    "scripts": {
+        "dev": "parcel src/index.html",
+        "prod": "parcel build src/index.html --experimental-scope-hoisting",
+        "tsc": "tsc --noEmit",
+        "lint": "eslint src --ext .tsx",
+        "fix": "eslint src --ext .tsx --fix",
+        "test": "jest"
+    },
+    "keywords": [],
+    "author": "Emil Gedda <emil.gedda@emilgedda.se>",
+    "license": "AGPL-3.0",
+    "dependencies": {
+        "leaflet": "^1.6.0",
+        "preact": "^10.4.6"
+    },
+    "devDependencies": {
+        "@types/enzyme": "^3.10.5",
+        "@types/jest": "^26.0.8",
+        "@types/leaflet": "^1.5.17",
+        "@typescript-eslint/eslint-plugin": "^3.8.0",
+        "@typescript-eslint/parser": "^3.8.0",
+        "enzyme": "^3.11.0",
+        "enzyme-adapter-preact-pure": "^2.2.1",
+        "eslint": "^6.8.0",
+        "eslint-config-preact": "^1.1.1",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "jest": "^26.2.2",
+        "parcel-bundler": "^1.12.4",
+        "prettier": "^2.0.5",
+        "sass": "^1.26.10",
+        "ts-jest": "^26.1.4",
+        "typescript": "^3.9.7"
+    },
+    "jest": {
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "coverageDirectory": "./coverage/",
+        "collectCoverage": true
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "ecmaVersion": "2020",
+            "sourceType": "module",
+            "project": "./tsconfig.json",
+            "ecmaFeatures": {
+                "impliedStrict": true
+            }
+        },
+        "plugins": [
+            "@typescript-eslint"
+        ],
+        "extends": [
+            "preact",
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking",
+            "prettier/@typescript-eslint",
+            "plugin:prettier/recommended"
+        ],
+        "rules": {
+            "@typescript-eslint/ban-ts-comment": "off"
+        }
+    },
+    "prettier": {
+        "semi": false,
+        "trailingComma": "all",
+        "singleQuote": true,
+        "printWidth": 80,
+        "tabWidth": 4
     }
-  }
 }
