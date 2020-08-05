@@ -8,7 +8,8 @@
         "tsc": "tsc --noEmit",
         "lint": "eslint src --ext .tsx",
         "fix": "eslint src --ext .tsx --fix",
-        "test": "jest"
+        "test": "jest",
+        "docs": "typedoc --out ./dist/docs"
     },
     "keywords": [],
     "author": "Emil Gedda <emil.gedda@emilgedda.se>",
@@ -38,6 +39,8 @@
         "prettier": "^2.0.5",
         "sass": "^1.26.10",
         "ts-jest": "^26.1.4",
+        "typedoc": "^0.17.8",
+        "typedoc-neo-theme": "^1.0.9",
         "typescript": "^3.9.7"
     },
     "jest": {
@@ -74,14 +77,17 @@
         "plugins": [
             "@typescript-eslint",
             "react",
-            "react-hooks"
+            "react-hooks",
+            "prettier"
         ],
         "extends": [
             "eslint:recommended",
             "plugin:@typescript-eslint/recommended",
             "plugin:@typescript-eslint/recommended-requiring-type-checking",
-            "prettier/@typescript-eslint",
-            "plugin:prettier/recommended"
+            "plugin:prettier/recommended",
+            "prettier",
+            "prettier/react",
+            "prettier/@typescript-eslint"
         ],
         "rules": {
             "@typescript-eslint/ban-ts-comment": "off",
@@ -105,12 +111,6 @@
             "react/jsx-no-duplicate-props": 2,
             "react/jsx-no-target-blank": 2,
             "react/jsx-no-undef": 2,
-            "react/jsx-tag-spacing": [
-                2,
-                {
-                    "beforeSelfClosing": "always"
-                }
-            ],
             "react/jsx-uses-react": 2,
             "react/jsx-uses-vars": 2,
             "react/self-closing-comp": 2,
@@ -146,17 +146,12 @@
             "no-extra-parens": 0,
             "no-iterator": 2,
             "no-lonely-if": 2,
-            "no-mixed-spaces-and-tabs": [
-                1,
-                "smart-tabs"
-            ],
             "no-multi-str": 1,
             "no-new-wrappers": 2,
             "no-proto": 2,
             "no-redeclare": 2,
             "no-shadow-restricted-names": 2,
             "no-shadow": 1,
-            "no-spaced-func": 2,
             "no-this-before-super": 2,
             "no-undef-init": 2,
             "no-unneeded-ternary": 2,
@@ -187,7 +182,6 @@
                 "never"
             ],
             "object-shorthand": 1,
-            "prefer-arrow-callback": 1,
             "prefer-rest-params": 1,
             "prefer-spread": 1,
             "prefer-template": 1,
@@ -199,12 +193,7 @@
                     "allowTemplateLiterals": true
                 }
             ],
-            "quote-props": [
-                2,
-                "as-needed"
-            ],
             "radix": 1,
-            "unicode-bom": 2,
             "valid-jsdoc": 0
         }
     },

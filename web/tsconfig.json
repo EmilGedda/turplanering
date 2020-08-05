@@ -17,5 +17,14 @@
         },
         "types": ["jest", "node"]
     },
+    "typedocOptions": {
+        "inputFiles": ["./src"],
+        "mode": "modules",
+        "out": "docs",
+        "exclude": "**/*.test.jsx",
+        "includeDeclarations": true,
+        "includeVersion": true,
+        "excludeExternals": true
+    },
     "include": ["src/**/*"]
 }

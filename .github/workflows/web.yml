@@ -44,6 +44,7 @@ jobs:
               node-version: '14'
         - run: npm ci
         - run: npm run prod
+        - run: npm run docs
 
         - name: Get short SHA
           id: scratch
