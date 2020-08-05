@@ -44,12 +44,18 @@ jobs:
               node-version: '14'
         - run: npm ci
         - run: npm run prod
+
+        - name: Get short SHA
+          id: scratch
+          run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+
         - name: Deploy
           if: github.ref == 'refs/heads/main'
           uses: peaceiris/actions-gh-pages@v3
           with:
+              allow_empty_commit: true
+              full_commit_message: ${{ steps.scratch.outputs.sha8 }} ${{ github.event.head_commit.message }}
               github_token: ${{ secrets.GITHUB_TOKEN }}
-              commit_message: ${{ github.event.head_commit.message }}
-              user_name: "Github Actions"
-              user_email: "actions@github"
               publish_dir: ./web/dist/
+              user_email: "actions@github"
+              user_name: "Github Actions"
