@@ -1,7 +1,8 @@
-import { FunctionalComponent, h } from 'preact'
+import { FC } from 'react'
+import TrailMap from './map/TrailMap'
 
 const App: FunctionalComponent = () => {
-    return <h1>Hello</h1>
+    return <TrailMap />
 }
 
 export default App
