@@ -1,13 +1,7 @@
-// This `<reference ...>` directive is necessary to include the adapter's
-// extensions to types in the "preact" and "enzyme" packages.
+/* eslint-disable */
 
-/* eslint-disable @typescript-eslint/triple-slash-reference */
-/// <reference types="enzyme-adapter-preact-pure"/>
-/* eslint-enable @typescript-eslint/triple-slash-reference */
 
 import { JSDOM } from 'jsdom'
-import { configure } from 'enzyme'
-import Adapter from 'enzyme-adapter-preact-pure'
 
 // Setup JSDOM
 const dom = new JSDOM('', {
@@ -25,6 +19,3 @@ global.window = dom.window
 global.document = dom.window.document
 // @ts-ignore
 global.requestAnimationFrame = dom.window.requestAnimationFrame
-
-// Setup Enzyme
-configure({ adapter: new Adapter() })

@@ -1,7 +1,7 @@
-import { FC } from 'react'
+import React from 'react'
 import TrailMap from './map/TrailMap'
 
-const App: FunctionalComponent = () => {
+const App: React.FC = () => {
     return <TrailMap />
 }
 

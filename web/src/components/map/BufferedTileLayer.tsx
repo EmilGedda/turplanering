@@ -1,12 +1,22 @@
 import { TileLayer, Bounds, point } from 'leaflet'
-import { withLeaflet, GridLayer, GridLayerProps, LeafletContext } from 'react-leaflet'
+import {
+    withLeaflet,
+    GridLayer,
+    GridLayerProps,
+    LeafletContext,
+} from 'react-leaflet'
 
-type Props = { url: string, leaflet: LeafletContext, bufferRadius?: number } & GridLayerProps
+type Props = {
+    url: string
+    leaflet: LeafletContext
+    bufferRadius?: number
+} & GridLayerProps
 
 class BufferedTileLayer extends GridLayer<Props, TileLayer> {
     createLeafletElement(props: Props): TileLayer {
         return new (class extends TileLayer {
             _pxBoundsToTileRange(pixels: Bounds): Bounds {
+                /* eslint-disable */
                 // @ts-ignore: Hack to wrap undeclared function
                 const viewport = super._pxBoundsToTileRange(pixels) as Bounds,
                     padding = props.bufferRadius || 2,
@@ -15,6 +25,7 @@ class BufferedTileLayer extends GridLayer<Props, TileLayer> {
                     viewport.min!.subtract(margin),
                     viewport.max!.add(margin),
                 )
+                /* eslint-enable */
             }
         })(props.url, this.getOptions(props))
     }
