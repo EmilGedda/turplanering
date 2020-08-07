@@ -1,11 +1,8 @@
 /* eslint-disable */
-
-
 import { JSDOM } from 'jsdom'
 
 // Setup JSDOM
 const dom = new JSDOM('', {
-    // Enable `requestAnimationFrame` which Preact uses internally.
     pretendToBeVisual: true,
 })
 
