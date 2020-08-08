@@ -102,7 +102,11 @@
             "prettier",
             "prettier/react",
             "prettier/@typescript-eslint"
-        ]
+        ],
+        "rules": { 
+                "react-hooks/rules-of-hooks": "error",
+                "react-hooks/exhaustive-deps": "warn"
+        }
     },
     "prettier": {
         "semi": false,
