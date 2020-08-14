@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
-import { Map, AttributionControl } from 'react-leaflet'
+import { Map, AttributionControl, LayersControl } from 'react-leaflet'
 import BufferedTileLayer from './map/BufferedTileLayer'
 import Searchbar from './Searchbar'
 
@@ -27,10 +27,17 @@ const App: React.FC = () => {
                 useFlyTo={true}
                 attributionControl={false}
             >
-                <BufferedTileLayer
-                    url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                    bufferRadius={2}
-                />
+                <LayersControl position="topright">
+                    <LayersControl.BaseLayer
+                        name="ArcGIS.Satellite"
+                        checked={true}
+                    >
+                        <BufferedTileLayer
+                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                            bufferRadius={2}
+                        />
+                    </LayersControl.BaseLayer>
+                </LayersControl>
                 <AttributionControl position="bottomright" prefix={false} />
             </Map>
         </div>

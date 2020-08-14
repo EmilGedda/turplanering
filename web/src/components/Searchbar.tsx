@@ -49,6 +49,7 @@ const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
     }
 
     const handleGPSError: PositionErrorCallback = (err: PositionError) => {
+        // TODO: update the gps icon to corresponding error
         console.log('GPS error:')
         console.log(err)
         stopTracking()
