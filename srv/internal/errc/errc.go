@@ -6,6 +6,10 @@ type UnmarshalError struct {
 	Obj  interface{}
 }
 
+func (e *UnmarshalError) Unwrap() error {
+	return e.Err
+}
+
 func (e *UnmarshalError) Causer() error {
 	return e.Err
 }

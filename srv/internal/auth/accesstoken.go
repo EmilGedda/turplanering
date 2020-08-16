@@ -82,6 +82,10 @@ func NewLantmateriet(opts ...LantmaterietOption) *Lantmateriet {
 }
 
 func (l *Lantmateriet) RevokeToken(token *Token) error {
+	if token == nil {
+		return errors.New("nil given to RevokeToken")
+	}
+
 	msg := strings.NewReader("token=" + token.AccessToken)
 	request, err := http.NewRequest("POST", l.url+"/revoke", msg)
 	if err != nil {
@@ -141,7 +145,12 @@ func (l *Lantmateriet) GetToken() (*Token, error) {
 	apiToken := &tokenResponse{}
 	err = json.Unmarshal(jsonData, apiToken)
 	if err != nil {
-		return nil, errors.Wrap(&errc.UnmarshalError{err, jsonData, apiToken}, "failed unmarshal on get token response")
+		err = &errc.UnmarshalError{Err: err, Json: jsonData, Obj: apiToken}
+		return nil, errors.Wrap(err, "failed unmarshal on get token response")
+	}
+
+	if apiToken.AccessToken == "" || apiToken.ExpiresIn == 0 {
+		return nil, errors.New("json received did not contain access_token and expires_in")
 	}
 
 	duration := time.Duration(apiToken.ExpiresIn) * time.Second
