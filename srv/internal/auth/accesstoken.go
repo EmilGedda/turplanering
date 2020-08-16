@@ -42,14 +42,10 @@ type Lantmateriet struct {
 	consumerKey string
 }
 
-const LantmaterietURL = "https://api.lantmateriet.se"
-
 type LantmaterietOption = func(l *Lantmateriet)
 
 func WithClient(client NetClient) LantmaterietOption {
-	return func(l *Lantmateriet) {
-		l.client = client
-	}
+	return func(l *Lantmateriet) { l.client = client }
 }
 
 func WithURL(url string) LantmaterietOption {
@@ -64,9 +60,13 @@ func WithConsumerKey(key string) LantmaterietOption {
 	return func(l *Lantmateriet) { l.consumerKey = key }
 }
 
+const LantmaterietURL = "https://api.lantmateriet.se"
+
 func NewLantmateriet(opts ...LantmaterietOption) *Lantmateriet {
+	// Grab sandbox secrets from environment
 	vars := env.Vars().Lantmateriet
 
+	// Default construction
 	l := &Lantmateriet{
 		NewNetClient(),
 		LantmaterietURL,
@@ -122,27 +122,26 @@ type tokenResponse struct {
 }
 
 func (l *Lantmateriet) GetToken() (*Token, error) {
-	tok := &Token{}
 	request, err := http.NewRequest("POST", l.url+"/token", strings.NewReader("grant_type=client_credentials"))
 	if err != nil {
-		return tok, errors.Wrap(err, "creating request failed")
+		return nil, errors.Wrap(err, "creating request failed")
 	}
 
 	request.SetBasicAuth(l.consumerID, l.consumerKey)
 	response, err := l.client.Do(request)
 	if err != nil {
-		return tok, errors.Wrap(err, "get token request failed")
+		return nil, errors.Wrap(err, "get token request failed")
 	}
 	defer response.Body.Close()
 	jsonData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return tok, errors.Wrap(err, "read body failed")
+		return nil, errors.Wrap(err, "read body failed")
 	}
 
 	apiToken := &tokenResponse{}
 	err = json.Unmarshal(jsonData, apiToken)
 	if err != nil {
-		return tok, errors.Wrap(&errc.UnmarshalError{err, jsonData, apiToken}, "failed unmarshal on get token response")
+		return nil, errors.Wrap(&errc.UnmarshalError{err, jsonData, apiToken}, "failed unmarshal on get token response")
 	}
 
 	duration := time.Duration(apiToken.ExpiresIn) * time.Second

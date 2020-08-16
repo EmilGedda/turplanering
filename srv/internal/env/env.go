@@ -6,6 +6,7 @@ import (
 )
 
 type Environment struct {
+	Env string `env:"TURPLANERING_ENVIRONMENT"`
 	*Lantmateriet
 }
 
@@ -17,7 +18,8 @@ type Lantmateriet struct {
 var (
 	once        sync.Once
 	environment Environment = Environment{
-		&Lantmateriet{},
+		Env: "testing",
+		Lantmateriet: &Lantmateriet{},
 	}
 )
 
@@ -26,6 +28,11 @@ func Vars() Environment {
 		err := lib.Parse(&environment)
 		if err != nil {
 			panic("error loading env")
+		}
+
+		// prevent using secrets from environment other than for testing
+		if environment.Env != "testing" {
+			environment.Lantmateriet = &Lantmateriet{}
 		}
 	})
 	return environment
