@@ -115,9 +115,7 @@ func (l *Lantmateriet) RevokeToken(token *Token) error {
 }
 
 func (l *Lantmateriet) RefreshToken(token *Token) (*Token, error) {
-	if l.RevokeToken(token) != nil {
-		// log
-	}
+	_ = l.RevokeToken(token)
 	return l.GetToken()
 }
 

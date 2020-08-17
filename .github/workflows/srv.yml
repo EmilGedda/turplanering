@@ -15,6 +15,7 @@ jobs:
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v1.2.1
       with:
+        version: v1.30
         working-directory: srv
     - run: |
         set -e

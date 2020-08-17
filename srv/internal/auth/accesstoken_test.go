@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -31,15 +30,6 @@ type mockClient struct {
 	err error
 }
 
-func printToken(t *Token) {
-	fmt.Printf(
-		"Token{\n  AccessToken:\t%s\n  ExpiresIn:\t%v\n  ExpiresAt\t%s\n}\n",
-		t.AccessToken,
-		t.ExpiresIn.Seconds(),
-		t.ExpiresAt.Format(time.UnixDate),
-	)
-}
-
 func stringReader(s string) io.ReadCloser {
 	return ioutil.NopCloser(strings.NewReader(s))
 }
@@ -50,23 +40,19 @@ func (client *mockClient) Do(req *http.Request) (*http.Response, error) {
 }
 
 var (
-	errorResponse http.Response = http.Response{
-		Status:     "500 Internal Server Error",
-		StatusCode: 500,
-	}
 	emptyResponse http.Response = http.Response{
 		Status:     "200 OK",
 		StatusCode: 200,
 		Body:       ioutil.NopCloser(strings.NewReader("")),
 	}
-	errReader reader = reader{err: fmt.Errorf("read error")}
+	errReader reader = reader{err: errors.New("read error")}
 )
 
 func TestGetToken(t *testing.T) {
 
 	empty := emptyResponse
 	mock := &mockClient{
-		err: fmt.Errorf("connection failure"),
+		err: errors.New("connection failure"),
 		res: &empty,
 	}
 
@@ -113,7 +99,7 @@ func TestRevokeToken(t *testing.T) {
 	}
 
 	mock := &mockClient{
-		err: fmt.Errorf("connection failure"),
+		err: errors.New("connection failure"),
 		res: &empty,
 	}
 
@@ -149,7 +135,7 @@ func TestRefreshToken(t *testing.T) {
 	}
 
 	mock := &mockClient{
-		err: fmt.Errorf("connection failure"),
+		err: errors.New("connection failure"),
 		res: &empty,
 	}
 
