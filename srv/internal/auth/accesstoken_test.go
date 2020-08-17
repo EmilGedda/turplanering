@@ -10,9 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EmilGedda/turplanering/srv/internal/errc"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/EmilGedda/turplanering/srv/internal/errc"
 )
 
 type reader struct {

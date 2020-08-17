@@ -4,19 +4,21 @@ package auth
 
 import (
 	"encoding/json"
-	"github.com/EmilGedda/turplanering/srv/internal/env"
-	"github.com/EmilGedda/turplanering/srv/internal/errc"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/EmilGedda/turplanering/srv/internal/env"
+	"github.com/EmilGedda/turplanering/srv/internal/errc"
 )
 
 type Token struct {
-	AccessToken string
-	ExpiresAt   time.Time
-	ExpiresIn   time.Duration
+	AccessToken string        `json:"access_token"`
+	ExpiresAt   time.Time     `json:"expires_at"`
+	ExpiresIn   time.Duration `json:"expires_in"`
 }
 
 type TokenService interface {
@@ -98,6 +100,7 @@ func (l *Lantmateriet) RevokeToken(token *Token) error {
 		return errors.Wrap(err, "revoke token request failed")
 	}
 	defer response.Body.Close()
+
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return errors.Wrap(err, "read body failed")
@@ -137,6 +140,7 @@ func (l *Lantmateriet) GetToken() (*Token, error) {
 		return nil, errors.Wrap(err, "get token request failed")
 	}
 	defer response.Body.Close()
+
 	jsonData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "read body failed")

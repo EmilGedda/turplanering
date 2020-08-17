@@ -1,8 +1,9 @@
 package env
 
 import (
-	lib "github.com/caarlos0/env"
 	"sync"
+
+	lib "github.com/caarlos0/env"
 )
 
 type Environment struct {
@@ -18,7 +19,7 @@ type Lantmateriet struct {
 var (
 	once        sync.Once
 	environment Environment = Environment{
-		Env: "testing",
+		Env:          "testing",
 		Lantmateriet: &Lantmateriet{},
 	}
 )
