@@ -6,30 +6,34 @@ defaults:
     working-directory: srv
 
 jobs:
-    tests:
-        name: Tests
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v2
-        - uses: actions/setup-go@v2
-        - run: |
-            set -e
-            echo "" > coverage.txt
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v1.2.1
+      with:
+        working-directory: srv
+    - run: |
+        set -e
+        echo "" > coverage.txt
 
-            for tag in "" "-tags integration"; do
-                for d in $(go list ./... | grep -v vendor); do
-                    go test -race -coverprofile=profile.out -covermode=atomic $d $tag
-                    if [ -f profile.out ]; then
-                        cat profile.out >> coverage.txt
-                        rm profile.out
-                    fi
-                done
+        for tag in "" "-tags integration"; do
+            for d in $(go list ./... | grep -v vendor); do
+                go test -race -coverprofile=profile.out -covermode=atomic $d $tag
+                if [ -f profile.out ]; then
+                    cat profile.out >> coverage.txt
+                    rm profile.out
+                fi
             done
-          env:
-            LANTMATERIET_CONSUMERID: ${{ secrets.LANTMATERIET_CONSUMERID }}
-            LANTMATERIET_CONSUMERKEY: ${{ secrets.LANTMATERIET_CONSUMERKEY }}
-        - uses: codecov/codecov-action@v1
-          with:
-              token: ${{ secrets.CODECOV_TOKEN }}
-              file: ./srv/coverage.txt
-              fail_ci_if_error: true
+        done
+      env:
+        LANTMATERIET_CONSUMERID: ${{ secrets.LANTMATERIET_CONSUMERID }}
+        LANTMATERIET_CONSUMERKEY: ${{ secrets.LANTMATERIET_CONSUMERKEY }}
+    - uses: codecov/codecov-action@v1
+      with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./srv/coverage.txt
+          fail_ci_if_error: true
