@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/EmilGedda/turplanering/srv/internal/api"
@@ -23,7 +24,15 @@ func main() {
 		api.WithTokenService(tokenService),
 	)
 
-	r.HandleFunc("/token", routes.GetTokenHandler).Methods(http.MethodGet, http.MethodHead, http.MethodOptions)
+	r.Use(
+		handlers.RecoveryHandler(),
+		handlers.CompressHandler,
+		handlers.CORS(
+			handlers.AllowedOrigins([]string{"*"}),
+		),
+	)
+
+	r.HandleFunc("/token", routes.GetTokenHandler).Methods(http.MethodGet)
 	r.HandleFunc("/token", routes.RevokeTokenHandler).Methods(http.MethodDelete)
 	r.HandleFunc("/token", routes.RefreshTokenHandler).Methods(http.MethodPut)
 

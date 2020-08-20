@@ -1,10 +1,21 @@
 import React from 'react'
 import { useState } from 'react'
-import { Map, AttributionControl, LayersControl } from 'react-leaflet'
-import BufferedTileLayer from './map/BufferedTileLayer'
 import Searchbar from './Searchbar'
+import TrailMap from './map/TrailMap'
 
-const App: React.FC = () => {
+type Environment = {
+    apiURL: string
+    environment: string
+}
+
+type Props = {
+    env: Environment
+}
+
+const App: React.FC<Props> = (props: Props) => {
+
+    React.useEffect(() => console.log("Running in " + props.env.environment))
+
     const [viewport, setViewport] = useState({
         center: [59.334591, 18.06324] as [number, number],
         zoom: 8,
@@ -21,27 +32,10 @@ const App: React.FC = () => {
     return (
         <div>
             <Searchbar onGPSTrack={centerToGPS} />
-            <Map
-                id="trailmap"
-                viewport={viewport}
-                useFlyTo={true}
-                attributionControl={false}
-            >
-                <LayersControl position="topright">
-                    <LayersControl.BaseLayer
-                        name="ArcGIS.Satellite"
-                        checked={true}
-                    >
-                        <BufferedTileLayer
-                            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                            bufferRadius={2}
-                        />
-                    </LayersControl.BaseLayer>
-                </LayersControl>
-                <AttributionControl position="bottomright" prefix={false} />
-            </Map>
+            <TrailMap id="trailmap" viewport={viewport} />
         </div>
     )
 }
 
-export default App
+export { App }
+export type { Props as AppProps, Environment }
