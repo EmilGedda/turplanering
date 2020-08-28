@@ -7,20 +7,20 @@ import InputBase from '@material-ui/core/InputBase'
 import Paper from '@material-ui/core/Paper'
 
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import AddCircleIcon from '@material-ui/icons/AddCircle'
 import GpsFixedIcon from '@material-ui/icons/GpsFixed'
 import GpsNotFixedIcon from '@material-ui/icons/GpsNotFixed'
-import HelpIcon from '@material-ui/icons/Help'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 
-const useStyles = makeStyles((theme) => ({
-    root: {
+const searchbarCSS = makeStyles((theme) => ({
+    searchbar: {
         padding: '2px 4px',
-        margin: 90,
         display: 'flex',
         alignItems: 'center',
-        width: 600,
+        width: '95%',
+        margin: '0 auto',
+        marginTop: '15px',
+        maxWidth: '800px',
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 type Props = { onGPSTrack: PositionCallback }
 
 const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
-    const classes = useStyles(),
+    const classes = searchbarCSS(),
         [watchID, setWatchID] = useState(0),
         [isTracking, setIsTracking] = useState(false), // TODO: switch to enum
         gps = navigator.geolocation
@@ -65,10 +65,7 @@ const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
     }
 
     return (
-        <Paper component="form" className={classes.root} elevation={5}>
-            <IconButton className={classes.iconButton}>
-                <HelpIcon />
-            </IconButton>
+        <Paper component="form" className={classes.searchbar} elevation={5}>
             <IconButton className={classes.iconButton}>
                 <AccountCircleIcon />
             </IconButton>
@@ -84,9 +81,6 @@ const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
                 onClick={isTracking ? stopTracking : watchGPS}
             >
                 {isTracking ? <GpsFixedIcon /> : <GpsNotFixedIcon />}
-            </IconButton>
-            <IconButton className={classes.iconButton}>
-                <AddCircleIcon />
             </IconButton>
         </Paper>
     )

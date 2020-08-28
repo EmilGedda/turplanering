@@ -15,7 +15,7 @@ type Props = Omit<MapProps, 'children'> & { token: string; children?: Children }
 const TrailMap: React.FC<Props> = (props: Props) => {
     return (
         <Map {...props} useFlyTo={true} attributionControl={false}>
-            <LayersControl position="topright">
+            <LayersControl position="bottomleft">
                 <LayersControl.BaseLayer
                     name="Lantmäteriet Webbkarta"
                     checked={true}

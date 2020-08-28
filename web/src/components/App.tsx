@@ -2,6 +2,9 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import Searchbar from './Searchbar'
 import TrailMap from './map/TrailMap'
+import { Fab } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
+import { makeStyles } from '@material-ui/core/styles'
 
 type Environment = {
     apiURL: string
@@ -12,32 +15,27 @@ type Props = {
     env: Environment
 }
 
-// type Token = {
-//     access_token: string
-//     expires_in: number
-//     expires_at: string
-// }
-//
-// const useToken = () => {
-//     const [token, setToken] = useState('')
-//
-//     useEffect(() => {
-//         fetch('http://localhost:8080/token') // TODO: useEnv
-//             .then((res) => res.json() as Promise<Token>)
-//             .then(
-//                 (result) => {
-//                     setToken(result.access_token)
-//                     console.log(result)
-//                     setTimeout(useToken, result.expires_in / 1e6 - 1e3) // TODO: a bit more typesafe timing
-//                 },
-//                 (error) => console.log(error), // TODO: better error handling
-//             )
-//     })
-//     return token
-// }
+const appStyles = makeStyles((theme) => ({
+    map: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        height: '100vh',
+        width: '100vw',
+        zIndex: -1,
+    },
+    add: {
+        margin: theme.spacing(4),
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+    },
+}))
 
 const App: React.FC<Props> = (props: Props) => {
     useEffect(() => console.log('Running in ' + props.env.environment))
+
+    const styles = appStyles()
 
     const token = '' // await fetch('http://localhost:8080/token').then((res) => res.json() as Promise<Token>)
 
@@ -57,7 +55,14 @@ const App: React.FC<Props> = (props: Props) => {
     return (
         <div>
             <Searchbar onGPSTrack={centerToGPS} />
-            <TrailMap id="trailmap" viewport={viewport} token={token} />
+            <Fab className={styles.add} color="primary">
+                <AddIcon />
+            </Fab>
+            <TrailMap
+                className={styles.map}
+                viewport={viewport}
+                token={token}
+            />
         </div>
     )
 }
