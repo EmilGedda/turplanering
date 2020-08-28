@@ -1,1 +1,0 @@
-{"mappings":"AAAA,KACA,QACA,CAEA,UACA,iBAAA,CACA,KAAA,CACA,OAAA,CACA,YAAA,CACA,WAAA,CACA,UACA","sources":["./src/index.css"],"sourcesContent":["body {\n   margin: 0px;\n}\n\n#trailmap {\n   position: absolute;\n   top: 0;\n   right: 0;\n   height: 100vh;\n   width: 100vw;\n   z-index: -1;\n}\n"],"names":[],"version":3,"file":"index.d9a2f63a.css.map"}
