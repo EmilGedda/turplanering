@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Searchbar from './Searchbar'
 import TrailMap from './map/TrailMap'
 
@@ -12,9 +12,34 @@ type Props = {
     env: Environment
 }
 
-const App: React.FC<Props> = (props: Props) => {
+// type Token = {
+//     access_token: string
+//     expires_in: number
+//     expires_at: string
+// }
+//
+// const useToken = () => {
+//     const [token, setToken] = useState('')
+//
+//     useEffect(() => {
+//         fetch('http://localhost:8080/token') // TODO: useEnv
+//             .then((res) => res.json() as Promise<Token>)
+//             .then(
+//                 (result) => {
+//                     setToken(result.access_token)
+//                     console.log(result)
+//                     setTimeout(useToken, result.expires_in / 1e6 - 1e3) // TODO: a bit more typesafe timing
+//                 },
+//                 (error) => console.log(error), // TODO: better error handling
+//             )
+//     })
+//     return token
+// }
 
-    React.useEffect(() => console.log("Running in " + props.env.environment))
+const App: React.FC<Props> = (props: Props) => {
+    useEffect(() => console.log('Running in ' + props.env.environment))
+
+    const token = '' // await fetch('http://localhost:8080/token').then((res) => res.json() as Promise<Token>)
 
     const [viewport, setViewport] = useState({
         center: [59.334591, 18.06324] as [number, number],
@@ -32,7 +57,7 @@ const App: React.FC<Props> = (props: Props) => {
     return (
         <div>
             <Searchbar onGPSTrack={centerToGPS} />
-            <TrailMap id="trailmap" viewport={viewport} />
+            <TrailMap id="trailmap" viewport={viewport} token={token} />
         </div>
     )
 }
