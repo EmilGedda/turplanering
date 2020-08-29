@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import GpsFixedIcon from '@material-ui/icons/GpsFixed'
 import GpsNotFixedIcon from '@material-ui/icons/GpsNotFixed'
+import GpsOffIcon from '@material-ui/icons/GpsOff'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 
@@ -43,29 +44,65 @@ const searchbarCSS = makeStyles((theme) => ({
 }))
 
 type Props = { onGPSTrack: PositionCallback }
+type GPSProps = { status: GPSStatus; onClick: () => void; className: string }
 
-const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
-    const classes = searchbarCSS(),
+enum GPSStatus {
+    Disabled,
+    Tracking,
+    Inactive,
+}
+
+const GPSButton: FC<GPSProps> = (props: GPSProps) => {
+    const { status, ...args } = props
+    switch (status) {
+        case GPSStatus.Inactive:
+            return (
+                <IconButton {...args}>
+                    <GpsNotFixedIcon />
+                </IconButton>
+            )
+        case GPSStatus.Tracking:
+            return (
+                <IconButton {...args} color="primary">
+                    <GpsFixedIcon />
+                </IconButton>
+            )
+        case GPSStatus.Disabled:
+            return (
+                <IconButton {...args} color="secondary">
+                    <GpsOffIcon />
+                </IconButton>
+            )
+    }
+}
+
+const Searchbar: FC<Props> = (props: Props) => {
+    const { onGPSTrack } = props,
+        classes = searchbarCSS(),
         [watchID, setWatchID] = useState(0),
-        [isTracking, setIsTracking] = useState(false), // TODO: switch to enum
+        [gpsStatus, setGPSStatus] = useState(GPSStatus.Inactive),
         gps = navigator.geolocation
 
     const stopTracking = () => {
-        setIsTracking(false)
+        setGPSStatus(GPSStatus.Inactive)
         gps.clearWatch(watchID)
-    }
-
-    const handleGPSError: PositionErrorCallback = (err: PositionError) => {
-        // TODO: update the gps icon to corresponding error
-        console.log('GPS error:')
-        alert(err.code)
-        stopTracking()
     }
 
     const watchGPS = () => {
         const opts = { enableHighAccuracy: true }
-        setIsTracking(true)
-        setWatchID(gps.watchPosition(onGPSTrack, handleGPSError, opts))
+        setWatchID(
+            gps.watchPosition(
+                (coords) => {
+                    setGPSStatus(GPSStatus.Tracking)
+                    onGPSTrack(coords)
+                },
+                () => {
+                    setGPSStatus(GPSStatus.Disabled)
+                    gps.clearWatch(watchID)
+                },
+                opts,
+            ),
+        )
     }
 
     return (
@@ -79,13 +116,13 @@ const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
                 <SearchIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" />
-            <IconButton
-                color={isTracking ? 'primary' : undefined}
+            <GPSButton
+                status={gps ? gpsStatus : GPSStatus.Disabled}
                 className={classes.iconButton}
-                onClick={isTracking ? stopTracking : watchGPS}
-            >
-                {isTracking ? <GpsFixedIcon /> : <GpsNotFixedIcon />}
-            </IconButton>
+                onClick={
+                    gpsStatus == GPSStatus.Tracking ? stopTracking : watchGPS
+                }
+            />
         </Paper>
     )
 }
