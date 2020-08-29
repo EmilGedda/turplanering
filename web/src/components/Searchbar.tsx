@@ -14,13 +14,20 @@ import SearchIcon from '@material-ui/icons/Search'
 
 const searchbarCSS = makeStyles((theme) => ({
     searchbar: {
+        position: 'relative',
         padding: '2px 4px',
         display: 'flex',
         alignItems: 'center',
         width: '95%',
         margin: '0 auto',
-        marginTop: '15px',
+        [theme.breakpoints.down('sm')]: {
+            marginTop: '5px',
+        },
+        [theme.breakpoints.up('sm')]: {
+            marginTop: '15px',
+        },
         maxWidth: '800px',
+        zIndex: 1000,
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -51,17 +58,14 @@ const Searchbar: FC<Props> = ({ onGPSTrack }: Props) => {
     const handleGPSError: PositionErrorCallback = (err: PositionError) => {
         // TODO: update the gps icon to corresponding error
         console.log('GPS error:')
-        console.log(err)
+        alert(err.code)
         stopTracking()
     }
 
     const watchGPS = () => {
+        const opts = { enableHighAccuracy: true }
         setIsTracking(true)
-        setWatchID(
-            gps.watchPosition(onGPSTrack, handleGPSError, {
-                enableHighAccuracy: true,
-            }),
-        )
+        setWatchID(gps.watchPosition(onGPSTrack, handleGPSError, opts))
     }
 
     return (

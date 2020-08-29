@@ -5,17 +5,26 @@ import {
     AttributionControl,
     LayersControl,
     Children,
+    ScaleControl,
 } from 'react-leaflet'
-import BufferedTileLayer from './BufferedTileLayer'
 import BufferedWMSLayer from './BufferedWMSTileLayer'
 
 // Children optional, not required
-type Props = Omit<MapProps, 'children'> & { token: string; children?: Children }
+type Props = Omit<MapProps, 'children'> & {
+    hasTouch: boolean
+    children?: Children
+}
 
 const TrailMap: React.FC<Props> = (props: Props) => {
     return (
-        <Map {...props} useFlyTo={true} attributionControl={false}>
-            <LayersControl position="bottomleft">
+        <Map
+            {...props}
+            useFlyTo={true}
+            attributionControl={false}
+            zoomControl={!props.hasTouch}
+            zoomSnap={0}
+        >
+            <LayersControl position="topright">
                 <LayersControl.BaseLayer
                     name="Lantmäteriet Webbkarta"
                     checked={true}
@@ -25,14 +34,8 @@ const TrailMap: React.FC<Props> = (props: Props) => {
                         layers="topowebbkartan"
                     />
                 </LayersControl.BaseLayer>
-                <LayersControl.BaseLayer name="Lantmäteriet WMTS">
-                    <BufferedTileLayer
-                        url={`https://api.lantmateriet.se/open/topowebb-ccby/v1/wmts/token/${props.token}/1.0.0/topowebb/default/3857/{z}/{y}/{x}.png`}
-                        bufferRadius={2}
-                        maxZoom={15}
-                    />
-                </LayersControl.BaseLayer>
             </LayersControl>
+            <ScaleControl position="bottomleft" />
             <AttributionControl position="bottomright" prefix={false} />
         </Map>
     )
