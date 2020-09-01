@@ -2,8 +2,8 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import Searchbar from './Searchbar'
 import TrailMap from './map/TrailMap'
-import { Fab } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
+// import { Fab } from '@material-ui/core'
+// import AddIcon from '@material-ui/icons/Add'
 import { makeStyles } from '@material-ui/core/styles'
 
 type Environment = {
@@ -43,9 +43,11 @@ const appStyles = makeStyles((theme) => ({
 const App: React.FC<Props> = (props: Props) => {
     useEffect(() => console.log('Running in ' + props.env.environment))
 
+
     const styles = appStyles()
 
-    const [viewport, setViewport] = useState({
+    const [showBar, setShowBar] = useState(false),
+          [viewport, setViewport] = useState({
         center: [59.334591, 18.06324] as [number, number],
         zoom: 8,
     })
@@ -58,6 +60,15 @@ const App: React.FC<Props> = (props: Props) => {
         })
     }
 
+    const delay = (f: TimerHandler, ms: number, ...args: any[]) => {
+        useEffect(() => {
+            const timeout = setTimeout(f, ms, args)
+            return () => clearTimeout(timeout)
+        }, [])
+    }
+
+    delay(setShowBar, 500, true)
+
     return (
         <div>
             <TrailMap
@@ -65,10 +76,12 @@ const App: React.FC<Props> = (props: Props) => {
                 viewport={viewport}
                 hasTouch={props.env.browser.hasTouch}
             />
-            <Searchbar onGPSTrack={flyToPosition} />
+                    <Searchbar onGPSTrack={flyToPosition} shown={showBar} />
+            {/*
             <Fab className={styles.add} color="primary">
                 <AddIcon />
             </Fab>
+            */}
         </div>
     )
 }

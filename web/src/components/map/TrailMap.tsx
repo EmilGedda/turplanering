@@ -32,6 +32,7 @@ const TrailMap: React.FC<Props> = (props: Props) => {
                     <BufferedWMSLayer
                         url="https://minkarta.lantmateriet.se/map/topowebb/"
                         layers="topowebbkartan"
+                        onload={props.onload}
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
