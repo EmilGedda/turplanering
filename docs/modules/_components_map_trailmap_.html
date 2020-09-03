@@ -71,13 +71,20 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_map_trailmap_.html#gpsmarkerprops" class="tsd-kind-icon">GPSMarker<wbr>Props</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_map_trailmap_.html#props" class="tsd-kind-icon">Props</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module"><a href="_components_map_trailmap_.html#trailmap" class="tsd-kind-icon">Trail<wbr>Map</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_components_map_trailmap_.html#trailmap" class="tsd-kind-icon">Trail<wbr>Map</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_components_map_trailmap_.html#gpsmarker" class="tsd-kind-icon">GPSMarker</a></li>
 							</ul>
 						</section>
 					</div>
@@ -86,12 +93,43 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+					<a name="gpsmarkerprops" class="tsd-anchor"></a>
+					<h3>GPSMarker<wbr>Props</h3>
+					<div class="tsd-signature tsd-kind-icon">GPSMarker<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Coordinates</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/680dfaf/web/src/components/map/TrailMap.tsx#L21">src/components/map/TrailMap.tsx:21</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Coordinates</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 					<a name="props" class="tsd-anchor"></a>
 					<h3>Props</h3>
 					<div class="tsd-signature tsd-kind-icon">Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">MapProps</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"children"</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>children<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Children</span><span class="tsd-signature-symbol">; </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/dd49cc3/web/src/components/map/TrailMap.tsx#L13">src/components/map/TrailMap.tsx:13</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/680dfaf/web/src/components/map/TrailMap.tsx#L16">src/components/map/TrailMap.tsx:16</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module">
+					<a name="trailmap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Trail<wbr>Map</h3>
+					<div class="tsd-signature tsd-kind-icon">Trail<wbr>Map<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ForwardRefExoticComponent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">MapProps</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"zoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"padding"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"center"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"style"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"animate"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"className"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"id"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onload"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"layers"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"crs"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"minZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"maxZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"bounds"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"duration"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"noMoveStart"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"boundsOptions"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"useFlyTo"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"viewport"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"whenReady"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onViewportChange"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onViewportChanged"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onclick"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ondblclick"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmousedown"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmouseup"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmouseover"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmouseout"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmousemove"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"oncontextmenu"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onfocus"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onblur"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onpreclick"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onunload"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onviewreset"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmove"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmovestart"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onmoveend"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ondragstart"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ondrag"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ondragend"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onzoomstart"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onzoomend"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onzoomlevelschange"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onresize"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onautopanstart"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onlayeradd"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onlayerremove"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onbaselayerchange"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onoverlayadd"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onoverlayremove"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onlocationfound"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onlocationerror"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onpopupopen"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"onpopupclose"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"preferCanvas"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"attributionControl"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"zoomControl"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"closePopupOnClick"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"zoomSnap"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"zoomDelta"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"trackResize"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"boxZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"doubleClickZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"dragging"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"maxBounds"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"renderer"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"fadeAnimation"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"markerZoomAnimation"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"transform3DLimit"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"zoomAnimation"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"zoomAnimationThreshold"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"inertia"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"inertiaDeceleration"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"inertiaMaxSpeed"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"easeLinearity"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"worldCopyJump"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"maxBoundsViscosity"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"keyboard"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"keyboardPanDelta"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"scrollWheelZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wheelDebounceTime"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wheelPxPerZoomLevel"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"tap"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"tapTolerance"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"touchZoom"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"bounceAtZoomLimits"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"watch"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"setView"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"timeout"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"maximumAge"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"enableHighAccuracy"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"paddingTopLeft"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"paddingBottomRight"</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-symbol">{ </span>children<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Children</span><span class="tsd-signature-symbol">; </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">RefAttributes</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">MapProps</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = React.forwardRef&lt;Map, Props&gt;((props: Props, ref) &#x3D;&gt; {const { children, ...baseProps } &#x3D; propsreturn (&lt;Map{...baseProps}useFlyTo&#x3D;{true}attributionControl&#x3D;{false}zoomControl&#x3D;{!props.hasTouch}zoomSnap&#x3D;{0}ref&#x3D;{ref}&gt;&lt;LayersControl position&#x3D;&quot;topright&quot;&gt;&lt;LayersControl.BaseLayername&#x3D;&quot;Lantmäteriet Webbkarta&quot;checked&#x3D;{true}&gt;&lt;BufferedWMSLayerurl&#x3D;&quot;https://minkarta.lantmateriet.se/map/topowebb/&quot;layers&#x3D;&quot;topowebbkartan&quot;onload&#x3D;{props.onload}/&gt;&lt;/LayersControl.BaseLayer&gt;&lt;/LayersControl&gt;{children}&lt;ScaleControl position&#x3D;&quot;bottomleft&quot; /&gt;&lt;AttributionControl position&#x3D;&quot;bottomright&quot; prefix&#x3D;{false} /&gt;&lt;/Map&gt;)})</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/680dfaf/web/src/components/map/TrailMap.tsx#L37">src/components/map/TrailMap.tsx:37</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -99,22 +137,27 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
-					<a name="trailmap" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> Trail<wbr>Map</h3>
+					<a name="gpsmarker" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> GPSMarker</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">Trail<wbr>Map<span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">: </span><a href="_components_map_trailmap_.html#props" class="tsd-signature-type">Props</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Element</span></li>
+						<li class="tsd-signature tsd-kind-icon">GPSMarker<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Coordinates</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Element</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/dd49cc3/web/src/components/map/TrailMap.tsx#L18">src/components/map/TrailMap.tsx:18</a></li>
+									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/680dfaf/web/src/components/map/TrailMap.tsx#L22">src/components/map/TrailMap.tsx:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>props: <a href="_components_map_trailmap_.html#props" class="tsd-signature-type">Props</a></h5>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Coordinates</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Coordinates</span></h5>
+										</li>
+									</ul>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Element</span></h4>
@@ -155,10 +198,16 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_map_trailmap_.html#gpsmarkerprops" class="tsd-kind-icon">GPSMarker<wbr>Props</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_components_map_trailmap_.html#props" class="tsd-kind-icon">Props</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
 						<a href="_components_map_trailmap_.html#trailmap" class="tsd-kind-icon">Trail<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_components_map_trailmap_.html#gpsmarker" class="tsd-kind-icon">GPSMarker</a>
 					</li>
 				</ul>
 			</nav>
@@ -173,12 +222,13 @@
 				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
 				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 			</ul>
 		</div>
 	</div>
