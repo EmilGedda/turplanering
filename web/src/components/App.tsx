@@ -1,9 +1,8 @@
-import React from 'react'
-import { useState, useEffect, createRef } from 'react'
+import React, { useState, useEffect, createRef } from 'react'
+import { FeatureGroup, Map, Viewport } from 'react-leaflet'
+import { makeStyles } from '@material-ui/core/styles'
 import Searchbar from './Searchbar'
 import { TrailMap, GPSMarker } from './map/TrailMap'
-import { makeStyles } from '@material-ui/core/styles'
-import { FeatureGroup, Map, Viewport } from 'react-leaflet'
 
 type Environment = {
     apiURL: string

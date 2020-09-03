@@ -1,20 +1,20 @@
-import React from 'react'
-import { useState, FC, useEffect } from 'react'
-import { makeStyles } from '@material-ui/core/styles'
-
-import Slide from '@material-ui/core/Slide'
-import Divider from '@material-ui/core/Divider'
-import InputBase from '@material-ui/core/InputBase'
-import Paper from '@material-ui/core/Paper'
-import IconButton from '@material-ui/core/IconButton'
-
-import AccountCircleIcon from '@material-ui/icons/AccountCircle'
-import GpsFixedIcon from '@material-ui/icons/GpsFixed'
-import GpsNotFixedIcon from '@material-ui/icons/GpsNotFixed'
-import GpsOffIcon from '@material-ui/icons/GpsOff'
-import SearchIcon from '@material-ui/icons/Search'
-
-import type { IconButtonProps } from '@material-ui/core/IconButton'
+import React, { useState, FC, useEffect } from 'react'
+import {
+    AccountCircle,
+    GpsFixed,
+    GpsNotFixed,
+    GpsOff,
+    Search,
+} from '@material-ui/icons'
+import {
+    Slide,
+    Divider,
+    InputBase,
+    Paper,
+    IconButton,
+    IconButtonProps,
+    makeStyles,
+} from '@material-ui/core'
 
 const searchbarCSS = makeStyles((theme) => ({
     searchbar: {
@@ -60,25 +60,25 @@ const GPSButton: FC<GPSProps> = ({ status, ...props }: GPSProps) => {
         case GPSStatus.Inactive:
             return (
                 <IconButton {...props}>
-                    <GpsNotFixedIcon />
+                    <GpsNotFixed />
                 </IconButton>
             )
         case GPSStatus.Loading:
             return (
                 <IconButton {...props} color="primary">
-                    <GpsNotFixedIcon />
+                    <GpsNotFixed />
                 </IconButton>
             )
         case GPSStatus.Tracking:
             return (
                 <IconButton {...props} color="primary">
-                    <GpsFixedIcon />
+                    <GpsFixed />
                 </IconButton>
             )
         case GPSStatus.Disabled:
             return (
                 <IconButton {...props} color="secondary">
-                    <GpsOffIcon />
+                    <GpsOff />
                 </IconButton>
             )
     }
@@ -128,12 +128,12 @@ const Searchbar: FC<Props> = (props: Props) => {
         <Slide direction="down" in={props.shown} mountOnEnter unmountOnExit>
             <Paper className={classes.searchbar} elevation={5}>
                 <IconButton className={classes.iconButton}>
-                    <AccountCircleIcon />
+                    <AccountCircle />
                 </IconButton>
                 <Divider className={classes.divider} orientation="vertical" />
                 <InputBase className={classes.input} placeholder="Sök" />
                 <IconButton type="submit" className={classes.iconButton}>
-                    <SearchIcon />
+                    <Search />
                 </IconButton>
                 <Divider className={classes.divider} orientation="vertical" />
                 <GPSButton
