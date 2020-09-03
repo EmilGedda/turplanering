@@ -2,8 +2,6 @@ import React from 'react'
 import { useState, useEffect, createRef } from 'react'
 import Searchbar from './Searchbar'
 import { TrailMap, GPSMarker } from './map/TrailMap'
-// import { Fab } from '@material-ui/core'
-// import AddIcon from '@material-ui/icons/Add'
 import { makeStyles } from '@material-ui/core/styles'
 import { FeatureGroup, Map, Viewport } from 'react-leaflet'
 
@@ -41,10 +39,6 @@ const appStyles = makeStyles((theme) => ({
     },
 }))
 
-type Ref<T> = {
-    current: null | T
-}
-
 const App: React.FC<Props> = (props: Props) => {
     useEffect(() => console.log('Running in ' + props.env.environment))
 
@@ -55,7 +49,7 @@ const App: React.FC<Props> = (props: Props) => {
 
     const [showBar, setShowBar] = useState(false)
     const [position, setPosition] = useState<Coordinates | undefined>(
-            undefined,
+            undefined
         ),
         [viewport, setViewPort] = useState<Viewport>({
             center: [59.334591, 18.06324],
@@ -69,8 +63,9 @@ const App: React.FC<Props> = (props: Props) => {
     }
 
     const flyToPosition: PositionCallback = ({ coords }) => {
-        const map = mapRef.current!.leafletElement
-        const group = groupRef.current!.leafletElement
+        if (!mapRef.current || !groupRef.current) return
+        const map = mapRef.current.leafletElement
+        const group = groupRef.current.leafletElement
         setPosition(coords)
         map.fitBounds(group.getBounds())
         const { lat, lng } = map.getCenter()
@@ -80,18 +75,10 @@ const App: React.FC<Props> = (props: Props) => {
         })
     }
 
-    const useDelay = (
-        f: (...args: any[]) => void,
-        ms: number,
-        ...args: any[]
-    ) => {
-        useEffect(() => {
-            const timeout = setTimeout(f, ms, ...args)
-            return () => clearTimeout(timeout)
-        }, [f, ms, args])
-    }
-
-    useDelay(setShowBar, 500, true)
+    useEffect(() => {
+        const timeout = setTimeout(setShowBar, 500, true)
+        return () => clearTimeout(timeout)
+    }, [])
 
     return (
         <div>

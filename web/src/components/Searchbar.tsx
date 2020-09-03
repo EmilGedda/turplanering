@@ -115,7 +115,7 @@ const Searchbar: FC<Props> = (props: Props) => {
                 props.onGPSLocate(coords)
             },
             disableGPS,
-            opts,
+            opts
         )
         setWatchID(gps.watchPosition(onGPSTrack, disableGPS, opts))
     }

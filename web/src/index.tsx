@@ -24,5 +24,5 @@ render(
     <React.StrictMode>
         <App env={getEnvironment()} />
     </React.StrictMode>,
-    document.getElementById('root') as HTMLElement,
+    document.getElementById('root') as HTMLElement
 )
