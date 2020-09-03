@@ -1,3 +1,4 @@
+import { LatLngTuple } from 'leaflet'
 import React from 'react'
 import {
     Map,
@@ -6,6 +7,8 @@ import {
     LayersControl,
     Children,
     ScaleControl,
+    Circle,
+    CircleMarker,
 } from 'react-leaflet'
 import BufferedWMSLayer from './BufferedWMSTileLayer'
 
@@ -15,14 +18,32 @@ type Props = Omit<MapProps, 'children'> & {
     children?: Children
 }
 
-const TrailMap: React.FC<Props> = (props: Props) => {
+type GPSMarkerProps = { pos: Coordinates }
+const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }: GPSMarkerProps) => {
+    const center: LatLngTuple = [pos.latitude, pos.longitude]
+    return (
+        <>
+            <Circle radius={pos.accuracy} center={center} />
+            <CircleMarker
+                radius={5}
+                center={center}
+                fillOpacity={1.0}
+                color="#0c31eb"
+            />
+        </>
+    )
+}
+
+const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
+    const { children, ...baseProps } = props
     return (
         <Map
-            {...props}
+            {...baseProps}
             useFlyTo={true}
             attributionControl={false}
             zoomControl={!props.hasTouch}
             zoomSnap={0}
+            ref={ref}
         >
             <LayersControl position="topright">
                 <LayersControl.BaseLayer
@@ -36,10 +57,13 @@ const TrailMap: React.FC<Props> = (props: Props) => {
                     />
                 </LayersControl.BaseLayer>
             </LayersControl>
+            {children}
             <ScaleControl position="bottomleft" />
             <AttributionControl position="bottomright" prefix={false} />
         </Map>
     )
-}
+})
 
-export default TrailMap
+TrailMap.displayName = 'TrailMap'
+
+export { TrailMap, GPSMarker }

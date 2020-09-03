@@ -1,10 +1,11 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createRef } from 'react'
 import Searchbar from './Searchbar'
-import TrailMap from './map/TrailMap'
+import { TrailMap, GPSMarker } from './map/TrailMap'
 // import { Fab } from '@material-ui/core'
 // import AddIcon from '@material-ui/icons/Add'
 import { makeStyles } from '@material-ui/core/styles'
+import { FeatureGroup, Map, Viewport } from 'react-leaflet'
 
 type Environment = {
     apiURL: string
@@ -40,34 +41,57 @@ const appStyles = makeStyles((theme) => ({
     },
 }))
 
+type Ref<T> = {
+    current: null | T
+}
+
 const App: React.FC<Props> = (props: Props) => {
     useEffect(() => console.log('Running in ' + props.env.environment))
 
-
     const styles = appStyles()
 
-    const [showBar, setShowBar] = useState(false),
-          [viewport, setViewport] = useState({
-        center: [59.334591, 18.06324] as [number, number],
-        zoom: 8,
-    })
+    const mapRef = createRef<Map>(),
+        groupRef = createRef<FeatureGroup>()
 
-    const flyToPosition: PositionCallback = (pos) => {
-        const { latitude, longitude } = pos.coords
-        setViewport({
-            center: [latitude, longitude],
-            zoom: 13, // TODO calculate this from accuracy in pos, and draw a circle
+    const [showBar, setShowBar] = useState(false)
+    const [position, setPosition] = useState<Coordinates | undefined>(
+            undefined,
+        ),
+        [viewport, setViewPort] = useState<Viewport>({
+            center: [59.334591, 18.06324],
+            zoom: 8,
+        })
+
+    const hideGPSMarker = () => setPosition(undefined)
+
+    const updatePosition: PositionCallback = ({ coords }) => {
+        setPosition(coords)
+    }
+
+    const flyToPosition: PositionCallback = ({ coords }) => {
+        const map = mapRef.current!.leafletElement
+        const group = groupRef.current!.leafletElement
+        setPosition(coords)
+        map.fitBounds(group.getBounds())
+        const { lat, lng } = map.getCenter()
+        setViewPort({
+            center: [lat, lng],
+            zoom: map.getZoom(),
         })
     }
 
-    const delay = (f: TimerHandler, ms: number, ...args: any[]) => {
+    const useDelay = (
+        f: (...args: any[]) => void,
+        ms: number,
+        ...args: any[]
+    ) => {
         useEffect(() => {
-            const timeout = setTimeout(f, ms, args)
+            const timeout = setTimeout(f, ms, ...args)
             return () => clearTimeout(timeout)
-        }, [])
+        }, [f, ms, args])
     }
 
-    delay(setShowBar, 500, true)
+    useDelay(setShowBar, 500, true)
 
     return (
         <div>
@@ -75,8 +99,18 @@ const App: React.FC<Props> = (props: Props) => {
                 className={styles.map}
                 viewport={viewport}
                 hasTouch={props.env.browser.hasTouch}
+                ref={mapRef}
+            >
+                <FeatureGroup ref={groupRef}>
+                    {position && <GPSMarker pos={position} />}
+                </FeatureGroup>
+            </TrailMap>
+            <Searchbar
+                shown={showBar}
+                onGPSLocate={flyToPosition}
+                onGPSTrack={updatePosition}
+                onGPSDeactivate={hideGPSMarker}
             />
-                    <Searchbar onGPSTrack={flyToPosition} shown={showBar} />
             {/*
             <Fab className={styles.add} color="primary">
                 <AddIcon />
