@@ -13,8 +13,8 @@ import {
     Paper,
     IconButton,
     IconButtonProps,
-    makeStyles,
 } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 
 const searchbarCSS = makeStyles((theme) => ({
     searchbar: {
