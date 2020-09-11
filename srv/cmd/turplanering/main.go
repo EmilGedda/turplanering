@@ -63,6 +63,11 @@ func main() {
 		handlers.CORS(
 			handlers.AllowedOrigins([]string{"https://emilgedda.github.io"}),
 		),
+		net.InjectResponseHeader(map[string][]string{
+			"Content-Security-Policy": {"none"},
+			"Content-Type":            {"application/json"},
+			"X-Content-Type-Options":  {"nosniff"},
+		}),
 		net.InjectLogger(&logger),
 		net.InjectRequestID,
 		net.LogRequest,
@@ -86,7 +91,6 @@ func main() {
 		r.HandleFunc(v.Route, v.Handler).
 			Name(v.Name).
 			Methods(v.Methods...)
-
 	}
 
 	logger.Info().

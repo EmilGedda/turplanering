@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/rs/zerolog"
@@ -106,5 +107,6 @@ func handlerError(w http.ResponseWriter, err error, logger *zerolog.Logger) {
 		out = string(data)
 	}
 
-	http.Error(w, out, code)
+	w.WriteHeader(code)
+	io.WriteString(w, out)
 }
