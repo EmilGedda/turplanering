@@ -3,11 +3,19 @@ package env
 import (
 	"sync"
 
-	lib "github.com/caarlos0/env"
+	lib "github.com/caarlos0/env/v6"
+)
+
+type RunningEnvironment string
+
+const (
+	Production  RunningEnvironment = "production"
+	Development RunningEnvironment = "development"
+	Testing     RunningEnvironment = "testing"
 )
 
 type Environment struct {
-	Env string `env:"TURPLANERING_ENVIRONMENT"`
+	Env RunningEnvironment `env:"TURPLANERING_ENVIRONMENT"`
 	*Lantmateriet
 }
 
@@ -19,7 +27,7 @@ type Lantmateriet struct {
 var (
 	once        sync.Once
 	environment Environment = Environment{
-		Env:          "testing",
+		Env:          Development,
 		Lantmateriet: &Lantmateriet{},
 	}
 )
@@ -31,9 +39,23 @@ func Vars() Environment {
 			panic("error loading env")
 		}
 
-		// prevent using secrets from environment other than for testing
-		if environment.Env != "testing" {
-			environment.Lantmateriet = &Lantmateriet{}
+		// validate the running env
+		switch environment.Env {
+		case Production:
+		case Development:
+		case Testing:
+		default:
+			environment.Env = Development
+		}
+
+		// TODO: validation should not be here
+		// create a config pkg which handles validation?
+		// read from file in prod, and file + env otherwise
+
+		// prevent using secrets from environment in production
+		l := environment.Lantmateriet
+		if environment.Env == Production && (l.ConsumerID != "" || l.ConsumerKey != "") {
+			panic("Lantmäteriet credentials provided in environment in production")
 		}
 	})
 	return environment

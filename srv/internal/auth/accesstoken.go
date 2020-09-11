@@ -11,7 +11,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/EmilGedda/turplanering/srv/internal/env"
 	"github.com/EmilGedda/turplanering/srv/internal/errc"
 )
 
@@ -64,28 +63,38 @@ func WithConsumerKey(key string) LantmaterietOption {
 
 const LantmaterietURL = "https://api.lantmateriet.se"
 
-func NewLantmateriet(opts ...LantmaterietOption) *Lantmateriet {
-	// Grab sandbox secrets from environment
-	vars := env.Vars().Lantmateriet
-
+func NewLantmateriet(opts ...LantmaterietOption) (*Lantmateriet, error) {
 	// Default construction
 	l := &Lantmateriet{
 		NewNetClient(),
 		LantmaterietURL,
-		vars.ConsumerID,
-		vars.ConsumerKey,
+		"",
+		"",
 	}
 
 	for _, opt := range opts {
 		opt(l)
 	}
 
-	return l
+	needs := []string{}
+
+	if l.consumerID == "" {
+		needs = append(needs, "ConsumerID")
+	}
+	if l.consumerKey == "" {
+		needs = append(needs, "ConsumerKey")
+	}
+
+	if len(needs) > 0 {
+		return nil, &errc.NotInitializedError{Module: "Lantmäteriet", Needs: needs}
+	}
+
+	return l, nil
 }
 
 func (l *Lantmateriet) RevokeToken(token *Token) error {
 	if token == nil {
-		return errors.New("nil given to RevokeToken")
+		return errors.New("nil given")
 	}
 
 	msg := strings.NewReader("token=" + token.AccessToken)
@@ -115,7 +124,10 @@ func (l *Lantmateriet) RevokeToken(token *Token) error {
 }
 
 func (l *Lantmateriet) RefreshToken(token *Token) (*Token, error) {
-	_ = l.RevokeToken(token)
+	err := l.RevokeToken(token)
+	if err != nil {
+		return nil, errors.Wrap(err, "revoke token")
+	}
 	return l.GetToken()
 }
 
