@@ -1,6 +1,9 @@
 package errc
 
-import "strings"
+import (
+	"encoding/json"
+	"strings"
+)
 
 type UnmarshalError struct {
 	Err  error
@@ -29,4 +32,29 @@ func (e *NotInitializedError) Error() string {
 	last := len(e.Needs) - 1
 	missing := strings.Join(e.Needs[:last], ", ") + " and " + e.Needs[last]
 	return e.Module + " is not initialized, missing " + missing
+}
+
+type WrappedError struct {
+	Err error
+	Msg string
+}
+
+func Wrap(err error, msg string) *WrappedError {
+	return &WrappedError{Err: err, Msg: msg}
+}
+
+func (e *WrappedError) Error() string {
+	return e.Msg + ": " + e.Err.Error()
+}
+
+func (e *WrappedError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(e.Err)
+}
+
+func (e *WrappedError) Unwrap() error {
+	return e.Err
+}
+
+func (e *WrappedError) Causer() error {
+	return e.Err
 }

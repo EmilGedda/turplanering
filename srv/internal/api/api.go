@@ -35,6 +35,7 @@ func WithTokenService(ts auth.TokenService, err error) APIOption {
 	}
 
 	return func(a *API) {
+		a.ts = ts
 		a.Endpoints = append(a.Endpoints, []Endpoint{
 			newRoute(http.MethodGet, "Get", a.GetTokenHandler),
 			newRoute(http.MethodPut, "Refresh", a.RefreshTokenHandler),

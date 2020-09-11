@@ -2,16 +2,19 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+
+	"github.com/EmilGedda/turplanering/srv/internal/auth"
+	"github.com/EmilGedda/turplanering/srv/internal/errc"
 )
 
 func ServiceUnvailableHandler(err error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := zerolog.Ctx(r.Context()).With().Str("handler", "service unavailable").Logger()
-		handlerError(w, err, http.StatusServiceUnavailable, &logger)
+		handlerError(w, err, &logger)
 	}
 }
 
@@ -20,21 +23,21 @@ func (a *API) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := a.ts.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token in refresh handler failed")
-		handlerError(w, errors.Wrap(err, "get token"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "get token"), &logger)
 		return
 	}
 
 	token, err = a.ts.RefreshToken(token)
 	if err != nil {
 		logger.Err(err).Msg("Refresh token failed")
-		handlerError(w, errors.Wrap(err, "refresh token"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "refresh token"), &logger)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(token)
 	if err != nil {
 		logger.Err(err).Msg("Unable to write token to response body")
-		handlerError(w, errors.Wrap(err, "json encode"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "json encode"), &logger)
 	}
 }
 
@@ -43,14 +46,14 @@ func (a *API) RevokeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := a.ts.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token failed")
-		handlerError(w, errors.Wrap(err, "get token"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "get token"), &logger)
 		return
 	}
 
 	err = a.ts.RevokeToken(token)
 	if err != nil {
 		logger.Err(err).Msg("Revoke token failed")
-		handlerError(w, errors.Wrap(err, "revoke token"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "revoke token"), &logger)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -61,18 +64,18 @@ func (a *API) GetTokenHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := a.ts.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token failed")
-		handlerError(w, errors.Wrap(err, "get token"), http.StatusInternalServerError, &logger)
+		handlerError(w, errc.Wrap(err, "get token"), &logger)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(token)
 	if err != nil {
 		logger.Err(err).Msg("Unable to write token to response body")
-		handlerError(w, err, http.StatusInternalServerError, &logger)
+		handlerError(w, err, &logger)
 	}
 }
 
-func handlerError(w http.ResponseWriter, err error, statusCode int, logger *zerolog.Logger) {
+func handlerError(w http.ResponseWriter, err error, logger *zerolog.Logger) {
 	type response struct {
 		StatusText string `json:"status_text"`
 		StatusCode int    `json:"status_code"`
@@ -80,9 +83,15 @@ func handlerError(w http.ResponseWriter, err error, statusCode int, logger *zero
 		ErrorStr   string `json:"error_string"`
 	}
 
+	code := http.StatusInternalServerError
+	var apiErr *auth.TokenErrResponse
+	if errors.As(err, &apiErr) {
+		code = http.StatusServiceUnavailable
+	}
+
 	res := response{
-		StatusText: http.StatusText(statusCode),
-		StatusCode: statusCode,
+		StatusText: http.StatusText(code),
+		StatusCode: code,
 		Error:      err,
 		ErrorStr:   err.Error(),
 	}
@@ -97,5 +106,5 @@ func handlerError(w http.ResponseWriter, err error, statusCode int, logger *zero
 		out = string(data)
 	}
 
-	http.Error(w, out, statusCode)
+	http.Error(w, out, code)
 }

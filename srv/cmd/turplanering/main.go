@@ -27,6 +27,8 @@ func main() {
 	var out io.Writer = os.Stdout
 
 	envVars := env.Vars()
+
+	// hide behind config interface
 	if envVars.Env == env.Development {
 		out = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
@@ -54,7 +56,9 @@ func main() {
 	r := mux.NewRouter()
 
 	r.Use(
-		handlers.RecoveryHandler(),
+		handlers.RecoveryHandler(
+			handlers.PrintRecoveryStack(envVars.Env == env.Development),
+		),
 		handlers.CompressHandler,
 		handlers.CORS(
 			handlers.AllowedOrigins([]string{"https://emilgedda.github.io"}),

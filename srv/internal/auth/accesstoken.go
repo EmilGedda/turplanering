@@ -100,19 +100,19 @@ func (l *Lantmateriet) RevokeToken(token *Token) error {
 	msg := strings.NewReader("token=" + token.AccessToken)
 	request, err := http.NewRequest("POST", l.url+"/revoke", msg)
 	if err != nil {
-		return errors.Wrap(err, "creating request failed")
+		return errc.Wrap(err, "creating request failed")
 	}
 
 	request.SetBasicAuth(l.consumerID, l.consumerKey)
 	response, err := l.client.Do(request)
 	if err != nil {
-		return errors.Wrap(err, "revoke token request failed")
+		return errc.Wrap(err, "revoke token request failed")
 	}
 	defer response.Body.Close()
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return errors.Wrap(err, "read body failed")
+		return errc.Wrap(err, "read body failed")
 	}
 
 	body := string(data)
@@ -126,7 +126,7 @@ func (l *Lantmateriet) RevokeToken(token *Token) error {
 func (l *Lantmateriet) RefreshToken(token *Token) (*Token, error) {
 	err := l.RevokeToken(token)
 	if err != nil {
-		return nil, errors.Wrap(err, "revoke token")
+		return nil, errc.Wrap(err, "revoke token")
 	}
 	return l.GetToken()
 }
@@ -138,29 +138,44 @@ type tokenResponse struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+type TokenErrResponse struct {
+	ErrorDescription *string `json:"error_description"`
+	ErrorType        *string `json:"error"`
+}
+
+func (t *TokenErrResponse) Error() string {
+	return "Lantmäteriet API returned error: " + *t.ErrorDescription
+}
+
 func (l *Lantmateriet) GetToken() (*Token, error) {
 	request, err := http.NewRequest("POST", l.url+"/token", strings.NewReader("grant_type=client_credentials"))
 	if err != nil {
-		return nil, errors.Wrap(err, "creating request failed")
+		return nil, errc.Wrap(err, "creating request failed")
 	}
 
 	request.SetBasicAuth(l.consumerID, l.consumerKey)
 	response, err := l.client.Do(request)
 	if err != nil {
-		return nil, errors.Wrap(err, "get token request failed")
+		return nil, errc.Wrap(err, "get token request failed")
 	}
 	defer response.Body.Close()
 
 	jsonData, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "read body failed")
+		return nil, errc.Wrap(err, "read body failed")
+	}
+
+	errResponse := TokenErrResponse{}
+	json.Unmarshal(jsonData, &errResponse)
+	if errResponse.ErrorType != nil || errResponse.ErrorDescription != nil {
+		return nil, &errResponse
 	}
 
 	apiToken := &tokenResponse{}
 	err = json.Unmarshal(jsonData, apiToken)
 	if err != nil {
 		err = &errc.UnmarshalError{Err: err, Json: jsonData, Obj: apiToken}
-		return nil, errors.Wrap(err, "failed unmarshal on get token response")
+		return nil, errc.Wrap(err, "failed unmarshal on get token response")
 	}
 
 	if apiToken.AccessToken == "" || apiToken.ExpiresIn == 0 {
