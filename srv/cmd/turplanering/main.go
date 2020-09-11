@@ -44,14 +44,23 @@ func main() {
 		Msg("Initializing Turplanering server")
 
 	creds := envVars.Lantmateriet
-	routes := api.NewAPI(
-		api.WithTokenService(
-			auth.NewLantmateriet(
-				auth.WithConsumerID(creds.ConsumerID),
-				auth.WithConsumerKey(creds.ConsumerKey),
-			),
-		),
+	routes := []*api.Endpoint{}
+
+	lantmateriet, err := auth.NewLantmateriet(
+		auth.WithConsumerID(creds.ConsumerID),
+		auth.WithConsumerKey(creds.ConsumerKey),
 	)
+
+	tokenRoutes := api.TokenAPIRoutes(lantmateriet)
+
+	if err != nil {
+		api.MarkUnavailable(tokenRoutes, err)
+		logger.Warn().
+			Err(err).
+			Msg("Lantmäteriet not available")
+	}
+
+	routes = append(routes, tokenRoutes...)
 
 	r := mux.NewRouter()
 
@@ -81,7 +90,7 @@ func main() {
 		Handler:      r,
 	}
 
-	for _, v := range routes.Endpoints {
+	for _, v := range routes {
 		logger.Debug().
 			Str("route", v.Route).
 			Strs("methods", v.Methods).

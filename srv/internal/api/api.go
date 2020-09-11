@@ -13,43 +13,32 @@ type Endpoint struct {
 	Handler http.HandlerFunc
 }
 
-type API struct {
-	ts        auth.TokenService
-	Endpoints []Endpoint
+type TokenAPI struct {
+	auth.TokenService
 }
 
-type APIOption = func(*API)
-
-func WithTokenService(ts auth.TokenService, err error) APIOption {
-	newRoute := func(methods string, name string, handler http.HandlerFunc) Endpoint {
-		ep := Endpoint{
+func TokenAPIRoutes(ts auth.TokenService) []*Endpoint {
+	newRoute := func(methods string, name string, handler http.HandlerFunc) *Endpoint {
+		return &Endpoint{
 			Route:   "/token",
 			Methods: []string{methods},
 			Name:    "(*API)." + name + "TokenHandler",
 			Handler: handler,
 		}
-		if err != nil {
-			ep.Handler = ServiceUnvailableHandler(err)
-		}
-		return ep
 	}
 
-	return func(a *API) {
-		a.ts = ts
-		a.Endpoints = append(a.Endpoints, []Endpoint{
-			newRoute(http.MethodGet, "Get", a.GetTokenHandler),
-			newRoute(http.MethodPut, "Refresh", a.RefreshTokenHandler),
-			newRoute(http.MethodDelete, "Revoke", a.RevokeTokenHandler),
-		}...)
+	api := TokenAPI{ts}
+
+	return []*Endpoint{
+		newRoute(http.MethodGet, "Get", api.GetTokenHandler),
+		newRoute(http.MethodPut, "Refresh", api.RefreshTokenHandler),
+		newRoute(http.MethodDelete, "Revoke", api.RevokeTokenHandler),
 	}
 }
 
-func NewAPI(opts ...APIOption) *API {
-	api := &API{}
-
-	for _, opt := range opts {
-		opt(api)
+func MarkUnavailable(eps []*Endpoint, err error) {
+	for _, ep := range eps {
+		ep.Name = "ServiceUnvailableHandler"
+		ep.Handler = ServiceUnvailableHandler(err)
 	}
-
-	return api
 }

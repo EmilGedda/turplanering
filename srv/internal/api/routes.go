@@ -19,16 +19,16 @@ func ServiceUnvailableHandler(err error) http.HandlerFunc {
 	}
 }
 
-func (a *API) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
+func (service *TokenAPI) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	logger := zerolog.Ctx(r.Context()).With().Str("handler", "refresh token").Logger()
-	token, err := a.ts.GetToken()
+	token, err := service.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token in refresh handler failed")
 		handlerError(w, errc.Wrap(err, "get token"), &logger)
 		return
 	}
 
-	token, err = a.ts.RefreshToken(token)
+	token, err = service.RefreshToken(token)
 	if err != nil {
 		logger.Err(err).Msg("Refresh token failed")
 		handlerError(w, errc.Wrap(err, "refresh token"), &logger)
@@ -42,16 +42,16 @@ func (a *API) RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *API) RevokeTokenHandler(w http.ResponseWriter, r *http.Request) {
+func (service *TokenAPI) RevokeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	logger := zerolog.Ctx(r.Context()).With().Str("handler", "revoke token").Logger()
-	token, err := a.ts.GetToken()
+	token, err := service.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token failed")
 		handlerError(w, errc.Wrap(err, "get token"), &logger)
 		return
 	}
 
-	err = a.ts.RevokeToken(token)
+	err = service.RevokeToken(token)
 	if err != nil {
 		logger.Err(err).Msg("Revoke token failed")
 		handlerError(w, errc.Wrap(err, "revoke token"), &logger)
@@ -60,9 +60,9 @@ func (a *API) RevokeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (a *API) GetTokenHandler(w http.ResponseWriter, r *http.Request) {
+func (service *TokenAPI) GetTokenHandler(w http.ResponseWriter, r *http.Request) {
 	logger := zerolog.Ctx(r.Context()).With().Str("handler", "get token").Logger()
-	token, err := a.ts.GetToken()
+	token, err := service.GetToken()
 	if err != nil {
 		logger.Err(err).Msg("Get token failed")
 		handlerError(w, errc.Wrap(err, "get token"), &logger)
