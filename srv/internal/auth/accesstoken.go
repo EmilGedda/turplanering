@@ -11,6 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/EmilGedda/turplanering/srv/internal/env"
 	"github.com/EmilGedda/turplanering/srv/internal/errc"
 )
 
@@ -68,8 +69,8 @@ func NewLantmateriet(opts ...LantmaterietOption) (*Lantmateriet, error) {
 	l := &Lantmateriet{
 		NewNetClient(),
 		LantmaterietURL,
-		"",
-		"",
+		env.Vars().ConsumerID,
+		env.Vars().ConsumerKey,
 	}
 
 	for _, opt := range opts {

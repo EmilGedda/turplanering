@@ -56,9 +56,10 @@ func TestGetToken(t *testing.T) {
 		res: &empty,
 	}
 
-	l := NewLantmateriet(
+	l, _ := NewLantmateriet(
 		WithClient(mock),
-		WithConsumerID(""),
+		WithConsumerID("a"),
+		WithConsumerKey("a"),
 	)
 
 	_, err := l.GetToken()
@@ -87,7 +88,8 @@ func TestGetToken(t *testing.T) {
 	assert.Equal(t, "a", token.AccessToken)
 	assert.Equal(t, 1*time.Second, token.ExpiresIn)
 
-	_, err = NewLantmateriet(WithURL("\n")).GetToken()
+	l, _ = NewLantmateriet(WithURL("\n"))
+	_, err = l.GetToken()
 	assert.Error(t, err, "invalid url")
 }
 
@@ -103,16 +105,14 @@ func TestRevokeToken(t *testing.T) {
 		res: &empty,
 	}
 
-	l := NewLantmateriet(
+	l, _ := NewLantmateriet(
 		WithClient(mock),
-		WithConsumerID(""),
-		WithConsumerKey(""),
+		WithConsumerID("a"),
+		WithConsumerKey("a"),
 	)
+	brokenURL, _ := NewLantmateriet(WithURL("\n"))
 
-	assert.Error(t,
-		NewLantmateriet(WithURL("\n")).RevokeToken(token),
-		"invalid url",
-	)
+	assert.Error(t, brokenURL.RevokeToken(token), "invalid url")
 
 	assert.Error(t, l.RevokeToken(nil), "nil token")
 	assert.Error(t, l.RevokeToken(token), "request Do failed error")
@@ -139,8 +139,10 @@ func TestRefreshToken(t *testing.T) {
 		res: &empty,
 	}
 
-	l := NewLantmateriet(
+	l, _ := NewLantmateriet(
 		WithClient(mock),
+		WithConsumerID("a"),
+		WithConsumerKey("a"),
 	)
 
 	_, err := l.RefreshToken(token)

@@ -10,7 +10,8 @@ import (
 )
 
 func TestIntegrationGetToken(t *testing.T) {
-	l := NewLantmateriet()
+	l, err := NewLantmateriet()
+	assert.NoError(t, err)
 
 	first, err := l.GetToken()
 	assert.NoError(t, err)
@@ -26,7 +27,8 @@ func TestIntegrationGetToken(t *testing.T) {
 }
 
 func TestIntegrationRevokeToken(t *testing.T) {
-	l := NewLantmateriet()
+	l, err := NewLantmateriet()
+	assert.NoError(t, err)
 
 	first, err := l.GetToken()
 	assert.NoError(t, err)
