@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/EmilGedda/turplanering/srv/internal/auth"
 	"github.com/rs/zerolog"
+
+	"github.com/EmilGedda/turplanering/srv/internal/auth"
 )
 
 type Endpoint struct {

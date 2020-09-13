@@ -8,9 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/EmilGedda/turplanering/srv/internal/auth"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/EmilGedda/turplanering/srv/internal/auth"
 )
 
 func TestTokenAPIRoutes(t *testing.T) {

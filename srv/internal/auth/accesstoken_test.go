@@ -68,8 +68,12 @@ func TestConstruction(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		noCreds := []LantmaterietOption{
+			WithConsumerID(""),
+			WithConsumerKey(""),
+		}
 		_, err := NewLantmateriet(
-			test.input...,
+			append(noCreds, test.input...)...,
 		)
 		assert.Equal(t, test.want, err)
 	}
@@ -116,11 +120,9 @@ func TestGetToken(t *testing.T) {
 	assert.Equal(t, 1*time.Second, token.ExpiresIn)
 
 	mock.res.Body = stringReader(`{"error":"foo","error_description":"bar"}`)
-	errType := "foo"
-	errDesc := "bar"
 	_, err = l.GetToken()
-	assert.Equal(t, &TokenErrResponse{ErrorType: &errType, ErrorDescription: &errDesc}, err)
-	assert.EqualError(t, err, "Lantmäteriet API returned error: "+errDesc)
+	assert.Equal(t, NewTokenErrResponse("bar", "foo"), err)
+	assert.EqualError(t, err, "Lantmäteriet API returned error: bar")
 
 	l, _ = NewLantmateriet(
 		WithURL("\n"),

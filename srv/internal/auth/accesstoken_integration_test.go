@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/EmilGedda/turplanering/srv/internal/env"
 )
 
 func TestIntegrationGetToken(t *testing.T) {
@@ -34,9 +32,7 @@ func TestIntegrationGetToken(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = l.GetToken()
-	errType := "invalid_client"
-	errDesc := "Client Authentication failed."
-	assert.Equal(t, &TokenErrResponse{ErrorType: &errType, ErrorDescription: &errDesc}, err)
+	assert.Equal(t, NewTokenErrResponse("Client Authentication failed.", "invalid_client"), err)
 }
 
 func TestIntegrationRevokeToken(t *testing.T) {
