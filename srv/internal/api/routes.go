@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 
 	"github.com/rs/zerolog"
@@ -15,6 +14,22 @@ import (
 func ServiceUnvailableHandler(err error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := zerolog.Ctx(r.Context()).With().Str("handler", "service unavailable").Logger()
+		handlerError(w, err, &logger)
+	}
+}
+
+func (service *TokenAPI) GetTokenHandler(w http.ResponseWriter, r *http.Request) {
+	logger := zerolog.Ctx(r.Context()).With().Str("handler", "get token").Logger()
+	token, err := service.GetToken()
+	if err != nil {
+		logger.Err(err).Msg("Get token failed")
+		handlerError(w, errc.Wrap(err, "get token"), &logger)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(token)
+	if err != nil {
+		logger.Err(err).Msg("Unable to write token to response body")
 		handlerError(w, err, &logger)
 	}
 }
@@ -60,22 +75,6 @@ func (service *TokenAPI) RevokeTokenHandler(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusOK)
 }
 
-func (service *TokenAPI) GetTokenHandler(w http.ResponseWriter, r *http.Request) {
-	logger := zerolog.Ctx(r.Context()).With().Str("handler", "get token").Logger()
-	token, err := service.GetToken()
-	if err != nil {
-		logger.Err(err).Msg("Get token failed")
-		handlerError(w, errc.Wrap(err, "get token"), &logger)
-		return
-	}
-
-	err = json.NewEncoder(w).Encode(token)
-	if err != nil {
-		logger.Err(err).Msg("Unable to write token to response body")
-		handlerError(w, err, &logger)
-	}
-}
-
 func handlerError(w http.ResponseWriter, err error, logger *zerolog.Logger) {
 	type response struct {
 		StatusText string `json:"status_text"`
@@ -97,16 +96,13 @@ func handlerError(w http.ResponseWriter, err error, logger *zerolog.Logger) {
 		ErrorStr:   err.Error(),
 	}
 
-	out := `{"status_text:"Internal Server Error","status_code":500,"error":"json marshal failure in handlerError"}`
-	data, err := json.Marshal(res)
-	if err != nil {
-		logger.Err(err).
-			Interface("response", res).
-			Msg("Json marshal failure in handlerError")
-	} else {
-		out = string(data)
-	}
+	data, _ := json.Marshal(res) // cant error with given struct
 
 	w.WriteHeader(code)
-	io.WriteString(w, out)
+	n, err := w.Write(data)
+	if err != nil {
+		logger.Err(err).
+			Int("count", n).
+			Msg("Unable to write error to response body")
+	}
 }

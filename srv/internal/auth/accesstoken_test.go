@@ -1,3 +1,5 @@
+// +build !integration
+
 package auth
 
 import (
@@ -48,6 +50,31 @@ var (
 	errReader reader = reader{err: errors.New("read error")}
 )
 
+func TestConstruction(t *testing.T) {
+	makeErr := func(needs ...string) *errc.NotInitializedError {
+		return &errc.NotInitializedError{
+			Module: "Lantmäteriet",
+			Needs:  needs,
+		}
+	}
+	tests := []struct {
+		input []LantmaterietOption
+		want  error
+	}{
+		{[]LantmaterietOption{}, makeErr("ConsumerID", "ConsumerKey")},
+		{[]LantmaterietOption{WithConsumerID("a")}, makeErr("ConsumerKey")},
+		{[]LantmaterietOption{WithConsumerKey("a")}, makeErr("ConsumerID")},
+		{[]LantmaterietOption{WithConsumerID("a"), WithConsumerKey("a")}, nil},
+	}
+
+	for _, test := range tests {
+		_, err := NewLantmateriet(
+			test.input...,
+		)
+		assert.Equal(t, test.want, err)
+	}
+
+}
 func TestGetToken(t *testing.T) {
 
 	empty := emptyResponse
@@ -88,9 +115,21 @@ func TestGetToken(t *testing.T) {
 	assert.Equal(t, "a", token.AccessToken)
 	assert.Equal(t, 1*time.Second, token.ExpiresIn)
 
-	l, _ = NewLantmateriet(WithURL("\n"))
+	mock.res.Body = stringReader(`{"error":"foo","error_description":"bar"}`)
+	errType := "foo"
+	errDesc := "bar"
+	_, err = l.GetToken()
+	assert.Equal(t, &TokenErrResponse{ErrorType: &errType, ErrorDescription: &errDesc}, err)
+	assert.EqualError(t, err, "Lantmäteriet API returned error: "+errDesc)
+
+	l, _ = NewLantmateriet(
+		WithURL("\n"),
+		WithConsumerID("a"),
+		WithConsumerKey("a"),
+	)
 	_, err = l.GetToken()
 	assert.Error(t, err, "invalid url")
+
 }
 
 func TestRevokeToken(t *testing.T) {
@@ -110,7 +149,12 @@ func TestRevokeToken(t *testing.T) {
 		WithConsumerID("a"),
 		WithConsumerKey("a"),
 	)
-	brokenURL, _ := NewLantmateriet(WithURL("\n"))
+
+	brokenURL, _ := NewLantmateriet(
+		WithURL("\n"),
+		WithConsumerID("a"),
+		WithConsumerKey("a"),
+	)
 
 	assert.Error(t, brokenURL.RevokeToken(token), "invalid url")
 
@@ -148,4 +192,8 @@ func TestRefreshToken(t *testing.T) {
 	_, err := l.RefreshToken(token)
 	assert.Error(t, err)
 
+	mock.err = nil
+	mock.res.Body = stringReader("")
+	_, err = l.RefreshToken(token)
+	assert.Errorf(t, err, "get token failed")
 }

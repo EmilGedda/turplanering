@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"io/ioutil"
+	stdnet "net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,8 +33,12 @@ func main() {
 	if envVars.Env == env.Development {
 		out = zerolog.ConsoleWriter{
 			Out:        os.Stdout,
-			TimeFormat: "15:04:03.000",
+			TimeFormat: "15:04:05.000",
 		}
+	}
+
+	zerolog.TimestampFunc = func() time.Time {
+		return time.Now().Local()
 	}
 
 	logger := zerolog.New(out).With().Timestamp().Logger()
@@ -44,7 +49,7 @@ func main() {
 		Msg("Initializing Turplanering server")
 
 	creds := envVars.Lantmateriet
-	routes := []*api.Endpoint{}
+	routes := []api.Endpoint{}
 
 	lantmateriet, err := auth.NewLantmateriet(
 		auth.WithConsumerID(creds.ConsumerID),
@@ -54,10 +59,16 @@ func main() {
 	tokenRoutes := api.TokenAPIRoutes(lantmateriet)
 
 	if err != nil {
+		if envVars.Env == env.Production {
+			logger.Fatal().
+				Err(err).
+				Msg("Lantmäteriet not available")
+		} else {
+			logger.Warn().
+				Err(err).
+				Msg("Lantmäteriet not available")
+		}
 		api.MarkUnavailable(tokenRoutes, err)
-		logger.Warn().
-			Err(err).
-			Msg("Lantmäteriet not available")
 	}
 
 	routes = append(routes, tokenRoutes...)
@@ -88,6 +99,12 @@ func main() {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 		Handler:      r,
+		ConnState: func(conn stdnet.Conn, state http.ConnState) {
+			logger.Trace().
+				Str("state", state.String()).
+				Str("remote", conn.RemoteAddr().String()).
+				Msg("Connection state change")
+		},
 	}
 
 	for _, v := range routes {
@@ -107,6 +124,9 @@ func main() {
 		Msg("Starting Turplanering server")
 
 	c := make(chan os.Signal, 8)
+
+	const shutoff = syscall.Signal(-1)
+
 	defer close(c)
 
 	signal.Notify(c,
@@ -122,16 +142,16 @@ func main() {
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			logger.Error().Err(err).Msg("Server failed")
-			c <- syscall.SIGTERM
+			c <- shutoff
 		}
 	}()
 
 	// Closing stdin closes server
 	go func() {
 		reader := bufio.NewReader(os.Stdin)
-		ioutil.ReadAll(reader)
+		_, _ = ioutil.ReadAll(reader)
 		logger.Info().Msg("Stdin closed")
-		c <- syscall.SIGTERM
+		c <- shutoff
 	}()
 
 	// Block until we receive our signal.
@@ -144,9 +164,11 @@ func main() {
 		syscall.SIGQUIT: "SIGQUIT",
 	}
 
-	logger.Info().
-		Str("signal", lookup[sig]).
-		Msg("Received signal")
+	if sig != shutoff {
+		logger.Info().
+			Str("signal", lookup[sig]).
+			Msg("Received signal")
+	}
 
 	logger.Info().
 		Msg("Shutting down server...")

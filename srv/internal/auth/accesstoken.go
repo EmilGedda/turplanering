@@ -167,7 +167,7 @@ func (l *Lantmateriet) GetToken() (*Token, error) {
 	}
 
 	errResponse := TokenErrResponse{}
-	json.Unmarshal(jsonData, &errResponse)
+	_ = json.Unmarshal(jsonData, &errResponse)
 	if errResponse.ErrorType != nil || errResponse.ErrorDescription != nil {
 		return nil, &errResponse
 	}
