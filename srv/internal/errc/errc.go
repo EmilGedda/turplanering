@@ -29,12 +29,16 @@ type NotInitializedError struct {
 }
 
 func (e *NotInitializedError) Error() string {
+	str := e.Module + " is not initialized"
 	last := len(e.Needs) - 1
+	if last < 0 {
+		return str
+	}
 	missing := e.Needs[last]
 	if last > 0 {
 		missing = strings.Join(e.Needs[:last], ", ") + " and " + e.Needs[last]
 	}
-	return e.Module + " is not initialized, missing " + missing
+	return str + ", missing " + missing
 }
 
 type WrappedError struct {

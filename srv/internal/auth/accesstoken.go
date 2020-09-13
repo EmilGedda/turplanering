@@ -144,6 +144,13 @@ type TokenErrResponse struct {
 	ErrorType        *string `json:"error"`
 }
 
+func NewTokenErrResponse(errDesc, errType string) *TokenErrResponse {
+	return &TokenErrResponse{
+		ErrorDescription: &errDesc,
+		ErrorType:        &errType,
+	}
+}
+
 func (t *TokenErrResponse) Error() string {
 	return "Lantmäteriet API returned error: " + *t.ErrorDescription
 }
