@@ -1,9 +1,9 @@
 package api
 
 import (
-	"context"
 	"errors"
 	"io/ioutil"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -64,13 +64,9 @@ func TestMarkUnavailable(t *testing.T) {
 	}
 }
 
-func InjectLogger(ctx context.Context) (context.Context, *strings.Builder) {
-	var sb strings.Builder
-	logger := zerolog.New(&sb).With().Logger()
-	return logger.WithContext(ctx), &sb
-}
-
 func TestWrapTokenHandler(t *testing.T) {
+	var out strings.Builder
+	logger := zerolog.New(&out).With().Logger()
 	json := map[string]string{
 		"key": "test value",
 	}
@@ -82,7 +78,7 @@ func TestWrapTokenHandler(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/token", nil)
-	ctx, out := InjectLogger(r.Context())
+	ctx := logger.WithContext(r.Context())
 	r = r.WithContext(ctx)
 
 	handler(w, r)
@@ -94,7 +90,7 @@ func TestWrapTokenHandler(t *testing.T) {
 	assert.Contains(t, string(body), "foo error")
 	assert.Contains(t, out.String(), "foo error")
 	assert.Contains(t, out.String(), "Wrapped failed")
-	assert.Contains(t, out.String(), "WrappedToken")
+	assert.Contains(t, out.String(), "WrappedHandler")
 
 	err = nil
 	w = httptest.NewRecorder()
@@ -107,12 +103,33 @@ func TestWrapTokenHandler(t *testing.T) {
 	assert.Equal(t, 200, res.StatusCode)
 
 	w = httptest.NewRecorder()
-	wrapTokenHandler("Wrapped", func() (interface{}, error) {
-		return nil, nil
-	})(w, r)
+	handler = wrapTokenHandler("Wrapped", func() (interface{}, error) {
+		return struct {
+			Msg string `json:"msg"`
+		}{"response"}, nil
+	})
 
-	res = w.Result()
-	body, _ = ioutil.ReadAll(res.Body)
-	assert.Empty(t, string(body))
-	assert.Equal(t, 200, res.StatusCode)
+	out.Reset()
+	handler(&writer{}, r)
+	assert.Contains(t, out.String(), "Unable to write response body")
+
+	handler = wrapTokenHandler("Wrapped", func() (interface{}, error) {
+		return nil, nil
+	})
+
+	out.Reset()
+	handler(&writer{}, r)
+	assert.NotContains(t, out.String(), "Unable to write response body")
+}
+
+type writer struct{}
+
+func (w *writer) Write([]byte) (int, error) {
+	return -1, errors.New("write error")
+}
+
+func (w *writer) WriteHeader(int) {}
+
+func (w *writer) Header() http.Header {
+	return map[string][]string{}
 }

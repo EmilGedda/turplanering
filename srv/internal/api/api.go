@@ -51,7 +51,7 @@ func MarkUnavailable(eps []Endpoint, err error) {
 
 func wrapTokenHandler(name string, handler tokenHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logger := zerolog.Ctx(r.Context()).With().Str("handler", name+"Token").Logger()
+		logger := zerolog.Ctx(r.Context()).With().Str("handler", name+"Handler").Logger()
 		res, err := handler()
 		if err != nil {
 			logger.Err(err).Msg(name + " failed")
