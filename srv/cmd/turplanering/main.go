@@ -76,15 +76,15 @@ func main() {
 		handlers.CORS(
 			handlers.AllowedOrigins([]string{"https://emilgedda.github.io"}),
 		),
-		api.InjectResponseHeader(map[string][]string{
+		api.InjectResponseHeaders(map[string][]string{
 			"Content-Security-Policy": {"none"},
 			"Content-Type":            {"application/json"},
 			"X-Content-Type-Options":  {"nosniff"},
 		}),
 		api.InjectLogger(&logger),
-		api.InjectRequestID,
+		api.InjectRequestID(10),
 		api.LogRequest,
-		api.LogResponse,
+		api.LogResponse(&api.HttpSnooper{}),
 		handlers.CompressHandler,
 	)
 

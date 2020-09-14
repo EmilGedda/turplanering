@@ -18,17 +18,19 @@ func InjectLogger(logger *zerolog.Logger) func(http.Handler) http.Handler {
 	}
 }
 
-func InjectRequestID(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		logger := zerolog.Ctx(ctx)
-		reqID := NewRequestID(10)
-		newLogger := logger.With().Str("requestID", reqID).Logger()
-		newLogger.Trace().Msg("Injecting request ID into logger")
-		ctx = newLogger.WithContext(ctx)
-		r.Header.Add("X-Request-ID", reqID)
-		h.ServeHTTP(w, r.WithContext(ContextWithRequestID(ctx, reqID)))
-	})
+func InjectRequestID(length int) func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			logger := zerolog.Ctx(ctx)
+			reqID := NewRequestID(length)
+			newLogger := logger.With().Str("requestID", reqID).Logger()
+			newLogger.Trace().Msg("Injecting request ID into logger")
+			ctx = newLogger.WithContext(ctx)
+			r.Header.Add("X-Request-ID", reqID)
+			h.ServeHTTP(w, r.WithContext(ContextWithRequestID(ctx, reqID)))
+		})
+	}
 }
 
 func LogRequest(h http.Handler) http.Handler {
@@ -43,23 +45,35 @@ func LogRequest(h http.Handler) http.Handler {
 	})
 }
 
-func LogResponse(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger := zerolog.Ctx(r.Context())
-		metrics := httpsnoop.CaptureMetrics(h, w, r)
-		logger.Info().
-			Int("status", metrics.Code).
-			Int64("size", metrics.Written).
-			Dur("elapsed", metrics.Duration).
-			Msg("Serving response")
-
-		if metrics.Duration > 500*time.Millisecond {
-			logger.Warn().Msg("Slow response time")
-		}
-	})
+type Snooper interface {
+	CaptureMetrics(hnd http.Handler, w http.ResponseWriter, r *http.Request) httpsnoop.Metrics
 }
 
-func InjectResponseHeader(headers http.Header) func(http.Handler) http.Handler {
+type HttpSnooper struct{}
+
+func (s *HttpSnooper) CaptureMetrics(hnd http.Handler, w http.ResponseWriter, r *http.Request) httpsnoop.Metrics {
+	return httpsnoop.CaptureMetrics(hnd, w, r)
+}
+
+func LogResponse(snooper Snooper) func(http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger := zerolog.Ctx(r.Context())
+			metrics := snooper.CaptureMetrics(h, w, r)
+			logger.Info().
+				Int("status", metrics.Code).
+				Int64("size", metrics.Written).
+				Dur("elapsed", metrics.Duration).
+				Msg("Serving response")
+
+			if metrics.Duration > 500*time.Millisecond {
+				logger.Warn().Msg("Slow response time")
+			}
+		})
+	}
+}
+
+func InjectResponseHeaders(headers http.Header) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for header, values := range headers {

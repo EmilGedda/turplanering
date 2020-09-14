@@ -102,7 +102,6 @@ func TestWrapTokenHandler(t *testing.T) {
 	assert.Contains(t, string(body), "test value")
 	assert.Equal(t, 200, res.StatusCode)
 
-	w = httptest.NewRecorder()
 	handler = wrapTokenHandler("Wrapped", func() (interface{}, error) {
 		return struct {
 			Msg string `json:"msg"`
