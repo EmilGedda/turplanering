@@ -5,7 +5,6 @@ import (
 	"context"
 	"io"
 	"io/ioutil"
-	stdnet "net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,11 +18,11 @@ import (
 	"github.com/EmilGedda/turplanering/srv/internal/api"
 	"github.com/EmilGedda/turplanering/srv/internal/auth"
 	"github.com/EmilGedda/turplanering/srv/internal/env"
-	"github.com/EmilGedda/turplanering/srv/internal/net"
 )
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMicro
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	var out io.Writer = os.Stdout
 
@@ -37,12 +36,7 @@ func main() {
 		}
 	}
 
-	zerolog.TimestampFunc = func() time.Time {
-		return time.Now().Local()
-	}
-
 	logger := zerolog.New(out).With().Timestamp().Logger()
-	logger.Level(zerolog.DebugLevel)
 
 	logger.Info().
 		Str("env", string(envVars.Env)).
@@ -79,18 +73,19 @@ func main() {
 		handlers.RecoveryHandler(
 			handlers.PrintRecoveryStack(envVars.Env == env.Development),
 		),
-		handlers.CompressHandler,
 		handlers.CORS(
 			handlers.AllowedOrigins([]string{"https://emilgedda.github.io"}),
 		),
-		net.InjectResponseHeader(map[string][]string{
+		api.InjectResponseHeader(map[string][]string{
 			"Content-Security-Policy": {"none"},
 			"Content-Type":            {"application/json"},
 			"X-Content-Type-Options":  {"nosniff"},
 		}),
-		net.InjectLogger(&logger),
-		net.InjectRequestID,
-		net.LogRequest,
+		api.InjectLogger(&logger),
+		api.InjectRequestID,
+		api.LogRequest,
+		api.LogResponse,
+		handlers.CompressHandler,
 	)
 
 	srv := &http.Server{
@@ -99,12 +94,6 @@ func main() {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 		Handler:      r,
-		ConnState: func(conn stdnet.Conn, state http.ConnState) {
-			logger.Trace().
-				Str("state", state.String()).
-				Str("remote", conn.RemoteAddr().String()).
-				Msg("Connection state change")
-		},
 	}
 
 	for _, v := range routes {
@@ -124,10 +113,9 @@ func main() {
 		Msg("Starting Turplanering server")
 
 	c := make(chan os.Signal, 8)
+	defer close(c)
 
 	const shutoff = syscall.Signal(-1)
-
-	defer close(c)
 
 	signal.Notify(c,
 		syscall.SIGHUP,
@@ -154,9 +142,6 @@ func main() {
 		c <- shutoff
 	}()
 
-	// Block until we receive our signal.
-	sig := <-c
-
 	lookup := map[os.Signal]string{
 		syscall.SIGHUP:  "SIGHUP",
 		syscall.SIGINT:  "SIGINT",
@@ -164,6 +149,8 @@ func main() {
 		syscall.SIGQUIT: "SIGQUIT",
 	}
 
+	// Block until we receive our signal.
+	sig := <-c
 	if sig != shutoff {
 		logger.Info().
 			Str("signal", lookup[sig]).

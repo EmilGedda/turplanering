@@ -1,10 +1,12 @@
-package net
+package api
 
 import (
 	"context"
 	"math/rand"
 	"net/http"
+	"time"
 
+	"github.com/felixge/httpsnoop"
 	"github.com/rs/zerolog"
 )
 
@@ -20,12 +22,10 @@ func InjectRequestID(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		logger := zerolog.Ctx(ctx)
-		reqID := NewRequestID(8)
-		if logger != nil {
-			newLogger := logger.With().Str("requestID", reqID).Logger()
-			newLogger.Trace().Msg("Injecting request ID into logger")
-			ctx = logger.WithContext(ctx)
-		}
+		reqID := NewRequestID(10)
+		newLogger := logger.With().Str("requestID", reqID).Logger()
+		newLogger.Trace().Msg("Injecting request ID into logger")
+		ctx = newLogger.WithContext(ctx)
 		r.Header.Add("X-Request-ID", reqID)
 		h.ServeHTTP(w, r.WithContext(ContextWithRequestID(ctx, reqID)))
 	})
@@ -40,6 +40,22 @@ func LogRequest(h http.Handler) http.Handler {
 			Str("remote", r.RemoteAddr).
 			Msg("Serving request")
 		h.ServeHTTP(w, r)
+	})
+}
+
+func LogResponse(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := zerolog.Ctx(r.Context())
+		metrics := httpsnoop.CaptureMetrics(h, w, r)
+		logger.Info().
+			Int("status", metrics.Code).
+			Int64("size", metrics.Written).
+			Dur("elapsed", metrics.Duration).
+			Msg("Serving response")
+
+		if metrics.Duration > 500*time.Millisecond {
+			logger.Warn().Msg("Slow response time")
+		}
 	})
 }
 
@@ -69,7 +85,7 @@ func RequestIDFromContext(ctx context.Context) string {
 	return ctx.Value(requestIDCtxValue).(string)
 }
 
-// NewRequestID requires n > 0
+// NewRequestID requires n > 0.
 func NewRequestID(n int) string {
 	const (
 		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
