@@ -14,7 +14,7 @@
     },
     "keywords": [],
     "author": "Emil Gedda <emil.gedda@emilgedda.se>",
-    "license": "AGPL-3.0",
+    "license": "AGPL-3.0-or-later",
     "dependencies": {
         "@material-ui/core": "^4.11.0",
         "@material-ui/icons": "^4.9.1",
