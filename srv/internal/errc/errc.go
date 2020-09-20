@@ -20,7 +20,7 @@ func (e *UnmarshalError) Causer() error {
 }
 
 func (e *UnmarshalError) Error() string {
-	return "json to marshal: " + string(e.Json) + ": " + e.Err.Error()
+	return "json unmarshal failed: " + string(e.Json) + ": " + e.Err.Error()
 }
 
 type NotInitializedError struct {
@@ -64,4 +64,20 @@ func (e *WrappedError) Unwrap() error {
 
 func (e *WrappedError) Causer() error {
 	return e.Err
+}
+
+type CompoundError []error
+
+func (e *CompoundError) Error() string {
+	errors := []error(*e)
+	sb := strings.Builder{}
+	last := len(errors) - 1
+
+	for _, err := range errors[:last] {
+		sb.WriteString(err.Error())
+		sb.WriteString(", ")
+	}
+
+	sb.WriteString(errors[last].Error())
+	return sb.String()
 }

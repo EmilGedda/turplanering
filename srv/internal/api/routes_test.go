@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EmilGedda/turplanering/srv/internal/auth"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/EmilGedda/turplanering/srv/internal/auth"
 )
 
 type mockTokenService struct {
