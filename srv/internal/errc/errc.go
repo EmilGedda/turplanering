@@ -69,15 +69,36 @@ func (e *WrappedError) Causer() error {
 type CompoundError []error
 
 func (e *CompoundError) Error() string {
-	errors := []error(*e)
-	sb := strings.Builder{}
-	last := len(errors) - 1
+	nonNils := []error{}
+	for _, err := range []error(*e) {
+		if err != nil {
+			nonNils = append(nonNils, err)
+		}
+	}
 
-	for _, err := range errors[:last] {
+	sb := strings.Builder{}
+	last := len(nonNils) - 1
+
+	if last < 1 {
+		return "no non nil errors"
+	}
+
+	sb.WriteString("{")
+	for _, err := range nonNils[:last] {
 		sb.WriteString(err.Error())
 		sb.WriteString(", ")
 	}
 
-	sb.WriteString(errors[last].Error())
+	sb.WriteString(nonNils[last].Error())
+	sb.WriteString("}")
 	return sb.String()
+}
+
+func (e *CompoundError) HasErrors() bool {
+	for _, err := range []error(*e) {
+		if err != nil {
+			return true
+		}
+	}
+	return false
 }
