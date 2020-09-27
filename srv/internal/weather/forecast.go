@@ -1,6 +1,7 @@
 package weather
 
 import (
+	"context"
 	"time"
 
 	"github.com/EmilGedda/turplanering/srv/internal/gis"
@@ -21,24 +22,34 @@ type Measurement struct {
 	Wind          Wind
 }
 
-type ForecastPoint struct {
-	Coords gis.WGS84
-	Measurement
+// Forecast represents the prognosis of an area over the given times
+// The Measurements in Prognosis values corresponds to the coordinate with
+// the same index in the Points slice.
+type Forecast struct {
+	Points    []gis.WGS84
+	Prognosis map[time.Time][]Measurement
 }
 
-type Warning struct {
-	Message string
-}
-
-type WeatherService interface {
+// WeatherProvider fetches forecast data from an external provider.
+type WeatherProvider interface {
+	// Retrieves the list of valid timepoint for which there is a forecast.
 	ValidTimes() ([]time.Time, error)
-	GetWarnings() ([]Warning, error)
+	// Gets all forecasted measurements on the given time.
+	// The given timepoint must have been returned from a ValidTimes call.
 	GetMeasurements(time.Time) ([]Measurement, error)
+	// Retrieves all the geographical points for which any forecast is valid.
+	// The boundary is Norway to Finland.
 	GetPoints() ([]gis.WGS84, error)
 }
 
+type ForecastProvider interface {
+	Query(context.Context, gis.Area) (*Forecast, error)
+}
+
+// ForecastService wraps WeatherService and ForecastStorage
 type ForecastStorage interface {
-	ValidTimes() ([]time.Time, error)
-	GetForecast(gis.Area, time.Time) ([]ForecastPoint, error)
-	GetWarnings(gis.Area) ([]Warning, error)
+	ForecastProvider
+	Empty(context.Context) (bool, error)
+	Create(context.Context, []gis.WGS84) error
+	Update(context.Context, time.Time, []Measurement) error
 }

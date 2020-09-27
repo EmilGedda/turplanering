@@ -3,6 +3,7 @@
 package weather
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -12,6 +13,12 @@ import (
 
 var smhi = NewSmhi(WithDownSampling(20))
 
+func assertBetween(t *testing.T, lower, upper, obj float32) {
+	// assert.InDelta is not descriptive enough in error messages
+	assert.GreaterOrEqual(t, obj, lower, fmt.Sprintf("%v must be greater than %v", obj, lower))
+	assert.LessOrEqual(t, obj, upper, fmt.Sprintf("%v must be less than %v", obj, upper))
+}
+
 func TestGetPoints(t *testing.T) {
 	points, err := smhi.GetPoints()
 	require.NoError(t, err)
@@ -19,8 +26,8 @@ func TestGetPoints(t *testing.T) {
 	assert.Less(t, len(points), 1000000)
 
 	for _, point := range points {
-		assert.InDelta(t, 62.5, point.Latitude, 10)
-		assert.InDelta(t, 15, point.Longitude, 25)
+		assertBetween(t, 52, 72, point.Latitude)
+		assertBetween(t, -9, 37, point.Longitude)
 	}
 }
 
@@ -45,10 +52,10 @@ func TestGetMeasurements(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, measure := range m {
-		assert.InDelta(t, 10, measure.Temp, 40)
-		assert.InDelta(t, 180, measure.Wind.Direction, 180)
-		assert.InDelta(t, 20, measure.Wind.Speed, 20)
-		assert.InDelta(t, 20, measure.Precipitation, 20)
+		assertBetween(t, -30, 40, measure.Temp)
+		assertBetween(t, 0, 360, measure.Wind.Direction)
+		assertBetween(t, 0, 40, measure.Wind.Speed)
+		assertBetween(t, 0, 40, measure.Precipitation)
 	}
 }
 

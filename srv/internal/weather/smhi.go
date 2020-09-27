@@ -9,8 +9,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rs/zerolog"
-
 	"github.com/EmilGedda/turplanering/srv/internal/errc"
 	"github.com/EmilGedda/turplanering/srv/internal/gis"
 	"github.com/EmilGedda/turplanering/srv/internal/util"
@@ -42,7 +40,6 @@ type HTTPGetter interface {
 }
 
 type Smhi struct {
-	logger     *zerolog.Logger
 	client     HTTPGetter
 	downsample int
 	api        api
@@ -113,7 +110,6 @@ func (s *Smhi) ValidTimes() ([]time.Time, error) {
 	if len(data.ValidTimes) == 0 {
 		return nil, errors.New("no valid times returned from smhi")
 	}
-	octas
 
 	return data.ValidTimes, nil
 }
@@ -165,11 +161,17 @@ func (s *Smhi) GetMeasurements(timepoint time.Time) ([]Measurement, error) {
 
 			res, err := s.client.Get(s.url() + timeUrl + parameter.url() + endpoint)
 			if err != nil {
-				ret.err = errc.Wrap(err, "failed to GET measurement "+parameter.name)
+				ret.err = errc.Wrap(err, "failed to GET measurement "+parameter.description)
 				return
 			}
 
 			defer res.Body.Close()
+
+			if res.StatusCode != http.StatusOK {
+				body, _ := ioutil.ReadAll(res.Body)
+				ret.err = fmt.Errorf("GET measurements failed with status code %s: %s", res.Status, body)
+				return
+			}
 
 			response := &smhiResponse{}
 			err = json.NewDecoder(res.Body).Decode(response)
@@ -191,7 +193,7 @@ func (s *Smhi) GetMeasurements(timepoint time.Time) ([]Measurement, error) {
 				ret.err = fmt.Errorf("invalid number of elements in timeSeries.parameters, expected 1 but got %d", nParams)
 			}
 
-			ret.name = parameter.name
+			ret.name = parameter.description
 			ret.assign = parameter.assign
 			ret.values = response.TimeSeries[0].Parameters[0].Values
 		}()
@@ -213,7 +215,8 @@ func (s *Smhi) GetMeasurements(timepoint time.Time) ([]Measurement, error) {
 	measurements := make([]Measurement, numPoints)
 	for i := range measurements {
 		for _, measurement := range weatherdata {
-			measurement.assign(&measurements[i], measurement.values[i])
+			m := &measurements[i]
+			measurement.assign(m, measurement.values[i])
 		}
 	}
 
@@ -270,11 +273,64 @@ func collectErrors(responses []measurementResponse) error {
 
 	list := []error{}
 	for _, v := range responses {
-		list = append(list, errc.Wrap(v.err, "failed fetching measurement "+v.name))
+		if v.err != nil {
+			list = append(list, errc.Wrap(v.err, "failed fetching measurement "+v.name))
+		}
 	}
 
 	err := errc.CompoundError(list)
 	return &err
+}
+
+// Aggregates all measurements from all valid times
+// Consumes ~6GB without any downsampling
+func (s *Smhi) GetForecast() (*Forecast, error) {
+	var err error
+	wg := sync.WaitGroup{}
+	forecast := &Forecast{}
+	wg.Add(1)
+
+	go func() {
+		forecast.Points, err = s.GetPoints()
+		wg.Done()
+	}()
+
+	times, timeErr := s.ValidTimes()
+	if timeErr != nil {
+		return nil, errc.Wrap(timeErr, "get all measurements")
+	}
+
+	n := len(times)
+	errors := errc.CompoundError(make([]error, n))
+	measurements := make([][]Measurement, n)
+
+	for timeIdx, timepoint := range times {
+		wg.Add(1)
+		timepoint := timepoint
+		timeIdx := timeIdx
+		go func() {
+			measurements[timeIdx], errors[timeIdx] = s.GetMeasurements(timepoint)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	// GetPoints
+	if err != nil {
+		errors = append(errors, errc.Wrap(err, "get all measurements"))
+	}
+
+	// GetMeasurements
+	if errors.HasErrors() {
+		return nil, errc.Wrap(&errors, "get all measurements")
+	}
+
+	for timeIdx, timepoint := range times {
+		forecast.Prognosis[timepoint] = measurements[timeIdx]
+	}
+
+	return forecast, nil
 }
 
 type SMHIOpt = func(*Smhi)
