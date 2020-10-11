@@ -18,10 +18,13 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const searchbarCSS = makeStyles((theme) => ({
     searchbar: {
-        position: 'relative',
+        position: 'fixed',
+        left: 0,
+        right: 0,
         padding: '2px 4px',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'center',
         width: '95%',
         margin: '0 auto',
         [theme.breakpoints.down('sm')]: {
@@ -31,7 +34,7 @@ const searchbarCSS = makeStyles((theme) => ({
             marginTop: '15px',
         },
         maxWidth: '800px',
-        zIndex: 1000,
+        zIndex: 1001,
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -93,7 +96,7 @@ type Props = {
 
 const Searchbar: FC<Props> = (props: Props) => {
     const { onGPSTrack } = props,
-        classes = searchbarCSS(),
+        css = searchbarCSS(),
         [watchID, setWatchID] = useState(0),
         [gpsStatus, setGPSStatus] = useState(GPSStatus.Inactive),
         gps = navigator.geolocation
@@ -126,19 +129,19 @@ const Searchbar: FC<Props> = (props: Props) => {
 
     return (
         <Slide direction="down" in={props.shown} mountOnEnter unmountOnExit>
-            <Paper className={classes.searchbar} elevation={5}>
-                <IconButton className={classes.iconButton}>
+            <Paper className={css.searchbar} elevation={5}>
+                <IconButton className={css.iconButton}>
                     <AccountCircle />
                 </IconButton>
-                <Divider className={classes.divider} orientation="vertical" />
-                <InputBase className={classes.input} placeholder="Sök" />
-                <IconButton type="submit" className={classes.iconButton}>
+                <Divider className={css.divider} orientation="vertical" />
+                <InputBase className={css.input} placeholder="Sök" />
+                <IconButton type="submit" className={css.iconButton}>
                     <Search />
                 </IconButton>
-                <Divider className={classes.divider} orientation="vertical" />
+                <Divider className={css.divider} orientation="vertical" />
                 <GPSButton
                     status={gps ? gpsStatus : GPSStatus.Disabled}
-                    className={classes.iconButton}
+                    className={css.iconButton}
                     onClick={
                         gpsStatus == GPSStatus.Tracking
                             ? stopTracking

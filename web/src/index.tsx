@@ -1,3 +1,4 @@
+///<reference types="webpack-env" />
 /** @license
  *
  *  Turplanering
@@ -16,9 +17,11 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
 import { render } from 'react-dom'
 import { App } from './components/App'
+import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline'
 
 const getEnvironment = () => {
     const browser = {
@@ -38,9 +41,14 @@ const getEnvironment = () => {
     }
 }
 
+// Opt-in to Webpack hot module replacement
+if (module.hot) module.hot.accept()
+
 render(
     <React.StrictMode>
-        <App env={getEnvironment()} />
+        <ScopedCssBaseline>
+            <App env={getEnvironment()} />
+        </ScopedCssBaseline>
     </React.StrictMode>,
     document.getElementById('root') as HTMLElement
 )

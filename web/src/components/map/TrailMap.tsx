@@ -1,4 +1,4 @@
-import { LatLngTuple } from 'leaflet'
+import { LatLngTuple, CRS } from 'leaflet'
 import React from 'react'
 import {
     Map,
@@ -11,12 +11,6 @@ import {
     CircleMarker,
 } from 'react-leaflet'
 import BufferedWMSLayer from './BufferedWMSTileLayer'
-
-// Children optional, not required
-type Props = Omit<MapProps, 'children'> & {
-    hasTouch: boolean
-    children?: Children
-}
 
 type GPSMarkerProps = { pos: Coordinates }
 const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }: GPSMarkerProps) => {
@@ -32,6 +26,14 @@ const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }: GPSMarkerProps) => {
             />
         </>
     )
+}
+
+type Props = Omit<MapProps, 'children'> & {
+    hasTouch: boolean
+    children?: Children
+    showPrecipitation?: boolean
+    showTemperature?: boolean
+    showWind?: boolean
 }
 
 const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
@@ -53,9 +55,20 @@ const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
                     <BufferedWMSLayer
                         url="https://minkarta.lantmateriet.se/map/topowebb/"
                         layers="topowebbkartan"
-                        onload={props.onload}
                     />
                 </LayersControl.BaseLayer>
+                {props.showPrecipitation && (
+                    <BufferedWMSLayer
+                        url="https://wts{s}.smhi.se/tile/"
+                        subdomains={['1', '2', '3', '4']}
+                        transparent={true}
+                        tileSize={512}
+                        crs={CRS.EPSG900913}
+                        // time="2020-10-11T17:00:00Z"
+                        format="image/png"
+                        layers="pmpfrekvent:wpt-overview_n-europe__::2020-10-11T21:00:00Z"
+                    />
+                )}
             </LayersControl>
             {children}
             <ScaleControl position="bottomleft" />

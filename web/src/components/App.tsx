@@ -2,6 +2,7 @@ import React, { useState, useEffect, createRef } from 'react'
 import { FeatureGroup, Map, Viewport } from 'react-leaflet'
 import { makeStyles } from '@material-ui/core/styles'
 import Searchbar from './Searchbar'
+import Overlaybar from './Overlaybar'
 import { TrailMap, GPSMarker } from './map/TrailMap'
 
 type Environment = {
@@ -16,40 +17,28 @@ type Props = {
     env: Environment
 }
 
-const appStyles = makeStyles((theme) => ({
-    map: {
+const appStyles = makeStyles(() => ({
+    fullscreen: {
         position: 'absolute',
         top: 0,
         right: 0,
         height: '100%',
         width: '100vw',
     },
-    add: {
-        [theme.breakpoints.down('sm')]: {
-            margin: theme.spacing(2),
-        },
-        [theme.breakpoints.up('sm')]: {
-            margin: theme.spacing(4),
-        },
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        zIndex: 1000,
-    },
 }))
 
 const App: React.FC<Props> = (props: Props) => {
-    useEffect(() => console.log('Running in ' + props.env.environment))
+    useEffect(() => console.log('Running in ' + env.environment))
 
-    const styles = appStyles()
+    const css = appStyles(),
+        { env } = props
 
     const mapRef = createRef<Map>(),
         groupRef = createRef<FeatureGroup>()
 
-    const [showBar, setShowBar] = useState(false)
-    const [position, setPosition] = useState<Coordinates | undefined>(
-            undefined
-        ),
+    const [showWeather, setShowWeather] = useState(false),
+        [showBar, setShowBar] = useState(false),
+        [position, setPosition] = useState<Coordinates | undefined>(undefined),
         [viewport, setViewPort] = useState<Viewport>({
             center: [59.334591, 18.06324],
             zoom: 8,
@@ -80,17 +69,22 @@ const App: React.FC<Props> = (props: Props) => {
     }, [])
 
     return (
-        <div>
+        <div className={css.fullscreen}>
             <TrailMap
-                className={styles.map}
+                className={css.fullscreen}
                 viewport={viewport}
-                hasTouch={props.env.browser.hasTouch}
+                hasTouch={env.browser.hasTouch}
                 ref={mapRef}
+                showPrecipitation={showWeather}
             >
                 <FeatureGroup ref={groupRef}>
                     {position && <GPSMarker pos={position} />}
                 </FeatureGroup>
             </TrailMap>
+            <Overlaybar
+                shown={showBar}
+                precipitation={{ onClick: setShowWeather }}
+            />
             <Searchbar
                 shown={showBar}
                 onGPSLocate={flyToPosition}
