@@ -13,6 +13,7 @@ export default merge(commonConfig, {
     ],
     devServer: {
         hot: true, // enable HMR on the server
+        compress: true,
     },
     devtool: 'eval-source-map',
     plugins: [

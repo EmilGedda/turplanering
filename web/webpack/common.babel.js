@@ -14,26 +14,30 @@ export default {
             {
                 test: /\.js$/,
                 use: ['babel-loader', 'source-map-loader'],
-                exclude: /node_modules/,
+                exclude: /node_modules/
             },
             {
                 test: /\.tsx?$/,
-                "exclude": /node_modules/,
-                "use": {
-                    "loader": "ts-loader",
-                    "options": {
-                        "transpileOnly": true
+                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        'transpileOnly': true
                     }
                 }
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
-                    'file-loader?hash=sha512&digest=hex&name=img/[contenthash:8].[ext]',
-                    'image-webpack-loader?bypassOnDebug&optipng.optimizationLevel=7&gifsicle.interlaced=false',
-                ],
-            },
-        ],
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        hash: 'sha256',
+                        digest: 'hex',
+                        name: 'img/[contenthash:8].[ext]'
+                    }
+                }
+            }
+        ]
     },
     plugins: [
         new ForkTsCheckerWebpackPlugin({typescript: {configFile: '../tsconfig.json'}}),
