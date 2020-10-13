@@ -69,48 +69,44 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Functions</h3>
+							<h3>Variables</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-not-exported"><a href="_index_.html#getenvironment" class="tsd-kind-icon">get<wbr>Environment</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_index_.html#env" class="tsd-kind-icon">env</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
-				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
-					<a name="getenvironment" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Environment</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Environment<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/0ff127d/web/src/index.tsx#L26">src/index.tsx:26</a></li>
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+					<a name="env" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> env</h3>
+					<div class="tsd-signature tsd-kind-icon">env<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = (() &#x3D;&gt; {const browser &#x3D; {hasTouch: &#x27;ontouchstart&#x27; in window || navigator.maxTouchPoints &gt; 0,}if (process.env.NODE_ENV &#x3D;&#x3D; &#x27;production&#x27;) {return {apiURL: &#x27;localhost:8080&#x27;,environment: &#x27;production&#x27;,browser,}}return {apiURL: &#x27;localhost:8080&#x27;,environment: &#x27;development&#x27;,browser,}})()</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/370e83d/web/src/index.tsx#L26">src/index.tsx:26</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+							<li class="tsd-parameter">
+								<h5>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></h5>
+								<ul class="tsd-parameters">
+									<li class="tsd-parameter">
+										<h5>has<wbr>Touch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
+									</li>
 								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
-							<ul class="tsd-parameters">
-								<li class="tsd-parameter">
-									<h5>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li class="tsd-parameter">
-									<h5>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></h5>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter">
-											<h5>has<wbr>Touch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
-										</li>
-									</ul>
-								</li>
-								<li class="tsd-parameter">
-									<h5>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-								</li>
-							</ul>
-						</li>
-					</ul>
+							</li>
+							<li class="tsd-parameter">
+								<h5>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -128,6 +124,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_components_searchbar_.html">&quot;components/<wbr>Searchbar&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="_components_timeline_.html">&quot;components/<wbr>Timeline&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_components_map_bufferedtilelayer_.html">&quot;components/map/<wbr>Buffered<wbr>Tile<wbr>Layer&quot;</a>
@@ -148,8 +147,8 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
-						<a href="_index_.html#getenvironment" class="tsd-kind-icon">get<wbr>Environment</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_index_.html#env" class="tsd-kind-icon">env</a>
 					</li>
 				</ul>
 			</nav>
