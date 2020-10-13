@@ -23,7 +23,7 @@ import { render } from 'react-dom'
 import { App } from './components/App'
 import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline'
 
-const getEnvironment = () => {
+const env = (() => {
     const browser = {
         hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
     }
@@ -39,7 +39,7 @@ const getEnvironment = () => {
         environment: 'development',
         browser,
     }
-}
+})()
 
 // Opt-in to Webpack hot module replacement
 if (module.hot) module.hot.accept()
@@ -47,7 +47,7 @@ if (module.hot) module.hot.accept()
 render(
     <React.StrictMode>
         <ScopedCssBaseline>
-            <App env={getEnvironment()} />
+            <App env={env} />
         </ScopedCssBaseline>
     </React.StrictMode>,
     document.getElementById('root') as HTMLElement

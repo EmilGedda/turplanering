@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useState, ReactElement } from 'react'
 import { WeatherPouring, Thermometer, WeatherWindy } from 'mdi-material-ui'
 import {
     Slide,
@@ -11,8 +11,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 type ToggleLayerCallback = (shown: boolean) => void
 
-type ToggleButtonProps = LayerToggleProps &
-    Omit<IconButtonProps, 'onClick' | 'disabled'>
+type ToggleButtonProps = LayerToggleProps & Omit<IconButtonProps, 'onClick'>
 
 const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
     const [active, setIsActive] = useState(false)
@@ -38,22 +37,38 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
 
 type LayerToggleProps = {
     onClick?: ToggleLayerCallback
-    disabled?: boolean
 }
 
 type Props = {
     shown: boolean
-    precipitation?: LayerToggleProps
-    wind?: LayerToggleProps
-    temperature?: LayerToggleProps
+    children: ReactElement<ToggleButtonProps>[]
 }
 
-const Overlaybar: FC<Props> = (props: Props) => {
-    const { precipitation, wind, temperature } = props
+const IconToggleButton = (Icon: FC): FC<ToggleButtonProps> => {
+    return Object.assign(
+        (props: ToggleButtonProps) => (
+            <ToggleButton {...props}>
+                <Icon />
+            </ToggleButton>
+        ),
+        { displayName: 'IconToggleButton' }
+    )
+}
+
+export const WeatherToggleButton = IconToggleButton(WeatherPouring)
+export const WindToggleButton = IconToggleButton(WeatherWindy)
+export const TemperatureToggleButton = IconToggleButton(Thermometer)
+
+WeatherToggleButton.displayName = 'WeatherToggleButton'
+WindToggleButton.displayName = 'WindToggleButton'
+TemperatureToggleButton.displayName = 'TemperatureToggleButton'
+
+export const Overlaybar: FC<Props> = (props: Props) => {
+    const { shown, children: buttons } = props
     const css = overlaybarCSS()
 
     return (
-        <Slide direction="left" in={props.shown}>
+        <Slide direction="left" in={shown}>
             <div className={css.outer}>
                 <Paper elevation={5} square={false}>
                     <Grid
@@ -62,15 +77,7 @@ const Overlaybar: FC<Props> = (props: Props) => {
                         justify="space-around"
                         alignItems="flex-end"
                     >
-                        <ToggleButton {...precipitation}>
-                            <WeatherPouring />
-                        </ToggleButton>
-                        <ToggleButton {...wind}>
-                            <WeatherWindy />
-                        </ToggleButton>
-                        <ToggleButton {...temperature}>
-                            <Thermometer />
-                        </ToggleButton>
+                        {...buttons}
                     </Grid>
                 </Paper>
             </div>
@@ -96,5 +103,3 @@ const overlaybarCSS = makeStyles((theme) => ({
         zIndex: 1000,
     },
 }))
-
-export default Overlaybar

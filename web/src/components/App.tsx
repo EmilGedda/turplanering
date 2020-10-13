@@ -2,8 +2,15 @@ import React, { useState, useEffect, createRef } from 'react'
 import { FeatureGroup, Map, Viewport } from 'react-leaflet'
 import { makeStyles } from '@material-ui/core/styles'
 import Searchbar from './Searchbar'
-import Overlaybar from './Overlaybar'
-import { TrailMap, GPSMarker } from './map/TrailMap'
+import {
+    Overlaybar,
+    WeatherToggleButton,
+    WindToggleButton,
+    TemperatureToggleButton,
+} from './Overlaybar'
+import Timeline from './Timeline'
+import BufferedWMSLayer from './map/BufferedWMSTileLayer'
+import { TrailMap, GPSMarker, WeatherLayer } from './map/TrailMap'
 
 type Environment = {
     apiURL: string
@@ -17,6 +24,8 @@ type Props = {
     env: Environment
 }
 
+type BooleanToggle = (show: boolean) => void
+
 const appStyles = makeStyles(() => ({
     fullscreen: {
         position: 'absolute',
@@ -28,16 +37,21 @@ const appStyles = makeStyles(() => ({
 }))
 
 const App: React.FC<Props> = (props: Props) => {
-    useEffect(() => console.log('Running in ' + env.environment))
-
     const css = appStyles(),
         { env } = props
+
+    useEffect(() => console.log('Running in ' + env.environment), [
+        env.environment,
+    ])
 
     const mapRef = createRef<Map>(),
         groupRef = createRef<FeatureGroup>()
 
     const [showWeather, setShowWeather] = useState(false),
+        [showWind, setShowWind] = useState(false),
+        [showTemperature, setShowTemperature] = useState(false),
         [showBar, setShowBar] = useState(false),
+        [layerCount, setLayerCount] = useState(0),
         [position, setPosition] = useState<Coordinates | undefined>(undefined),
         [viewport, setViewPort] = useState<Viewport>({
             center: [59.334591, 18.06324],
@@ -51,15 +65,16 @@ const App: React.FC<Props> = (props: Props) => {
     }
 
     const flyToPosition: PositionCallback = ({ coords }) => {
-        if (!mapRef.current || !groupRef.current) return
+        if (!mapRef.current || !groupRef.current || !coords) return
         const map = mapRef.current.leafletElement
         const group = groupRef.current.leafletElement
+        if (!map || !group) return
         setPosition(coords)
-        map.fitBounds(group.getBounds())
-        const { lat, lng } = map.getCenter()
+        const zoom = map.getBoundsZoom(group.getBounds())
+        const { latitude, longitude } = coords
         setViewPort({
-            center: [lat, lng],
-            zoom: map.getZoom(),
+            center: [latitude, longitude],
+            zoom: zoom - 0.5,
         })
     }
 
@@ -68,6 +83,15 @@ const App: React.FC<Props> = (props: Props) => {
         return () => clearTimeout(timeout)
     }, [])
 
+    const layerToggle = (toggle: BooleanToggle): BooleanToggle => {
+        return (show: boolean): void => {
+            setLayerCount(layerCount + (show ? 1 : -1))
+            toggle(show)
+        }
+    }
+
+    const referenceTime = new Date('2020-10-12T21:00:00Z')
+
     return (
         <div className={css.fullscreen}>
             <TrailMap
@@ -75,27 +99,38 @@ const App: React.FC<Props> = (props: Props) => {
                 viewport={viewport}
                 hasTouch={env.browser.hasTouch}
                 ref={mapRef}
-                showPrecipitation={showWeather}
             >
+                <BufferedWMSLayer
+                    url="https://minkarta.lantmateriet.se/map/topowebb/"
+                    layers="topowebbkartan"
+                />
+
+                {showWeather && <WeatherLayer referenceTime={referenceTime} />}
+                {showWind && <WeatherLayer referenceTime={referenceTime} />}
+                {showTemperature && (
+                    <WeatherLayer referenceTime={referenceTime} />
+                )}
+
                 <FeatureGroup ref={groupRef}>
                     {position && <GPSMarker pos={position} />}
                 </FeatureGroup>
             </TrailMap>
-            <Overlaybar
-                shown={showBar}
-                precipitation={{ onClick: setShowWeather }}
-            />
+
+            <Timeline shown={layerCount > 0 && showBar} timepoints={[]} />
+
+            <Overlaybar shown={showBar}>
+                <WeatherToggleButton onClick={layerToggle(setShowWeather)} />
+                <WindToggleButton onClick={layerToggle(setShowWind)} />
+                <TemperatureToggleButton
+                    onClick={layerToggle(setShowTemperature)}
+                />
+            </Overlaybar>
             <Searchbar
                 shown={showBar}
                 onGPSLocate={flyToPosition}
                 onGPSTrack={updatePosition}
                 onGPSDeactivate={hideGPSMarker}
             />
-            {/*
-            <Fab className={styles.add} color="primary">
-                <AddIcon />
-            </Fab>
-            */}
         </div>
     )
 }

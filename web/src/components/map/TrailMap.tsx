@@ -1,15 +1,14 @@
-import { LatLngTuple, CRS } from 'leaflet'
-import React from 'react'
+import React, { FC } from 'react'
 import {
     Map,
     MapProps,
     AttributionControl,
-    LayersControl,
     Children,
     ScaleControl,
     Circle,
     CircleMarker,
 } from 'react-leaflet'
+import { LatLngTuple, CRS } from 'leaflet'
 import BufferedWMSLayer from './BufferedWMSTileLayer'
 
 type GPSMarkerProps = { pos: Coordinates }
@@ -31,9 +30,38 @@ const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }: GPSMarkerProps) => {
 type Props = Omit<MapProps, 'children'> & {
     hasTouch: boolean
     children?: Children
-    showPrecipitation?: boolean
     showTemperature?: boolean
     showWind?: boolean
+}
+
+type WeatherLayerProps = {
+    referenceTime: Date
+    displayTime?: Date
+}
+
+const WeatherLayer: FC<WeatherLayerProps> = ({
+    displayTime,
+    referenceTime,
+}: WeatherLayerProps) => {
+    const timeStr = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
+    const now = timeStr(referenceTime)
+
+    if (!displayTime)
+        displayTime = new Date(referenceTime.getTime() + 60 * 60 * 1000)
+
+    return (
+        <BufferedWMSLayer
+            url="https://wts{s}.smhi.se/tile/"
+            subdomains="1234"
+            transparent={true}
+            tileSize={512}
+            crs={CRS.EPSG900913}
+            format="image/png"
+            dim_reftime={now}
+            time={timeStr(displayTime)}
+            layers={'pmpfrekvent:wpt-overview_n-europe__::' + now}
+        />
+    )
 }
 
 const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
@@ -47,29 +75,6 @@ const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
             zoomSnap={0}
             ref={ref}
         >
-            <LayersControl position="topright">
-                <LayersControl.BaseLayer
-                    name="Lantmäteriet Webbkarta"
-                    checked={true}
-                >
-                    <BufferedWMSLayer
-                        url="https://minkarta.lantmateriet.se/map/topowebb/"
-                        layers="topowebbkartan"
-                    />
-                </LayersControl.BaseLayer>
-                {props.showPrecipitation && (
-                    <BufferedWMSLayer
-                        url="https://wts{s}.smhi.se/tile/"
-                        subdomains={['1', '2', '3', '4']}
-                        transparent={true}
-                        tileSize={512}
-                        crs={CRS.EPSG900913}
-                        // time="2020-10-11T17:00:00Z"
-                        format="image/png"
-                        layers="pmpfrekvent:wpt-overview_n-europe__::2020-10-11T21:00:00Z"
-                    />
-                )}
-            </LayersControl>
             {children}
             <ScaleControl position="bottomleft" />
             <AttributionControl position="bottomright" prefix={false} />
@@ -79,4 +84,4 @@ const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
 
 TrailMap.displayName = 'TrailMap'
 
-export { TrailMap, GPSMarker }
+export { TrailMap, GPSMarker, WeatherLayer }

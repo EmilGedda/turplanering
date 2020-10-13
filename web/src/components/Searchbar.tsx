@@ -7,12 +7,12 @@ import {
     Search,
 } from '@material-ui/icons'
 import {
-    Slide,
     Divider,
-    InputBase,
-    Paper,
     IconButton,
     IconButtonProps,
+    InputBase,
+    Paper,
+    Slide,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -96,9 +96,9 @@ type Props = {
 
 const Searchbar: FC<Props> = (props: Props) => {
     const { onGPSTrack } = props,
-        css = searchbarCSS(),
         [watchID, setWatchID] = useState(0),
         [gpsStatus, setGPSStatus] = useState(GPSStatus.Inactive),
+        css = searchbarCSS(),
         gps = navigator.geolocation
 
     const stopTracking = () => {
