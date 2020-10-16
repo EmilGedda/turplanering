@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import {
     Divider,
     Grid,
@@ -26,27 +26,64 @@ type SliderCallback = (
 const Timeline: FC<Props> = (props: Props) => {
     const { shown, timepoints, onChange } = props
     const css = timelineCSS()
-    const [currentIdx, setCurrentIdx] = useState(0)
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [running, setRunning] = useState(false)
     const [watchID, setWatchID] = useState(-1)
+
+    const start = (run: boolean) => {
+        if (run && currentIndex == timepoints.length - 1) {
+            setCurrentIndex(0)
+        }
+        setRunning(run)
+    }
 
     const updateTime = (f: (timepoint: Date) => void): SliderCallback => {
         return (_, value) => {
             const v = value as number
-            if (value == currentIdx) return
+            if (v == currentIndex || v < 0 || v >= timepoints.length) return
+
+            if (running) {
+                setRunning(false)
+            }
+
             if (watchID != -1) {
                 clearTimeout(watchID)
             }
 
-            if (v >= 0 && v < timepoints.length) setCurrentIdx(v)
+            setCurrentIndex(v)
             setWatchID(
-                window.setTimeout(() => {
-                    f(timepoints[v])
-                    setWatchID(-1)
-                }, 300)
+                window.setTimeout(
+                    (idx: number) => {
+                        setWatchID(-1)
+                        f(timepoints[idx])
+                    },
+                    300,
+                    v
+                )
             )
         }
     }
-    console.log(timepoints)
+
+    useEffect(() => {
+        if (running) {
+            const id = window.setTimeout(() => {
+                onChange(timepoints[currentIndex + 1])
+                setCurrentIndex(currentIndex + 1)
+                if (currentIndex + 1 == timepoints.length - 1) {
+                    setWatchID(-1)
+                    setRunning(false)
+                }
+            }, 2500)
+            setWatchID(id)
+            return () => clearInterval(id)
+        }
+    }, [running, currentIndex, onChange, timepoints])
+
+    if (!shown && watchID != -1) {
+        clearTimeout(watchID)
+        setWatchID(-1)
+        setRunning(false)
+    }
 
     return (
         <Slide direction="up" in={shown} mountOnEnter>
@@ -58,17 +95,18 @@ const Timeline: FC<Props> = (props: Props) => {
                         justify="flex-start"
                         alignItems="center"
                     >
-                        <PlayButton />
+                        <PlayButton onClick={start} isplaying={running} />
                         <Divider
                             className={css.divider}
                             orientation="vertical"
                         />
                         <div style={{ flex: 1, marginLeft: 2 }}>
                             <Typography>
-                                {timepoints[currentIdx].toString()}
+                                {timepoints[currentIndex].toString()}
                             </Typography>
                             <Slider
                                 max={timepoints.length - 1}
+                                value={currentIndex}
                                 onChange={updateTime(onChange)}
                             />
                         </div>
@@ -79,16 +117,16 @@ const Timeline: FC<Props> = (props: Props) => {
     )
 }
 
-type PlayButtonProps = { onClick?: (play: boolean) => void } & IconButtonProps
+type PlayButtonProps = {
+    isplaying: boolean
+    onClick: (play: boolean) => void
+} & Omit<IconButtonProps, 'onClick'>
+
 const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
-    const [active, setIsActive] = useState(false)
-    const { onClick: callback, ...baseProps } = props
+    const { onClick: callback, isplaying, ...baseProps } = props
     const css = timelineCSS()
 
-    const onClick = () => {
-        if (callback) callback(!active)
-        setIsActive(!active)
-    }
+    const onClick = () => callback(!isplaying)
 
     return (
         <IconButton
@@ -98,7 +136,7 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
             edge="end"
             {...baseProps}
         >
-            {active ? (
+            {isplaying ? (
                 <PauseCircleOutline className={css.icon} />
             ) : (
                 <PlayCircleOutline className={css.icon} />
