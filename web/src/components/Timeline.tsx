@@ -15,14 +15,41 @@ import { makeStyles } from '@material-ui/core/styles'
 type Props = {
     shown: boolean
     timepoints: Date[]
-    onChange?: (timepoint: Date) => void
+    onChange: (timepoint: Date) => void
 }
 
+type SliderCallback = (
+    event: React.ChangeEvent<unknown>,
+    value: number | number[]
+) => void
+
 const Timeline: FC<Props> = (props: Props) => {
+    const { shown, timepoints, onChange } = props
     const css = timelineCSS()
+    const [currentIdx, setCurrentIdx] = useState(0)
+    const [watchID, setWatchID] = useState(-1)
+
+    const updateTime = (f: (timepoint: Date) => void): SliderCallback => {
+        return (_, value) => {
+            const v = value as number
+            if (value == currentIdx) return
+            if (watchID != -1) {
+                clearTimeout(watchID)
+            }
+
+            if (v >= 0 && v < timepoints.length) setCurrentIdx(v)
+            setWatchID(
+                window.setTimeout(() => {
+                    f(timepoints[v])
+                    setWatchID(-1)
+                }, 300)
+            )
+        }
+    }
+    console.log(timepoints)
 
     return (
-        <Slide direction="up" in={props.shown} mountOnEnter unmountOnExit>
+        <Slide direction="up" in={shown} mountOnEnter>
             <div className={css.outer}>
                 <Paper elevation={5} square={false} className={css.bar}>
                     <Grid
@@ -37,13 +64,12 @@ const Timeline: FC<Props> = (props: Props) => {
                             orientation="vertical"
                         />
                         <div style={{ flex: 1, marginLeft: 2 }}>
-                            <Typography>Måndag</Typography>
+                            <Typography>
+                                {timepoints[currentIdx].toString()}
+                            </Typography>
                             <Slider
-                                defaultValue={1}
-                                step={1}
-                                min={0}
-                                max={75}
-                                valueLabelDisplay="auto"
+                                max={timepoints.length - 1}
+                                onChange={updateTime(onChange)}
                             />
                         </div>
                     </Grid>

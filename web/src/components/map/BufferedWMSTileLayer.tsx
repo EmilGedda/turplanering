@@ -9,11 +9,31 @@ type Props = WMSTileLayerProps & {
 
 type WMSLayer = TileLayer.WMS
 
+type WMSParams = {
+    dim_reftime?: string
+    time?: string
+    format?: string
+    layers?: string
+    request?: string
+    service?: string
+    styles?: string
+    version?: string
+    transparent?: boolean
+    width?: number
+    height?: number
+}
+
 class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
     updateLeafletElement(fromProps: Props, toProps: Props) {
         super.updateLeafletElement(fromProps, toProps)
         if (toProps.url !== fromProps.url) {
             this.leafletElement.setUrl(toProps.url)
+        }
+        if (
+            toProps.dim_reftime !== fromProps.dim_reftime ||
+            toProps.time !== fromProps.time
+        ) {
+            this.leafletElement.setParams(this.getParams(toProps))
         }
     }
 
@@ -39,9 +59,8 @@ class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
 
     getOptions(props: any): any {
         const keys = [
-            "addBaseLayer",
-            "addOverlay", "removeLayer",
-            "removeLayerControl"
+            "addBaseLayer", "addOverlay", "removeLayer",
+            "removeLayerControl", "bufferRadius", "leaflet"
         ]
 
         for (let key of keys) {
@@ -49,6 +68,27 @@ class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
         }
 
         return props
+    }
+
+    getParams(props: any): any {
+        const keys: Array<keyof WMSParams> = [
+            "dim_reftime", "time",
+            "format", "layers",
+            "request", "service",
+            "styles", "version",
+            "width", "height",
+            "transparent",
+        ]
+
+        let params:WMSParams = {}
+
+        for (let key of keys) {
+            if (props[key]) {
+                params[key] = props[key]
+            }
+        }
+
+        return params
     }
     /* eslint-enable */
 }

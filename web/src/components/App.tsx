@@ -10,6 +10,7 @@ import {
 } from './Overlaybar'
 import Timeline from './Timeline'
 import BufferedWMSLayer from './map/BufferedWMSTileLayer'
+import { ForecastAPI, ForecastTimestamps } from '../forecast'
 import { TrailMap, GPSMarker, WeatherLayer } from './map/TrailMap'
 
 type Environment = {
@@ -22,9 +23,8 @@ type Environment = {
 
 type Props = {
     env: Environment
+    forecastAPI: ForecastAPI
 }
-
-type BooleanToggle = (show: boolean) => void
 
 const appStyles = makeStyles(() => ({
     fullscreen: {
@@ -38,7 +38,7 @@ const appStyles = makeStyles(() => ({
 
 const App: React.FC<Props> = (props: Props) => {
     const css = appStyles(),
-        { env } = props
+        { env, forecastAPI } = props
 
     useEffect(() => console.log('Running in ' + env.environment), [
         env.environment,
@@ -47,16 +47,28 @@ const App: React.FC<Props> = (props: Props) => {
     const mapRef = createRef<Map>(),
         groupRef = createRef<FeatureGroup>()
 
-    const [showWeather, setShowWeather] = useState(false),
-        [showWind, setShowWind] = useState(false),
-        [showTemperature, setShowTemperature] = useState(false),
-        [showBar, setShowBar] = useState(false),
-        [layerCount, setLayerCount] = useState(0),
-        [position, setPosition] = useState<Coordinates | undefined>(undefined),
-        [viewport, setViewPort] = useState<Viewport>({
-            center: [59.334591, 18.06324],
-            zoom: 8,
-        })
+    const [showBar, setShowBar] = useState(false)
+    const [hasForecast, setHasForecast] = useState(false)
+    const [displayTime, setDisplayTime] = useState<Date | undefined>()
+    const [referenceTime, setReferenceTime] = useState<Date | undefined>()
+
+    const [forecast, setForecast] = useState<ForecastTimestamps>({
+        reference: new Date(),
+        validTimes: [new Date()],
+    })
+
+    const [overlays, setOverlays] = useState({
+        weather: false,
+        wind: false,
+        temperature: false,
+        layers: 0,
+    })
+
+    const [position, setPosition] = useState<Coordinates>()
+    const [viewport, setViewPort] = useState<Viewport>({
+        center: [59.334591, 18.06324],
+        zoom: 8,
+    })
 
     const hideGPSMarker = () => setPosition(undefined)
 
@@ -79,18 +91,35 @@ const App: React.FC<Props> = (props: Props) => {
     }
 
     useEffect(() => {
+        void (async (): Promise<void> => {
+            console.log('Fetching forecast...')
+            const before = new Date()
+            const forecast = await forecastAPI.ValidTimes()
+            const duration = new Date().getTime() - before.getTime()
+            console.log(
+                `Fetched forecast, reference time: ${forecast.reference.toUTCString()}` +
+                    `, with ${forecast.validTimes.length} timestamps in ${duration}ms`
+            )
+            setForecast(forecast)
+            setReferenceTime(forecast.reference)
+            setDisplayTime(forecast.validTimes[0])
+            setHasForecast(true)
+        })()
+    }, [forecastAPI])
+
+    useEffect(() => {
         const timeout = setTimeout(setShowBar, 500, true)
         return () => clearTimeout(timeout)
     }, [])
 
-    const layerToggle = (toggle: BooleanToggle): BooleanToggle => {
-        return (show: boolean): void => {
-            setLayerCount(layerCount + (show ? 1 : -1))
-            toggle(show)
+    const toggleOverlay = (key: 'weather' | 'wind' | 'temperature') => {
+        return (enable: boolean) => {
+            const count = overlays.layers + (enable ? 1 : -1)
+            const obj = { ...overlays, layers: count }
+            obj[key] = enable
+            setOverlays(obj)
         }
     }
-
-    const referenceTime = new Date('2020-10-12T21:00:00Z')
 
     return (
         <div className={css.fullscreen}>
@@ -105,10 +134,11 @@ const App: React.FC<Props> = (props: Props) => {
                     layers="topowebbkartan"
                 />
 
-                {showWeather && <WeatherLayer referenceTime={referenceTime} />}
-                {showWind && <WeatherLayer referenceTime={referenceTime} />}
-                {showTemperature && (
-                    <WeatherLayer referenceTime={referenceTime} />
+                {overlays.weather && displayTime && referenceTime && (
+                    <WeatherLayer
+                        referenceTime={referenceTime}
+                        displayTime={displayTime}
+                    />
                 )}
 
                 <FeatureGroup ref={groupRef}>
@@ -116,15 +146,20 @@ const App: React.FC<Props> = (props: Props) => {
                 </FeatureGroup>
             </TrailMap>
 
-            <Timeline shown={layerCount > 0 && showBar} timepoints={[]} />
+            <Timeline
+                shown={overlays.layers > 0 && showBar}
+                timepoints={forecast.validTimes}
+                onChange={setDisplayTime}
+            />
 
-            <Overlaybar shown={showBar}>
-                <WeatherToggleButton onClick={layerToggle(setShowWeather)} />
-                <WindToggleButton onClick={layerToggle(setShowWind)} />
+            <Overlaybar shown={hasForecast && showBar}>
+                <WeatherToggleButton onClick={toggleOverlay('weather')} />
+                <WindToggleButton onClick={toggleOverlay('wind')} />
                 <TemperatureToggleButton
-                    onClick={layerToggle(setShowTemperature)}
+                    onClick={toggleOverlay('temperature')}
                 />
             </Overlaybar>
+
             <Searchbar
                 shown={showBar}
                 onGPSLocate={flyToPosition}

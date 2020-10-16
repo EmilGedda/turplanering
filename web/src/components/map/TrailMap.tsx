@@ -36,7 +36,7 @@ type Props = Omit<MapProps, 'children'> & {
 
 type WeatherLayerProps = {
     referenceTime: Date
-    displayTime?: Date
+    displayTime: Date
 }
 
 const WeatherLayer: FC<WeatherLayerProps> = ({
@@ -45,9 +45,6 @@ const WeatherLayer: FC<WeatherLayerProps> = ({
 }: WeatherLayerProps) => {
     const timeStr = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
     const now = timeStr(referenceTime)
-
-    if (!displayTime)
-        displayTime = new Date(referenceTime.getTime() + 60 * 60 * 1000)
 
     return (
         <BufferedWMSLayer

@@ -20,8 +20,9 @@
 
 import React from 'react'
 import { render } from 'react-dom'
-import { App } from './components/App'
 import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline'
+import { Smhi } from './forecast'
+import { App } from './components/App'
 
 const env = (() => {
     const browser = {
@@ -47,7 +48,7 @@ if (module.hot) module.hot.accept()
 render(
     <React.StrictMode>
         <ScopedCssBaseline>
-            <App env={env} />
+            <App env={env} forecastAPI={Smhi} />
         </ScopedCssBaseline>
     </React.StrictMode>,
     document.getElementById('root') as HTMLElement
