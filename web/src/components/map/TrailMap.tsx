@@ -9,10 +9,13 @@ import {
     CircleMarker,
 } from 'react-leaflet'
 import { LatLngTuple, CRS } from 'leaflet'
-import BufferedWMSLayer from './BufferedWMSTileLayer'
+import { WMSLayer, BufferedWMSLayerProps } from './BufferedWMSTileLayer'
 
 type GPSMarkerProps = { pos: Coordinates }
-const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }: GPSMarkerProps) => {
+
+export const GPSMarker: React.FC<GPSMarkerProps> = ({
+    pos,
+}: GPSMarkerProps) => {
     const center: LatLngTuple = [pos.latitude, pos.longitude]
     return (
         <>
@@ -34,20 +37,22 @@ type Props = Omit<MapProps, 'children'> & {
     showWind?: boolean
 }
 
-type WeatherLayerProps = {
+type OverlayProps = Omit<BufferedWMSLayerProps, 'url'> & {
     referenceTime: Date
     displayTime: Date
 }
 
-const WeatherLayer: FC<WeatherLayerProps> = ({
-    displayTime,
-    referenceTime,
-}: WeatherLayerProps) => {
-    const timeStr = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
+type SmhiLayerProps = OverlayProps & { layer: string }
+
+const timeStr = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
+
+const SmhiLayer: FC<SmhiLayerProps> = (props: SmhiLayerProps) => {
+    const { displayTime, referenceTime, layer, ...baseProps } = props
     const now = timeStr(referenceTime)
 
     return (
-        <BufferedWMSLayer
+        <WMSLayer
+            {...baseProps}
             url="https://wts{s}.smhi.se/tile/"
             subdomains="1234"
             transparent={true}
@@ -56,12 +61,28 @@ const WeatherLayer: FC<WeatherLayerProps> = ({
             format="image/png"
             dim_reftime={now}
             time={timeStr(displayTime)}
-            layers={'pmpfrekvent:wpt-overview_n-europe__::' + now}
+            layers={layer + '::' + now}
         />
     )
 }
 
-const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
+export const WeatherLayer: FC<OverlayProps> = (props: OverlayProps) => {
+    return (
+        <SmhiLayer {...props} layer={'pmpfrekvent:wpt-overview_n-europe__'} />
+    )
+}
+
+export const TemperatureLayer: FC<OverlayProps> = (props: OverlayProps) => {
+    return (
+        <SmhiLayer
+            {...props}
+            opacity={0.5}
+            layer={'pmpfrekvent:temperature-2m_n-europe_rainbow_'}
+        />
+    )
+}
+
+export const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
     const { children, ...baseProps } = props
     return (
         <Map
@@ -80,5 +101,3 @@ const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
 })
 
 TrailMap.displayName = 'TrailMap'
-
-export { TrailMap, GPSMarker, WeatherLayer }

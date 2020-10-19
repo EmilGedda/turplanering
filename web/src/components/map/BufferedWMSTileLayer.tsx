@@ -29,6 +29,11 @@ class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
         if (toProps.url !== fromProps.url) {
             this.leafletElement.setUrl(toProps.url)
         }
+        if (toProps.opacity !== fromProps.opacity) {
+            this.leafletElement.setOpacity(
+                toProps.opacity ? toProps.opacity : 1.0
+            )
+        }
         if (
             toProps.dim_reftime !== fromProps.dim_reftime ||
             toProps.time !== fromProps.time
@@ -60,7 +65,7 @@ class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
     getOptions(props: any): any {
         const keys = [
             "addBaseLayer", "addOverlay", "removeLayer",
-            "removeLayerControl", "bufferRadius", "leaflet"
+            "removeLayerControl", "bufferRadius", "leaflet",
         ]
 
         for (let key of keys) {
@@ -93,4 +98,5 @@ class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
     /* eslint-enable */
 }
 
-export default withLeaflet<Props>(BufferedWMSLayer)
+export const WMSLayer = withLeaflet<Props>(BufferedWMSLayer)
+export type { Props as BufferedWMSLayerProps }

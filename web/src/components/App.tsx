@@ -9,9 +9,14 @@ import {
     TemperatureToggleButton,
 } from './Overlaybar'
 import Timeline from './Timeline'
-import BufferedWMSLayer from './map/BufferedWMSTileLayer'
+import { WMSLayer } from './map/BufferedWMSTileLayer'
 import { ForecastAPI, ForecastTimestamps } from '../forecast'
-import { TrailMap, GPSMarker, WeatherLayer } from './map/TrailMap'
+import {
+    TrailMap,
+    GPSMarker,
+    WeatherLayer,
+    TemperatureLayer,
+} from './map/TrailMap'
 
 type Environment = {
     apiURL: string
@@ -129,10 +134,17 @@ const App: React.FC<Props> = (props: Props) => {
                 hasTouch={env.browser.hasTouch}
                 ref={mapRef}
             >
-                <BufferedWMSLayer
+                <WMSLayer
                     url="https://minkarta.lantmateriet.se/map/topowebb/"
                     layers="topowebbkartan"
                 />
+
+                {overlays.temperature && displayTime && referenceTime && (
+                    <TemperatureLayer
+                        referenceTime={referenceTime}
+                        displayTime={displayTime}
+                    />
+                )}
 
                 {overlays.weather && displayTime && referenceTime && (
                     <WeatherLayer
