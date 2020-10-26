@@ -23,6 +23,7 @@ type WMSParams = {
     height?: number
 }
 
+// TODO: make this generic to reuse for regular TileLayer
 class BufferedWMSLayer extends GridLayer<Props, WMSLayer> {
     updateLeafletElement(fromProps: Props, toProps: Props) {
         super.updateLeafletElement(fromProps, toProps)

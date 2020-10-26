@@ -9,7 +9,7 @@ import {
     TemperatureToggleButton,
 } from './Overlaybar'
 import Timeline from './Timeline'
-import { WMSLayer } from './map/BufferedWMSTileLayer'
+import { WMSLayer } from './map/WMSTileLayer'
 import { ForecastAPI, ForecastTimestamps } from '../forecast'
 import {
     TrailMap,
@@ -134,6 +134,13 @@ const App: React.FC<Props> = (props: Props) => {
                 hasTouch={env.browser.hasTouch}
                 ref={mapRef}
             >
+                { /* TODO: Add WMTS layer support for faster loading
+                    <WMTSLayer
+                        url="https://kso.etjanster.lantmateriet.se/karta/topowebb/v1.1/wmts"
+                        layers="topowebb"
+                    /> */
+                }
+
                 <WMSLayer
                     url="https://minkarta.lantmateriet.se/map/topowebb/"
                     layers="topowebbkartan"

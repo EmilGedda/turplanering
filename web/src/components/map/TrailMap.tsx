@@ -9,13 +9,11 @@ import {
     CircleMarker,
 } from 'react-leaflet'
 import { LatLngTuple, CRS } from 'leaflet'
-import { WMSLayer, BufferedWMSLayerProps } from './BufferedWMSTileLayer'
+import { WMSLayer, BufferedWMSLayerProps } from './WMSTileLayer'
 
 type GPSMarkerProps = { pos: Coordinates }
 
-export const GPSMarker: React.FC<GPSMarkerProps> = ({
-    pos,
-}: GPSMarkerProps) => {
+export const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }) => {
     const center: LatLngTuple = [pos.latitude, pos.longitude]
     return (
         <>
@@ -44,11 +42,11 @@ type OverlayProps = Omit<BufferedWMSLayerProps, 'url'> & {
 
 type SmhiLayerProps = OverlayProps & { layer: string }
 
-const timeStr = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
+const shortISO = (d: Date): string => d.toISOString().slice(0, -5) + 'Z'
 
-const SmhiLayer: FC<SmhiLayerProps> = (props: SmhiLayerProps) => {
+const SmhiLayer: FC<SmhiLayerProps> = (props) => {
     const { displayTime, referenceTime, layer, ...baseProps } = props
-    const now = timeStr(referenceTime)
+    const now = shortISO(referenceTime)
 
     return (
         <WMSLayer
@@ -60,36 +58,36 @@ const SmhiLayer: FC<SmhiLayerProps> = (props: SmhiLayerProps) => {
             crs={CRS.EPSG900913}
             format="image/png"
             dim_reftime={now}
-            time={timeStr(displayTime)}
+            time={shortISO(displayTime)}
             layers={layer + '::' + now}
         />
     )
 }
 
-export const WeatherLayer: FC<OverlayProps> = (props: OverlayProps) => {
+export const WeatherLayer: FC<OverlayProps> = (props) => {
     return (
-        <SmhiLayer {...props} layer={'pmpfrekvent:wpt-overview_n-europe__'} />
+        <SmhiLayer {...props} layer="pmpfrekvent:wpt-overview_n-europe__" />
     )
 }
 
-export const TemperatureLayer: FC<OverlayProps> = (props: OverlayProps) => {
+export const TemperatureLayer: FC<OverlayProps> = (props) => {
     return (
         <SmhiLayer
             {...props}
             opacity={0.5}
-            layer={'pmpfrekvent:temperature-2m_n-europe_rainbow_'}
+            layer="pmpfrekvent:temperature-2m_n-europe_rainbow_"
         />
     )
 }
 
-export const TrailMap = React.forwardRef<Map, Props>((props: Props, ref) => {
-    const { children, ...baseProps } = props
+export const TrailMap = React.forwardRef<Map, Props>((props, ref) => {
+    const { children, hasTouch, ...baseProps } = props
     return (
         <Map
             {...baseProps}
             useFlyTo={true}
             attributionControl={false}
-            zoomControl={!props.hasTouch}
+            zoomControl={!hasTouch}
             zoomSnap={0}
             ref={ref}
         >
