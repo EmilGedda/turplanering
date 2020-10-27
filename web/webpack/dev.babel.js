@@ -2,6 +2,7 @@
 import commonConfig from './common.babel';
 import {merge} from 'webpack-merge';
 import webpack from 'webpack';
+import {resolve} from 'path';
 
 export default merge(commonConfig, {
     mode: 'development',
@@ -14,8 +15,15 @@ export default merge(commonConfig, {
     devServer: {
         hot: true, // enable HMR on the server
         compress: true,
+        contentBase: resolve(__dirname, '../dist'),
+        publicPath: './',
     },
     devtool: 'eval-source-map',
+    resolve: {
+        alias: {
+            'react-dom': '@hot-loader/react-dom',
+        },
+    },
     plugins: [
         new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     ],

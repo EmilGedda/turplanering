@@ -28,14 +28,7 @@ export default {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        hash: 'sha256',
-                        digest: 'hex',
-                        name: 'img/[contenthash:8].[ext]'
-                    }
-                }
+                type: 'asset/resource'
             }
         ]
     },
