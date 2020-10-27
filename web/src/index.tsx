@@ -18,38 +18,38 @@
  *  along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { render } from 'react-dom'
-import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline'
-import { Smhi } from './forecast'
-import { App } from './components/App'
+import React from 'react';
+import { render } from 'react-dom';
+import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline';
+import { Smhi } from './forecast';
+import { App } from './components/App';
 
 const env = (() => {
-    const browser = {
-        hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-    }
-    if (process.env.NODE_ENV == 'production') {
-        return {
-            apiURL: 'localhost:8080',
-            environment: 'production',
-            browser,
-        }
-    }
+  const browser = {
+    hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+  };
+  if (process.env.NODE_ENV == 'production') {
     return {
-        apiURL: 'localhost:8080',
-        environment: 'development',
-        browser,
-    }
-})()
+      apiURL: 'localhost:8080',
+      environment: 'production',
+      browser,
+    };
+  }
+  return {
+    apiURL: 'localhost:8080',
+    environment: 'development',
+    browser,
+  };
+})();
 
 // Opt-in to Webpack hot module replacement
-if (module.hot) module.hot.accept()
+if (module.hot) module.hot.accept();
 
 render(
-    <React.StrictMode>
-        <ScopedCssBaseline>
-            <App env={env} forecastAPI={Smhi} />
-        </ScopedCssBaseline>
-    </React.StrictMode>,
-    document.getElementById('root') as HTMLElement
-)
+  <React.StrictMode>
+    <ScopedCssBaseline>
+      <App env={env} forecastAPI={Smhi} />
+    </ScopedCssBaseline>
+  </React.StrictMode>,
+  document.getElementById('root') as HTMLElement
+);

@@ -133,13 +133,13 @@
         ],
         "rules": {
             "react-hooks/rules-of-hooks": "error",
-            "react-hooks/exhaustive-deps": "warn"
+            "react-hooks/exhaustive-deps": "warn",
+            "react/prop-types": "off"
         }
     },
     "prettier": {
-        "semi": false,
         "singleQuote": true,
-        "printWidth": 80,
-        "tabWidth": 4
+        "jsxSingleQuote": true,
+        "quoteProps": "consistent"
     }
 }

@@ -1,184 +1,179 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react';
 import {
-    Divider,
-    Grid,
-    IconButton,
-    IconButtonProps,
-    Paper,
-    Slide,
-    Slider,
-    Typography,
-} from '@material-ui/core'
-import { PlayCircleOutline, PauseCircleOutline } from '@material-ui/icons'
-import { makeStyles } from '@material-ui/core/styles'
+  Divider,
+  Grid,
+  IconButton,
+  IconButtonProps,
+  Paper,
+  Slide,
+  Slider,
+  Typography,
+} from '@material-ui/core';
+import { PlayCircleOutline, PauseCircleOutline } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
 
 type Props = {
-    shown: boolean
-    timepoints: Date[]
-    onChange: (timepoint: Date) => void
-}
+  shown: boolean;
+  timepoints: Date[];
+  onChange: (timepoint: Date) => void;
+};
 
 type SliderCallback = (
-    event: React.ChangeEvent<unknown>,
-    value: number | number[]
-) => void
+  event: React.ChangeEvent<unknown>,
+  value: number | number[]
+) => void;
 
 const Timeline: FC<Props> = (props: Props) => {
-    const { shown, timepoints, onChange } = props
-    const css = timelineCSS()
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [running, setRunning] = useState(false)
-    const [watchID, setWatchID] = useState(-1)
+  const { shown, timepoints, onChange } = props;
+  const css = timelineCSS();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [running, setRunning] = useState(false);
+  const [watchID, setWatchID] = useState(-1);
 
-    const start = (run: boolean) => {
-        if (run && currentIndex == timepoints.length - 1) {
-            setCurrentIndex(0)
-        }
-        setRunning(run)
+  const start = (run: boolean) => {
+    if (run && currentIndex == timepoints.length - 1) {
+      setCurrentIndex(0);
     }
+    setRunning(run);
+  };
 
-    const updateTime = (f: (timepoint: Date) => void): SliderCallback => {
-        return (_, value) => {
-            const v = value as number
-            if (v == currentIndex || v < 0 || v >= timepoints.length) return
+  const updateTime = (f: (timepoint: Date) => void): SliderCallback => {
+    return (_, value) => {
+      const v = value as number;
+      if (v == currentIndex || v < 0 || v >= timepoints.length) return;
 
-            if (running) {
-                setRunning(false)
-            }
+      if (running) {
+        setRunning(false);
+      }
 
-            if (watchID != -1) {
-                clearTimeout(watchID)
-            }
+      if (watchID != -1) {
+        clearTimeout(watchID);
+      }
 
-            setCurrentIndex(v)
-            setWatchID(
-                window.setTimeout(
-                    (idx: number) => {
-                        setWatchID(-1)
-                        f(timepoints[idx])
-                    },
-                    300,
-                    v
-                )
-            )
+      setCurrentIndex(v);
+      setWatchID(
+        window.setTimeout(
+          (idx: number) => {
+            setWatchID(-1);
+            f(timepoints[idx]);
+          },
+          300,
+          v
+        )
+      );
+    };
+  };
+
+  useEffect(() => {
+    if (running) {
+      const id = window.setTimeout(() => {
+        onChange(timepoints[currentIndex + 1]);
+        setCurrentIndex(currentIndex + 1);
+        if (currentIndex + 1 == timepoints.length - 1) {
+          setWatchID(-1);
+          setRunning(false);
         }
+      }, 2500);
+      setWatchID(id);
+      return () => clearInterval(id);
     }
+  }, [running, currentIndex, onChange, timepoints]);
 
-    useEffect(() => {
-        if (running) {
-            const id = window.setTimeout(() => {
-                onChange(timepoints[currentIndex + 1])
-                setCurrentIndex(currentIndex + 1)
-                if (currentIndex + 1 == timepoints.length - 1) {
-                    setWatchID(-1)
-                    setRunning(false)
-                }
-            }, 2500)
-            setWatchID(id)
-            return () => clearInterval(id)
-        }
-    }, [running, currentIndex, onChange, timepoints])
+  if (!shown && watchID != -1) {
+    clearTimeout(watchID);
+    setWatchID(-1);
+    setRunning(false);
+  }
 
-    if (!shown && watchID != -1) {
-        clearTimeout(watchID)
-        setWatchID(-1)
-        setRunning(false)
-    }
-
-    return (
-        <Slide direction="up" in={shown} mountOnEnter>
-            <div className={css.outer}>
-                <Paper elevation={5} square={false} className={css.bar}>
-                    <Grid
-                        container
-                        direction="row"
-                        justify="flex-start"
-                        alignItems="center"
-                    >
-                        <PlayButton onClick={start} isplaying={running} />
-                        <Divider
-                            className={css.divider}
-                            orientation="vertical"
-                        />
-                        <div style={{ flex: 1, marginLeft: 2 }}>
-                            <Typography>
-                                {timepoints[currentIndex].toString()}
-                            </Typography>
-                            <Slider
-                                max={timepoints.length - 1}
-                                value={currentIndex}
-                                onChange={updateTime(onChange)}
-                            />
-                        </div>
-                    </Grid>
-                </Paper>
+  return (
+    <Slide direction='up' in={shown} mountOnEnter>
+      <div className={css.outer}>
+        <Paper elevation={5} square={false} className={css.bar}>
+          <Grid
+            container
+            direction='row'
+            justify='flex-start'
+            alignItems='center'
+          >
+            <PlayButton onClick={start} isplaying={running} />
+            <Divider className={css.divider} orientation='vertical' />
+            <div style={{ flex: 1, marginLeft: 2 }}>
+              <Typography>{timepoints[currentIndex].toString()}</Typography>
+              <Slider
+                max={timepoints.length - 1}
+                value={currentIndex}
+                onChange={updateTime(onChange)}
+              />
             </div>
-        </Slide>
-    )
-}
+          </Grid>
+        </Paper>
+      </div>
+    </Slide>
+  );
+};
 
 type PlayButtonProps = {
-    isplaying: boolean
-    onClick: (play: boolean) => void
-} & Omit<IconButtonProps, 'onClick'>
+  isplaying: boolean;
+  onClick: (play: boolean) => void;
+} & Omit<IconButtonProps, 'onClick'>;
 
 const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
-    const { onClick: callback, isplaying, ...baseProps } = props
-    const css = timelineCSS()
+  const { onClick: callback, isplaying, ...baseProps } = props;
+  const css = timelineCSS();
 
-    const onClick = () => callback(!isplaying)
+  const onClick = () => callback(!isplaying);
 
-    return (
-        <IconButton
-            color="primary"
-            onClick={onClick}
-            className={css.icon}
-            edge="end"
-            {...baseProps}
-        >
-            {isplaying ? (
-                <PauseCircleOutline className={css.icon} />
-            ) : (
-                <PlayCircleOutline className={css.icon} />
-            )}
-        </IconButton>
-    )
-}
+  return (
+    <IconButton
+      color='primary'
+      onClick={onClick}
+      className={css.icon}
+      edge='end'
+      {...baseProps}
+    >
+      {isplaying ? (
+        <PauseCircleOutline className={css.icon} />
+      ) : (
+        <PlayCircleOutline className={css.icon} />
+      )}
+    </IconButton>
+  );
+};
 
 const timelineCSS = makeStyles((theme) => ({
-    outer: {
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        padding: '2px 4px',
-        maxWidth: '95%',
-        margin: '0 auto',
-        [theme.breakpoints.down('sm')]: {
-            marginBottom: '5px',
-        },
-        [theme.breakpoints.up('sm')]: {
-            marginBottom: '15px',
-        },
-        width: 600,
-        zIndex: 1001,
+  outer: {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: '2px 4px',
+    maxWidth: '95%',
+    margin: '0 auto',
+    [theme.breakpoints.down('sm')]: {
+      marginBottom: '5px',
     },
-    bar: {
-        width: '100%',
-        paddingRight: 32,
+    [theme.breakpoints.up('sm')]: {
+      marginBottom: '15px',
     },
-    center: {
-        width: '100%',
-        left: 0,
-        right: 0,
-    },
-    divider: {
-        height: 60,
-        margin: 12,
-    },
-    icon: {
-        fontSize: 60,
-    },
-}))
+    width: 600,
+    zIndex: 1001,
+  },
+  bar: {
+    width: '100%',
+    paddingRight: 32,
+  },
+  center: {
+    width: '100%',
+    left: 0,
+    right: 0,
+  },
+  divider: {
+    height: 60,
+    margin: 12,
+  },
+  icon: {
+    fontSize: 60,
+  },
+}));
 
-export default Timeline
+export default Timeline;
