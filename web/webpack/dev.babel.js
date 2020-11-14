@@ -16,7 +16,7 @@ export default merge(commonConfig, {
         hot: true, // enable HMR on the server
         compress: true,
         contentBase: resolve(__dirname, '../dist'),
-        publicPath: './',
+        publicPath: '/',
     },
     devtool: 'eval-source-map',
     resolve: {
