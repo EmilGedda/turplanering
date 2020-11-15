@@ -17,6 +17,7 @@ export default merge(commonConfig, {
         compress: true,
         contentBase: resolve(__dirname, '../dist'),
         publicPath: '/',
+        writeToDisk: true,
     },
     devtool: 'eval-source-map',
     resolve: {

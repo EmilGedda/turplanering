@@ -58,7 +58,9 @@ const SmhiLayer: FC<SmhiLayerProps> = (props) => {
 };
 
 export const WeatherLayer: FC<Omit<OverlayProps, 'layer'>> = (props) => {
-  return <SmhiLayer {...props} layer='wpt-overview_n-europe__' />;
+  return (
+    <SmhiLayer transparent={true} {...props} layer='wpt-overview_n-europe__' />
+  );
 };
 
 export const TemperatureLayer: FC<Omit<OverlayProps, 'layer'>> = (props) => {

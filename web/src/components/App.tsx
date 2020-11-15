@@ -2,6 +2,7 @@ import React, { useState, useEffect, createRef } from 'react';
 import { FeatureGroup, Map, Viewport } from 'react-leaflet';
 import { makeStyles } from '@material-ui/core/styles';
 import Searchbar from './Searchbar';
+import LayerSelectorButton from './LayerSelector';
 import {
   Overlaybar,
   WeatherToggleButton,
@@ -138,13 +139,27 @@ const App: React.FC<Props> = (props: Props) => {
                     <WMTSLayer
                         url="https://kso.etjanster.lantmateriet.se/karta/topowebb/v1.1/wmts"
                         layers="topowebb"
-                    /> */}
+                    />
+                */}
 
-        <WMSLayer
+        <WMSLayer // Terrain
           url='https://minkarta.lantmateriet.se/map/topowebb/'
           layers='topowebbkartan'
         />
 
+        <WMSLayer // Hillshading layer
+          url='https://minkarta.lantmateriet.se/map/hojdmodell/'
+          layers='terrangskuggning'
+          format='image/png'
+          transparent={true}
+          opacity={0.25}
+        />
+        {/*
+                    <WMSLayer // Satellite
+                      url='https://minkarta.lantmateriet.se/map/ortofoto/'
+                      layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
+                    />
+                */}
         {overlays.temperature && displayTime && referenceTime && (
           <TemperatureLayer
             referenceTime={referenceTime}
@@ -170,18 +185,20 @@ const App: React.FC<Props> = (props: Props) => {
         onChange={setDisplayTime}
       />
 
-      <Overlaybar shown={hasForecast && showBar}>
-        <WeatherToggleButton onClick={toggleOverlay('weather')} />
-        <WindToggleButton onClick={toggleOverlay('wind')} />
-        <TemperatureToggleButton onClick={toggleOverlay('temperature')} />
-      </Overlaybar>
-
       <Searchbar
         shown={showBar}
         onGPSLocate={flyToPosition}
         onGPSTrack={updatePosition}
         onGPSDeactivate={hideGPSMarker}
       />
+
+      <Overlaybar shown={hasForecast && showBar}>
+        <WeatherToggleButton onClick={toggleOverlay('weather')} />
+        <WindToggleButton onClick={toggleOverlay('wind')} />
+        <TemperatureToggleButton onClick={toggleOverlay('temperature')} />
+      </Overlaybar>
+
+      <LayerSelectorButton />
     </div>
   );
 };

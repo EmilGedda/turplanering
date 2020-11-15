@@ -34,7 +34,7 @@ const searchbarCSS = makeStyles((theme) => ({
       marginTop: '15px',
     },
     maxWidth: '800px',
-    zIndex: 1001,
+    zIndex: 1000,
   },
   input: {
     marginLeft: theme.spacing(1),

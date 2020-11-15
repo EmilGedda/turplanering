@@ -71,12 +71,7 @@ export const Overlaybar: FC<Props> = (props: Props) => {
     <Slide direction='left' in={shown}>
       <div className={css.outer}>
         <Paper elevation={5} square={false}>
-          <Grid
-            container
-            direction='column'
-            justify='space-around'
-            alignItems='flex-end'
-          >
+          <Grid container direction='column' justify='space-around'>
             {...buttons}
           </Grid>
         </Paper>

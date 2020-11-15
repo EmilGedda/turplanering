@@ -11,6 +11,52 @@ import {
 } from '@material-ui/core';
 import { PlayCircleOutline, PauseCircleOutline } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
+import { common } from '@material-ui/core/colors';
+
+type LabelProps = {
+  timepoint: Date;
+};
+
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+const labelCSS = makeStyles((theme) => ({
+  time: {
+    fontSize: theme.typography.pxToRem(24),
+  },
+  date: {
+    fontStyle: 'italic',
+    color: 'grey',
+    marginLeft: '12px',
+    fontSize: theme.typography.pxToRem(20),
+  },
+}));
+
+const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
+  const locale = 'sv-SE';
+  const css = labelCSS();
+
+  const time = timepoint.toLocaleTimeString(locale, {
+    hour: 'numeric',
+    minute: 'numeric',
+  });
+
+  const date = timepoint.toLocaleDateString(locale, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  return (
+    <div>
+      <Typography variantMapping={{ body1: 'span' }} className={css.time}>
+        {time}
+      </Typography>
+      <Typography variantMapping={{ body1: 'span' }} className={css.date}>
+        {capitalize(date)}
+      </Typography>
+    </div>
+  );
+};
 
 type Props = {
   shown: boolean;
@@ -98,7 +144,7 @@ const Timeline: FC<Props> = (props: Props) => {
             <PlayButton onClick={start} isplaying={running} />
             <Divider className={css.divider} orientation='vertical' />
             <div style={{ flex: 1, marginLeft: 2 }}>
-              <Typography>{timepoints[currentIndex].toString()}</Typography>
+              <TimepointLabel timepoint={timepoints[currentIndex]} />
               <Slider
                 max={timepoints.length - 1}
                 value={currentIndex}
@@ -120,6 +166,7 @@ type PlayButtonProps = {
 const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
   const { onClick: callback, isplaying, ...baseProps } = props;
   const css = timelineCSS();
+  const color = iconColor();
 
   const onClick = () => callback(!isplaying);
 
@@ -128,6 +175,7 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
       color='primary'
       onClick={onClick}
       className={css.icon}
+      classes={color}
       edge='end'
       {...baseProps}
     >
@@ -139,6 +187,13 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
     </IconButton>
   );
 };
+
+const iconColor = makeStyles((theme) => ({
+  colorPrimary: {
+    color:
+      theme.palette.type == 'dark' ? common.white : theme.palette.primary.main,
+  },
+}));
 
 const timelineCSS = makeStyles((theme) => ({
   outer: {
