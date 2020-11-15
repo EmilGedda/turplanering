@@ -71,6 +71,7 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#labelprops" class="tsd-kind-icon">Label<wbr>Props</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#playbuttonprops" class="tsd-kind-icon">Play<wbr>Button<wbr>Props</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#props" class="tsd-kind-icon">Props</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#slidercallback" class="tsd-kind-icon">Slider<wbr>Callback</a></li>
@@ -79,6 +80,8 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#iconcolor" class="tsd-kind-icon">icon<wbr>Color</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#labelcss" class="tsd-kind-icon">labelCSS</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#timelinecss" class="tsd-kind-icon">timelineCSS</a></li>
 							</ul>
 						</section>
@@ -87,6 +90,8 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#playbutton" class="tsd-kind-icon">Play<wbr>Button</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_components_timeline_.html#timeline" class="tsd-kind-icon">Timeline</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#timepointlabel" class="tsd-kind-icon">Timepoint<wbr>Label</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-not-exported"><a href="_components_timeline_.html#capitalize" class="tsd-kind-icon">capitalize</a></li>
 							</ul>
 						</section>
 					</div>
@@ -95,12 +100,30 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Type aliases</h2>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+					<a name="labelprops" class="tsd-anchor"></a>
+					<h3>Label<wbr>Props</h3>
+					<div class="tsd-signature tsd-kind-icon">Label<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> }</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L16">src/components/Timeline.tsx:16</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter">
+								<h5>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 					<a name="playbuttonprops" class="tsd-anchor"></a>
 					<h3>Play<wbr>Button<wbr>Props</h3>
 					<div class="tsd-signature tsd-kind-icon">Play<wbr>Button<wbr>Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>isplaying<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>onClick<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>play<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">IconButtonProps</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"onClick"</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L115">src/components/Timeline.tsx:115</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L161">src/components/Timeline.tsx:161</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -110,7 +133,7 @@
 					<div class="tsd-signature tsd-kind-icon">Props<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>onChange<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>shown<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>timepoints<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L15">src/components/Timeline.tsx:15</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L61">src/components/Timeline.tsx:61</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -152,7 +175,7 @@
 					<div class="tsd-signature tsd-kind-icon">Slider<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>event<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ChangeEvent</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L21">src/components/Timeline.tsx:21</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L67">src/components/Timeline.tsx:67</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -184,12 +207,74 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Variables</h2>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+					<a name="iconcolor" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> icon<wbr>Color</h3>
+					<div class="tsd-signature tsd-kind-icon">icon<wbr>Color<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = makeStyles((theme) &#x3D;&gt; ({colorPrimary: {color:theme.palette.type &#x3D;&#x3D; &#x27;dark&#x27; ? common.white : theme.palette.primary.main,},}))</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L191">src/components/Timeline.tsx:191</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-variable tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> props: <span class="tsd-signature-type">any</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+					<a name="labelcss" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> labelCSS</h3>
+					<div class="tsd-signature tsd-kind-icon">labelCSS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = makeStyles((theme) &#x3D;&gt; ({time: {fontSize: theme.typography.pxToRem(24),},date: {fontStyle: &#x27;italic&#x27;,color: &#x27;grey&#x27;,marginLeft: &#x27;12px&#x27;,fontSize: theme.typography.pxToRem(20),},}))</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L22">src/components/Timeline.tsx:22</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-variable tsd-is-not-exported">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagOptional">Optional</span> props: <span class="tsd-signature-type">any</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
 					<a name="timelinecss" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> timelineCSS</h3>
 					<div class="tsd-signature tsd-kind-icon">timelineCSS<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>props<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ClassNameMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ClassKey</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = makeStyles((theme) &#x3D;&gt; ({outer: {position: &#x27;fixed&#x27;,left: 0,right: 0,bottom: 0,padding: &#x27;2px 4px&#x27;,maxWidth: &#x27;95%&#x27;,margin: &#x27;0 auto&#x27;,[theme.breakpoints.down(&#x27;sm&#x27;)]: {marginBottom: &#x27;5px&#x27;,},[theme.breakpoints.up(&#x27;sm&#x27;)]: {marginBottom: &#x27;15px&#x27;,},width: 600,zIndex: 1001,},bar: {width: &#x27;100%&#x27;,paddingRight: 32,},center: {width: &#x27;100%&#x27;,left: 0,right: 0,},divider: {height: 60,margin: 12,},icon: {fontSize: 60,},}))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L143">src/components/Timeline.tsx:143</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L198">src/components/Timeline.tsx:198</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -227,7 +312,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L120">src/components/Timeline.tsx:120</a></li>
+									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L166">src/components/Timeline.tsx:166</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -250,7 +335,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/components/Timeline.tsx#L26">src/components/Timeline.tsx:26</a></li>
+									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L72">src/components/Timeline.tsx:72</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -260,6 +345,57 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Element</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+					<a name="timepointlabel" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Timepoint<wbr>Label</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">Timepoint<wbr>Label<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Element</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L34">src/components/Timeline.tsx:34</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol"> }</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>timepoint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Date</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Element</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+					<a name="capitalize" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> capitalize</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">capitalize<span class="tsd-signature-symbol">(</span>str<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/components/Timeline.tsx#L20">src/components/Timeline.tsx:20</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>str: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -273,6 +409,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_components_app_.html">&quot;components/<wbr>App&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="_components_layerselector_.html">&quot;components/<wbr>Layer<wbr>Selector&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_components_overlaybar_.html">&quot;components/<wbr>Overlaybar&quot;</a>
@@ -296,12 +435,18 @@
 						<a href="_index_.html">&quot;index&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="_index_test_.html">&quot;index.test&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="_setup_test_.html">&quot;setup.test&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_timeline_.html#labelprops" class="tsd-kind-icon">Label<wbr>Props</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_components_timeline_.html#playbuttonprops" class="tsd-kind-icon">Play<wbr>Button<wbr>Props</a>
 					</li>
@@ -312,6 +457,12 @@
 						<a href="_components_timeline_.html#slidercallback" class="tsd-kind-icon">Slider<wbr>Callback</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_timeline_.html#iconcolor" class="tsd-kind-icon">icon<wbr>Color</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_timeline_.html#labelcss" class="tsd-kind-icon">labelCSS</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_components_timeline_.html#timelinecss" class="tsd-kind-icon">timelineCSS</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
@@ -319,6 +470,12 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_components_timeline_.html#timeline" class="tsd-kind-icon">Timeline</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_timeline_.html#timepointlabel" class="tsd-kind-icon">Timepoint<wbr>Label</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_components_timeline_.html#capitalize" class="tsd-kind-icon">capitalize</a>
 					</li>
 				</ul>
 			</nav>

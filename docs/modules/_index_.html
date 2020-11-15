@@ -71,6 +71,7 @@
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_index_.html#darktheme" class="tsd-kind-icon">dark<wbr>Theme</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported"><a href="_index_.html#env" class="tsd-kind-icon">env</a></li>
 							</ul>
 						</section>
@@ -80,12 +81,22 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Variables</h2>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+					<a name="darktheme" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> dark<wbr>Theme</h3>
+					<div class="tsd-signature tsd-kind-icon">dark<wbr>Theme<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Theme</span><span class="tsd-signature-symbol"> = createMuiTheme({palette: {type: &#x27;dark&#x27;,},overrides: {MuiSlider: {// drag color and opacitytrack: { backgroundColor: grey[500] },rail: { backgroundColor: grey[600] },thumb: {&#x27;backgroundColor&#x27;: &#x27;white&#x27;,&#x27;&amp;$focusVisible,&amp;:hover&#x27;: {&#x27;boxShadow&#x27;: &#x60;0px 0px 0px 8px ${fade(common.white, 0.16)}&#x60;,&#x27;@media (hover: none)&#x27;: {boxShadow: &#x27;none&#x27;,},},&#x27;&amp;$active&#x27;: {boxShadow: &#x60;0px 0px 0px 14px ${fade(common.white, 0.16)}&#x60;,},},},MuiIconButton: {colorPrimary: {color: orange[500],},},},})</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/index.tsx#L53">src/index.tsx:53</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
 					<a name="env" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> env</h3>
 					<div class="tsd-signature tsd-kind-icon">env<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>apiURL<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>browser<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hasTouch<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>environment<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = (() &#x3D;&gt; {const browser &#x3D; {hasTouch: &#x27;ontouchstart&#x27; in window || navigator.maxTouchPoints &gt; 0,};if (process.env.NODE_ENV &#x3D;&#x3D; &#x27;production&#x27;) {return {apiURL: &#x27;localhost:8080&#x27;,environment: &#x27;production&#x27;,browser,};}return {apiURL: &#x27;localhost:8080&#x27;,environment: &#x27;development&#x27;,browser,};})()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/5df6dac/web/src/index.tsx#L27">src/index.tsx:27</a></li>
+							<li>Defined in <a href="https://github.com/EmilGedda/turplanering/blob/43c7c0b/web/src/index.tsx#L29">src/index.tsx:29</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -120,6 +131,9 @@
 						<a href="_components_app_.html">&quot;components/<wbr>App&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="_components_layerselector_.html">&quot;components/<wbr>Layer<wbr>Selector&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="_components_overlaybar_.html">&quot;components/<wbr>Overlaybar&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -141,12 +155,18 @@
 						<a href="_index_.html">&quot;index&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="_index_test_.html">&quot;index.test&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="_setup_test_.html">&quot;setup.test&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_index_.html#darktheme" class="tsd-kind-icon">dark<wbr>Theme</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_index_.html#env" class="tsd-kind-icon">env</a>
 					</li>
