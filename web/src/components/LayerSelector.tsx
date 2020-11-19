@@ -6,33 +6,28 @@ import { makeStyles, emphasize } from '@material-ui/core/styles';
 const selectorCSS = makeStyles((theme) => ({
   root: {
     height: 380,
-    flexGrow: 1,
-    zIndex: 1000
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: 10
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: 25
+    }
   },
-  speedDial: {
-    zIndex: 1000,
-    position: 'absolute',
-    top: theme.spacing(2),
-    right: theme.spacing(2)
-  },
+  speedDial: {},
   icon: {
     color: theme.palette.action.active
   },
   fab: {
-    borderRadius: 4,
-    width: '48px',
-    height: '48px',
-    zIndex: 1000,
-    backgroundColor: theme.palette.background.paper,
-    transition: theme.transitions.create('background-color', {
+    'borderRadius': 4,
+    'width': '48px',
+    'height': '48px',
+    'zIndex': 1000,
+    'backgroundColor': theme.palette.background.paper,
+    'transition': theme.transitions.create('background-color', {
       duration: theme.transitions.duration.shortest
     }),
     '&:hover': {
       backgroundColor: emphasize(theme.palette.background.paper)
-    },
-    '&$disabled': {
-      backgroundColor: 'transparent',
-      color: theme.palette.action.disabled
     }
   }
 }));

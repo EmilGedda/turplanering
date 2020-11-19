@@ -1,6 +1,7 @@
 import React, { useState, useEffect, createRef } from 'react';
 import { FeatureGroup, Map, Viewport } from 'react-leaflet';
-import { makeStyles } from '@material-ui/core/styles';
+import { Slide, useMediaQuery } from '@material-ui/core';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Searchbar from './Searchbar';
 import LayerSelectorButton from './LayerSelector';
 import {
@@ -32,19 +33,34 @@ type Props = {
   forecastAPI: ForecastAPI;
 };
 
-const appStyles = makeStyles(() => ({
+const appStyles = makeStyles((theme) => ({
   fullscreen: {
     position: 'absolute',
     top: 0,
     right: 0,
     height: '100%',
     width: '100vw'
+  },
+  topbar: {
+    display: 'flex',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: 5,
+      marginRight: 10,
+      marginLeft: 10
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginTop: 15,
+      marginRight: 25,
+      marginLeft: 25
+    },
+    justifyContent: 'space-between'
   }
 }));
 
 const App: React.FC<Props> = (props: Props) => {
   const { env, forecastAPI } = props;
   const css = appStyles();
+  const theme = useTheme();
 
   useEffect(() => console.log('Running in ' + env.environment), [
     env.environment
@@ -185,20 +201,26 @@ const App: React.FC<Props> = (props: Props) => {
         onChange={setDisplayTime}
       />
 
-      <Searchbar
-        shown={showBar}
-        onGPSLocate={flyToPosition}
-        onGPSTrack={updatePosition}
-        onGPSDeactivate={hideGPSMarker}
-      />
+      <Slide direction='down' in={showBar} mountOnEnter unmountOnExit>
+        <div className={css.topbar}>
+          {useMediaQuery(theme.breakpoints.up('sm')) && (
+            /* properly align search bar */
+            <div style={{ width: 64, marginRight: 10 }} />
+          )}
+          <Searchbar
+            onGPSLocate={flyToPosition}
+            onGPSTrack={updatePosition}
+            onGPSDeactivate={hideGPSMarker}
+          />
+          <LayerSelectorButton />
+        </div>
+      </Slide>
 
       <Overlaybar shown={hasForecast && showBar}>
         <WeatherToggleButton onClick={toggleOverlay('weather')} />
         <WindToggleButton onClick={toggleOverlay('wind')} />
         <TemperatureToggleButton onClick={toggleOverlay('temperature')} />
       </Overlaybar>
-
-      <LayerSelectorButton />
     </div>
   );
 };
