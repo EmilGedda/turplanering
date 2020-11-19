@@ -7,34 +7,34 @@ const selectorCSS = makeStyles((theme) => ({
   root: {
     height: 380,
     flexGrow: 1,
-    zIndex: 1000,
+    zIndex: 1000
   },
   speedDial: {
     zIndex: 1000,
     position: 'absolute',
     top: theme.spacing(2),
-    right: theme.spacing(2),
+    right: theme.spacing(2)
   },
   icon: {
-    color: theme.palette.action.active,
+    color: theme.palette.action.active
   },
   fab: {
-    'borderRadius': 4,
-    'width': '48px',
-    'height': '48px',
-    'zIndex': 1000,
-    'backgroundColor': theme.palette.background.paper,
-    'transition': theme.transitions.create('background-color', {
-      duration: theme.transitions.duration.shortest,
+    borderRadius: 4,
+    width: '48px',
+    height: '48px',
+    zIndex: 1000,
+    backgroundColor: theme.palette.background.paper,
+    transition: theme.transitions.create('background-color', {
+      duration: theme.transitions.duration.shortest
     }),
     '&:hover': {
-      backgroundColor: emphasize(theme.palette.background.paper),
+      backgroundColor: emphasize(theme.palette.background.paper)
     },
     '&$disabled': {
       backgroundColor: 'transparent',
-      color: theme.palette.action.disabled,
-    },
-  },
+      color: theme.palette.action.disabled
+    }
+  }
 }));
 
 type IconProps = { className: string };
@@ -47,7 +47,7 @@ const LayerSelectorButton: FC = () => {
   const actions = [
     { icon: <LayersOutlined />, name: 'Lantmäteriet skuggad' },
     { icon: <LayersOutlined />, name: 'Lantmäteriet' },
-    { icon: <LayersOutlined />, name: 'OpenStreetMap' },
+    { icon: <LayersOutlined />, name: 'OpenStreetMap' }
   ];
 
   const css = selectorCSS();

@@ -141,6 +141,7 @@
     "prettier": {
         "singleQuote": true,
         "jsxSingleQuote": true,
-        "quoteProps": "consistent"
+        "quoteProps": "consistent",
+        "trailingComma": "none"
     }
 }

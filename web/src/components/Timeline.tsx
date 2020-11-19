@@ -7,7 +7,7 @@ import {
   Paper,
   Slide,
   Slider,
-  Typography,
+  Typography
 } from '@material-ui/core';
 import { PlayCircleOutline, PauseCircleOutline } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
@@ -21,14 +21,14 @@ const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const labelCSS = makeStyles((theme) => ({
   time: {
-    fontSize: theme.typography.pxToRem(24),
+    fontSize: theme.typography.pxToRem(24)
   },
   date: {
     fontStyle: 'italic',
     color: 'grey',
     marginLeft: '12px',
-    fontSize: theme.typography.pxToRem(20),
-  },
+    fontSize: theme.typography.pxToRem(20)
+  }
 }));
 
 const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
@@ -37,13 +37,13 @@ const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
 
   const time = timepoint.toLocaleTimeString(locale, {
     hour: 'numeric',
-    minute: 'numeric',
+    minute: 'numeric'
   });
 
   const date = timepoint.toLocaleDateString(locale, {
     weekday: 'long',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric'
   });
 
   return (
@@ -191,8 +191,8 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
 const iconColor = makeStyles((theme) => ({
   colorPrimary: {
     color:
-      theme.palette.type == 'dark' ? common.white : theme.palette.primary.main,
-  },
+      theme.palette.type == 'dark' ? common.white : theme.palette.primary.main
+  }
 }));
 
 const timelineCSS = makeStyles((theme) => ({
@@ -205,30 +205,30 @@ const timelineCSS = makeStyles((theme) => ({
     maxWidth: '95%',
     margin: '0 auto',
     [theme.breakpoints.down('sm')]: {
-      marginBottom: '5px',
+      marginBottom: '5px'
     },
     [theme.breakpoints.up('sm')]: {
-      marginBottom: '15px',
+      marginBottom: '15px'
     },
     width: 600,
-    zIndex: 1001,
+    zIndex: 1001
   },
   bar: {
     width: '100%',
-    paddingRight: 32,
+    paddingRight: 32
   },
   center: {
     width: '100%',
     left: 0,
-    right: 0,
+    right: 0
   },
   divider: {
     height: 60,
-    margin: 12,
+    margin: 12
   },
   icon: {
-    fontSize: 60,
-  },
+    fontSize: 60
+  }
 }));
 
 export default Timeline;

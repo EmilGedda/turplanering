@@ -28,57 +28,58 @@ import { App } from './components/App';
 
 const env = (() => {
   const browser = {
-    hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+    hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
   };
   if (process.env.NODE_ENV == 'production') {
     return {
       apiURL: 'localhost:8080',
       environment: 'production',
-      browser,
+      browser
     };
   }
   return {
     apiURL: 'localhost:8080',
     environment: 'development',
-    browser,
+    browser
   };
 })();
 
-/* const lightTheme = */ createMuiTheme({
-  palette: {
-    type: 'light',
-  },
-});
-
-const darkTheme = createMuiTheme({
-  palette: {
-    type: 'dark',
-  },
-  overrides: {
-    MuiSlider: {
-      // drag color and opacity
-      track: { backgroundColor: grey[500] },
-      rail: { backgroundColor: grey[600] },
-      thumb: {
-        'backgroundColor': 'white',
-        '&$focusVisible,&:hover': {
-          'boxShadow': `0px 0px 0px 8px ${fade(common.white, 0.16)}`,
-          '@media (hover: none)': {
-            boxShadow: 'none',
+const theme = {
+  light: createMuiTheme({
+    palette: {
+      type: 'light'
+    }
+  }),
+  dark: createMuiTheme({
+    palette: {
+      type: 'dark'
+    },
+    overrides: {
+      MuiSlider: {
+        // drag color and opacity
+        track: { backgroundColor: grey[500] },
+        rail: { backgroundColor: grey[600] },
+        thumb: {
+          'backgroundColor': 'white',
+          '&$focusVisible,&:hover': {
+            'boxShadow': `0px 0px 0px 8px ${fade(common.white, 0.16)}`,
+            '@media (hover: none)': {
+              boxShadow: 'none'
+            }
           },
-        },
-        '&$active': {
-          boxShadow: `0px 0px 0px 14px ${fade(common.white, 0.16)}`,
-        },
+          '&$active': {
+            boxShadow: `0px 0px 0px 14px ${fade(common.white, 0.16)}`
+          }
+        }
       },
-    },
-    MuiIconButton: {
-      colorPrimary: {
-        color: orange[500],
-      },
-    },
-  },
-});
+      MuiIconButton: {
+        colorPrimary: {
+          color: orange[500]
+        }
+      }
+    }
+  })
+};
 
 // Opt-in to Webpack hot module replacement
 if (module.hot) module.hot.accept();
@@ -87,7 +88,7 @@ if (module.hot) module.hot.accept();
 
 render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme.light}>
       <ScopedCssBaseline>
         <App env={env} forecastAPI={Smhi} />
       </ScopedCssBaseline>

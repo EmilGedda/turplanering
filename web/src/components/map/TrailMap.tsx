@@ -6,7 +6,7 @@ import {
   Children,
   ScaleControl,
   Circle,
-  CircleMarker,
+  CircleMarker
 } from 'react-leaflet';
 import { LatLngTuple, CRS } from 'leaflet';
 import { WMSLayer, BufferedWMSLayerProps } from './WMSTileLayer';

@@ -4,7 +4,7 @@ import {
   GpsFixed,
   GpsNotFixed,
   GpsOff,
-  Search,
+  Search
 } from '@material-ui/icons';
 import {
   Divider,
@@ -12,7 +12,7 @@ import {
   IconButtonProps,
   InputBase,
   Paper,
-  Slide,
+  Slide
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -28,25 +28,25 @@ const searchbarCSS = makeStyles((theme) => ({
     width: '95%',
     margin: '0 auto',
     [theme.breakpoints.down('sm')]: {
-      marginTop: '5px',
+      marginTop: '5px'
     },
     [theme.breakpoints.up('sm')]: {
-      marginTop: '15px',
+      marginTop: '15px'
     },
     maxWidth: '800px',
-    zIndex: 1000,
+    zIndex: 1000
   },
   input: {
     marginLeft: theme.spacing(1),
-    flex: 1,
+    flex: 1
   },
   iconButton: {
-    padding: 10,
+    padding: 10
   },
   divider: {
     height: 28,
-    margin: 4,
-  },
+    margin: 4
+  }
 }));
 
 type GPSProps = { status: GPSStatus } & IconButtonProps;
@@ -55,7 +55,7 @@ enum GPSStatus {
   Disabled,
   Tracking,
   Loading,
-  Inactive,
+  Inactive
 }
 
 const GPSButton: FC<GPSProps> = ({ status, ...props }: GPSProps) => {

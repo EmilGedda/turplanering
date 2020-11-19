@@ -12,13 +12,13 @@
     <body style="margin: 0px">
         <div id="root"></div>
         <% if (webpackConfig.mode == 'production') { %>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.1/umd/react.production.min.js" integrity="sha256-yUhvEmYVhZ/GGshIQKArLvySDSh6cdmdcIx0spR3UP4=" crossorigin=""></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.1/umd/react-dom.production.min.js" integrity="sha256-vFt3l+illeNlwThbDUdoPTqF81M8WNSZZZt3HEjsbSU=" crossorigin=""></script>
-            <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha256-yDc0eil8GjWFKqN1OSzHSVCiuGghTosZCcRje4tj7iQ=" crossorigin=""></script>
+            <script src="https://unpkg.com/react@16/umd/react.production.min.js" integrity="sha256-XO+TZ9K8q6JbdNIODhOdLPkA6RI+X94mEBruf0D2tc8=" crossorigin></script>
+            <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" integrity="sha256-SUn04c/56KlgtEyai+cLxLsQIW600BI8phdT4JCKD4c=" crossorigin></script>
+            <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha256-yDc0eil8GjWFKqN1OSzHSVCiuGghTosZCcRje4tj7iQ=" crossorigin></script>
         <% } else { %>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.1/umd/react.development.js" integrity="sha256-4gJGEx/zXAxofkLPGXiU2IJHqSOmYV33Ru0zw0TeJ30=" crossorigin=""></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.1/umd/react-dom.development.min.js" integrity="sha256-9xBa2Hcuh2S3iew36CzJawq7T9iviOAcAVz3bw8h3Lo=" crossorigin=""></script>
-            <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.js" integrity="sha256-dG7rUAec0UN0e3nlMEuYJzsbK0rpoz4hBbNp0ir9iF8=" crossorigin=""></script>
+            <script src="https://unpkg.com/react@16/umd/react.development.js" integrity="sha256-db9g8+oOPLzb3syQLuuEK2y+OduOYvH6f5GnVdUdAgw=" crossorigin></script>
+            <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" integrity="sha256-cz/+89EvSbYnW6R8XXgkx+lIt+EC/Voe+bW5gO5dndo=" crossorigin></script>
+            <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet-src.js" integrity="sha256-dG7rUAec0UN0e3nlMEuYJzsbK0rpoz4hBbNp0ir9iF8=" crossorigin></script>
         <% } %>
     </body>
 </html>

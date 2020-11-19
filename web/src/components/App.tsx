@@ -7,7 +7,7 @@ import {
   Overlaybar,
   WeatherToggleButton,
   WindToggleButton,
-  TemperatureToggleButton,
+  TemperatureToggleButton
 } from './Overlaybar';
 import Timeline from './Timeline';
 import { WMSLayer } from './map/WMSTileLayer';
@@ -16,7 +16,7 @@ import {
   TrailMap,
   GPSMarker,
   WeatherLayer,
-  TemperatureLayer,
+  TemperatureLayer
 } from './map/TrailMap';
 
 type Environment = {
@@ -38,8 +38,8 @@ const appStyles = makeStyles(() => ({
     top: 0,
     right: 0,
     height: '100%',
-    width: '100vw',
-  },
+    width: '100vw'
+  }
 }));
 
 const App: React.FC<Props> = (props: Props) => {
@@ -47,7 +47,7 @@ const App: React.FC<Props> = (props: Props) => {
   const css = appStyles();
 
   useEffect(() => console.log('Running in ' + env.environment), [
-    env.environment,
+    env.environment
   ]);
 
   const mapRef = createRef<Map>();
@@ -60,20 +60,20 @@ const App: React.FC<Props> = (props: Props) => {
 
   const [forecast, setForecast] = useState<ForecastTimestamps>({
     reference: new Date(),
-    validTimes: [new Date()],
+    validTimes: [new Date()]
   });
 
   const [overlays, setOverlays] = useState({
     weather: false,
     wind: false,
     temperature: false,
-    layers: 0,
+    layers: 0
   });
 
   const [position, setPosition] = useState<Coordinates>();
   const [viewport, setViewPort] = useState<Viewport>({
     center: [59.334591, 18.06324],
-    zoom: 8,
+    zoom: 8
   });
 
   const hideGPSMarker = () => setPosition(undefined);
@@ -92,7 +92,7 @@ const App: React.FC<Props> = (props: Props) => {
     const { latitude, longitude } = coords;
     setViewPort({
       center: [latitude, longitude],
-      zoom: zoom - 0.5,
+      zoom: zoom - 0.5
     });
   };
 

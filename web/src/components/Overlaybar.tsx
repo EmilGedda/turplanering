@@ -5,7 +5,7 @@ import {
   Paper,
   Grid,
   IconButton,
-  IconButtonProps,
+  IconButtonProps
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -90,11 +90,11 @@ const overlaybarCSS = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     [theme.breakpoints.down('sm')]: {
-      marginRight: 10,
+      marginRight: 10
     },
     [theme.breakpoints.up('sm')]: {
-      marginRight: 25,
+      marginRight: 25
     },
-    zIndex: 1000,
-  },
+    zIndex: 1000
+  }
 }));
