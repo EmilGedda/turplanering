@@ -32,7 +32,7 @@ func TestIntegrationGetToken(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, err = l.GetToken()
-	assert.Equal(t, NewTokenErrResponse("Client Authentication failed.", "invalid_client"), err)
+	assert.Equal(t, NewTokenErrResponse("A valid OAuth client could not be found for client_id: foo", "invalid_client"), err)
 }
 
 func TestIntegrationRevokeToken(t *testing.T) {
