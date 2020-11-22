@@ -39,21 +39,24 @@ const appStyles = makeStyles((theme) => ({
     top: 0,
     right: 0,
     height: '100%',
-    width: '100vw'
-  },
-  topbar: {
-    display: 'flex',
+    width: '100vw',
     [theme.breakpoints.down('sm')]: {
-      marginTop: 5,
-      marginRight: 10,
-      marginLeft: 10
+      paddingTop: 5,
+      paddingRight: 10,
+      paddingLeft: 10
     },
     [theme.breakpoints.up('sm')]: {
-      marginTop: 15,
-      marginRight: 25,
-      marginLeft: 25
-    },
-    justifyContent: 'space-between'
+      paddingTop: 15,
+      paddingRight: 25,
+      paddingLeft: 25
+    }
+  },
+  topbar: {
+    position: 'relative',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    zIndex: 1001
   },
   hiddenBox: {
     width: 64,
@@ -75,9 +78,7 @@ const App: React.FC<Props> = (props: Props) => {
   const groupRef = createRef<FeatureGroup>();
 
   const [showBar, setShowBar] = useState(false);
-  const [hasForecast, setHasForecast] = useState(false);
-  const [displayTime, setDisplayTime] = useState<Date | undefined>();
-  const [referenceTime, setReferenceTime] = useState<Date | undefined>();
+  const [displayTime, setDisplayTime] = useState<Date>();
 
   const [forecast, setForecast] = useState<ForecastTimestamps>({
     reference: new Date(),
@@ -128,14 +129,12 @@ const App: React.FC<Props> = (props: Props) => {
           `, with ${forecast.validTimes.length} timestamps in ${duration}ms`
       );
       setForecast(forecast);
-      setReferenceTime(forecast.reference);
       setDisplayTime(forecast.validTimes[0]);
-      setHasForecast(true);
     })();
   }, [forecastAPI]);
 
   useEffect(() => {
-    const timeout = setTimeout(setShowBar, 500, true);
+    const timeout = setTimeout(() => setShowBar(true), 500);
     return () => clearTimeout(timeout);
   }, []);
 
@@ -181,16 +180,16 @@ const App: React.FC<Props> = (props: Props) => {
                       layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
                     />
                 */}
-        {overlays.temperature && displayTime && referenceTime && (
+        {overlays.temperature && !!displayTime && (
           <TemperatureLayer
-            referenceTime={referenceTime}
+            referenceTime={forecast.reference}
             displayTime={displayTime}
           />
         )}
 
-        {overlays.weather && displayTime && referenceTime && (
+        {overlays.weather && !!displayTime && (
           <WeatherLayer
-            referenceTime={referenceTime}
+            referenceTime={forecast.reference}
             displayTime={displayTime}
           />
         )}
@@ -206,7 +205,7 @@ const App: React.FC<Props> = (props: Props) => {
         onChange={setDisplayTime}
       />
 
-      <Slide direction='down' in={showBar} mountOnEnter unmountOnExit>
+      <Slide direction='down' in={showBar}>
         <div className={css.topbar}>
           <div className={css.hiddenBox} />
 
@@ -220,7 +219,7 @@ const App: React.FC<Props> = (props: Props) => {
         </div>
       </Slide>
 
-      <Overlaybar shown={hasForecast && showBar}>
+      <Overlaybar shown={!!displayTime && showBar}>
         <WeatherToggleButton onClick={toggleOverlay('weather')} />
         <WindToggleButton onClick={toggleOverlay('wind')} />
         <TemperatureToggleButton onClick={toggleOverlay('temperature')} />

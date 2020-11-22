@@ -13,7 +13,7 @@ const selectorCSS = makeStyles((theme) => ({
   },
   button: {
     right: 0,
-    position: 'absolute',
+    position: 'relative',
     [theme.breakpoints.down('sm')]: {
       marginLeft: 10
     },
@@ -33,12 +33,13 @@ const selectorCSS = makeStyles((theme) => ({
     }
   },
   selector: {
-    zIndex: 1002
+    zIndex: 1002,
+    position: 'absolute',
+    right: 0
   },
   svg: {
     width: 100,
-    height: 100,
-    float: 'left'
+    height: 100
   },
   polygon: {
     fillOpacity: 0,

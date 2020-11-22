@@ -90,6 +90,7 @@ export const TrailMap = React.forwardRef<Map, Props>((props, ref) => {
       useFlyTo={true}
       attributionControl={false}
       zoomSnap={0}
+      zoomControl={false}
       ref={ref}
     >
       {children}
