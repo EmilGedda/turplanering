@@ -1,9 +1,9 @@
 import React, { useState, useEffect, createRef } from 'react';
 import { FeatureGroup, Map, Viewport } from 'react-leaflet';
-import { Slide, useMediaQuery } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Slide } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import Searchbar from './Searchbar';
-import LayerSelectorButton from './LayerSelector';
+import LayerSelector from './LayerSelector';
 import {
   Overlaybar,
   WeatherToggleButton,
@@ -54,13 +54,18 @@ const appStyles = makeStyles((theme) => ({
       marginLeft: 25
     },
     justifyContent: 'space-between'
+  },
+  hiddenBox: {
+    width: 64,
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    }
   }
 }));
 
 const App: React.FC<Props> = (props: Props) => {
   const { env, forecastAPI } = props;
   const css = appStyles();
-  const theme = useTheme();
 
   useEffect(() => console.log('Running in ' + env.environment), [
     env.environment
@@ -203,16 +208,15 @@ const App: React.FC<Props> = (props: Props) => {
 
       <Slide direction='down' in={showBar} mountOnEnter unmountOnExit>
         <div className={css.topbar}>
-          {useMediaQuery(theme.breakpoints.up('sm')) && (
-            /* properly align search bar */
-            <div style={{ width: 64, marginRight: 10 }} />
-          )}
+          <div className={css.hiddenBox} />
+
           <Searchbar
             onGPSLocate={flyToPosition}
             onGPSTrack={updatePosition}
             onGPSDeactivate={hideGPSMarker}
           />
-          <LayerSelectorButton />
+
+          <LayerSelector />
         </div>
       </Slide>
 

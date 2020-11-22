@@ -60,9 +60,9 @@ const theme = {
         track: { backgroundColor: grey[500] },
         rail: { backgroundColor: grey[600] },
         thumb: {
-          'backgroundColor': 'white',
+          backgroundColor: 'white',
           '&$focusVisible,&:hover': {
-            'boxShadow': `0px 0px 0px 8px ${fade(common.white, 0.16)}`,
+            boxShadow: `0px 0px 0px 8px ${fade(common.white, 0.16)}`,
             '@media (hover: none)': {
               boxShadow: 'none'
             }
