@@ -24,7 +24,8 @@ const searchbarCSS = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     height: 48,
-    padding: '0px 4px'
+    padding: '0px 4px',
+    pointerEvents: 'auto'
   },
   input: {
     marginLeft: theme.spacing(1),

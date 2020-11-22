@@ -56,6 +56,7 @@ const appStyles = makeStyles((theme) => ({
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between',
+    pointerEvents: 'none',
     zIndex: 1001
   },
   hiddenBox: {

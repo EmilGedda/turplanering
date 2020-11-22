@@ -9,6 +9,26 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+const overlaybarCSS = makeStyles((theme) => ({
+  outer: {
+    pointerEvents: 'none',
+    position: 'fixed',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    [theme.breakpoints.down('sm')]: {
+      marginRight: 10
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginRight: 25
+    },
+    zIndex: 1000
+  }
+}));
+
 type ToggleLayerCallback = (shown: boolean) => void;
 
 type ToggleButtonProps = LayerToggleProps & Omit<IconButtonProps, 'onClick'>;
@@ -70,7 +90,7 @@ export const Overlaybar: FC<Props> = (props: Props) => {
   return (
     <Slide direction='left' in={shown}>
       <div className={css.outer}>
-        <Paper elevation={5} square={false}>
+        <Paper elevation={5} square={false} style={{ pointerEvents: 'auto' }}>
           <Grid container direction='column' justify='space-around'>
             {...buttons}
           </Grid>
@@ -79,22 +99,3 @@ export const Overlaybar: FC<Props> = (props: Props) => {
     </Slide>
   );
 };
-
-const overlaybarCSS = makeStyles((theme) => ({
-  outer: {
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    [theme.breakpoints.down('sm')]: {
-      marginRight: 10
-    },
-    [theme.breakpoints.up('sm')]: {
-      marginRight: 25
-    },
-    zIndex: 1000
-  }
-}));

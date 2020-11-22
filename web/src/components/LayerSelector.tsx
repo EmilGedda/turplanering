@@ -6,7 +6,8 @@ import { makeStyles, emphasize } from '@material-ui/core/styles';
 const selectorCSS = makeStyles((theme) => ({
   container: {
     display: 'flex',
-    position: 'relative'
+    position: 'relative',
+    pointerEvents: 'auto'
   },
   icon: {
     color: theme.palette.action.active
