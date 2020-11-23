@@ -1,16 +1,25 @@
 import React, { FC, useState } from 'react';
 import { Layers } from '@material-ui/icons';
-import { Fab, Grow, ClickAwayListener, Paper } from '@material-ui/core';
+import {
+  Fab,
+  Grow,
+  ClickAwayListener,
+  Paper,
+  Typography,
+  Grid
+} from '@material-ui/core';
+import type { TypographyProps } from '@material-ui/core';
 import { makeStyles, emphasize } from '@material-ui/core/styles';
 
 const selectorCSS = makeStyles((theme) => ({
   container: {
-    display: 'flex',
-    position: 'relative',
+    position: 'static',
     pointerEvents: 'auto'
   },
   icon: {
-    color: theme.palette.action.active
+    color: theme.palette.action.active,
+    width: '26px',
+    height: '26px'
   },
   button: {
     right: 0,
@@ -34,20 +43,36 @@ const selectorCSS = makeStyles((theme) => ({
     }
   },
   selector: {
-    zIndex: 1002,
+    zIndex: 1005,
+    flexGrow: 1,
     position: 'absolute',
+    padding: '8px 20px',
     right: 0
   },
-  svg: {
-    width: 100,
-    height: 100
+  sectionTitle: {
+    color: 'grey',
+    fontWeight: 'bold',
+    fontSize: theme.typography.pxToRem(11)
   },
-  polygon: {
-    fillOpacity: 0,
-    stroke: theme.palette.divider,
-    strokeWidth: 1
+  layer: {
+    position: 'relative',
+    width: '64px',
+    height: '64px'
   }
 }));
+
+const SectionTitle: FC<TypographyProps> = (props) => {
+  const css = selectorCSS();
+
+  return (
+    <>
+      <Typography variant='overline' className={css.sectionTitle}>
+        {props.children}
+      </Typography>
+      <br />
+    </>
+  );
+};
 
 const LayerSelector: FC = () => {
   const css = selectorCSS();
@@ -69,12 +94,43 @@ const LayerSelector: FC = () => {
             className={css.selector}
             // onMouseLeave={() => setHover(false)}
           >
-            <svg className={css.svg}>
-              <polygon points='0,100 50,00, 100,100' className={css.polygon} />
-              <polygon points='0,0 50,100, 100,0' className={css.polygon} />
-              <polygon points='0,0 100,50, 0,100' className={css.polygon} />
-              <polygon points='100,0 0,50, 100,100' className={css.polygon} />
-            </svg>
+            <SectionTitle>Baslager</SectionTitle>
+            <Grid
+              container
+              spacing={3}
+              justify='flex-start'
+              alignItems='center'
+              style={{ marginBottom: '4px' }}
+            >
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+            </Grid>
+            <SectionTitle>Varianter</SectionTitle>
+            <Grid
+              container
+              spacing={3}
+              justify='flex-start'
+              alignItems='center'
+              style={{ marginBottom: '4px' }}
+            >
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+              <Grid item>
+                <Paper className={css.layer} />
+              </Grid>
+            </Grid>
+            <SectionTitle>Detaljer</SectionTitle>
           </Paper>
         </Grow>
         <Fab
