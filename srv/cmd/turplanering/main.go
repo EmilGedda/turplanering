@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
+	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/EmilGedda/turplanering/srv/internal/api"
 	"github.com/EmilGedda/turplanering/srv/internal/auth"
@@ -89,7 +90,7 @@ func main() {
 	)
 
 	srv := &http.Server{
-		Addr:         "localhost:8080",
+		Addr:         "0.0.0.0:8080",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -134,13 +135,16 @@ func main() {
 		}
 	}()
 
-	// Closing stdin closes server
-	go func() {
-		reader := bufio.NewReader(os.Stdin)
-		_, _ = ioutil.ReadAll(reader)
-		logger.Info().Msg("Stdin closed")
-		c <- shutoff
-	}()
+	// Is not a terminal
+	if terminal.IsTerminal(int(os.Stdin.Fd())) {
+		// Closing stdin closes server
+		go func() {
+			reader := bufio.NewReader(os.Stdin)
+			_, _ = ioutil.ReadAll(reader)
+			logger.Info().Msg("Stdin closed")
+			c <- shutoff
+		}()
+	}
 
 	lookup := map[os.Signal]string{
 		syscall.SIGHUP:  "SIGHUP",

@@ -35,7 +35,7 @@ func TestValidTimes(t *testing.T) {
 	times, err := smhi.ValidTimes()
 	require.NoError(t, err)
 
-	assert.InDelta(t, 70, len(times), 5)
+	assertBetween(t, 64, 76, float32(len(times)))
 
 	// is sorted and recent
 	last := time.Now().Add(-2 * time.Hour)

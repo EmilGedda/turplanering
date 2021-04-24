@@ -5,11 +5,13 @@ import (
 	"encoding/gob"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog"
 	flag "github.com/spf13/pflag"
 
+	"github.com/EmilGedda/turplanering/srv/internal/errc"
 	"github.com/EmilGedda/turplanering/srv/internal/weather"
 )
 
@@ -25,19 +27,15 @@ func main() {
 	).With().Timestamp().Logger()
 
 	args := map[string]func(*zerolog.Logger){
-		"forecast": DownloadForecast,
+		"forecast": downloadForecast,
 	}
 
 	flag.Parse()
 	testdata := flag.Arg(0)
 
-	if testdata == "" {
-		flag.PrintDefaults()
-	}
-
 	f, ok := args[testdata]
 	if !ok {
-		fmt.Printf("unknown test data \"%v\"\n", testdata)
+		fmt.Printf("unknown test data %s \"%v\"\n", os.Args[0], testdata)
 		fmt.Println("valid arguments are:")
 		for k := range args {
 			fmt.Println("\t", k)
@@ -48,7 +46,7 @@ func main() {
 	f(&logger)
 }
 
-func DownloadForecast(logger *zerolog.Logger) {
+func downloadForecast(logger *zerolog.Logger) {
 
 	f, err := os.Create("forecast.gz")
 	defer f.Close()
@@ -61,7 +59,7 @@ func DownloadForecast(logger *zerolog.Logger) {
 	logger.Info().Msg("Downloading weather forecast...")
 	smhi := weather.NewSmhi(weather.WithDownSampling(2))
 	before := time.Now()
-	data, err := smhi.GetForecast()
+	data, err := getForecast(smhi)
 	elapsed := time.Now().Sub(before)
 	if err != nil {
 		logger.Err(err).Dur("elapsed", elapsed).
@@ -107,4 +105,55 @@ func ByteCountSI(b int64) string {
 	}
 
 	return fmt.Sprintf("%.1f%cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+// Aggregates all measurements from all valid times
+// Consumes ~6GB without any downsampling
+func getForecast(s weather.WeatherProvider) (*weather.Forecast, error) {
+	var err error
+	wg := sync.WaitGroup{}
+	forecast := &weather.Forecast{}
+	wg.Add(1)
+
+	go func() {
+		forecast.Points, err = s.GetPoints()
+		wg.Done()
+	}()
+
+	times, timeErr := s.ValidTimes()
+	if timeErr != nil {
+		return nil, errc.Wrap(timeErr, "get all measurements")
+	}
+
+	n := len(times)
+	errors := errc.CompoundError(make([]error, n))
+	measurements := make([][]weather.Measurement, n)
+
+	for timeIdx, timepoint := range times {
+		wg.Add(1)
+		timepoint := timepoint
+		timeIdx := timeIdx
+		go func() {
+			measurements[timeIdx], errors[timeIdx] = s.GetMeasurements(timepoint)
+			wg.Done()
+		}()
+	}
+
+	wg.Wait()
+
+	// GetPoints
+	if err != nil {
+		errors = append(errors, errc.Wrap(err, "get all measurements"))
+	}
+
+	// GetMeasurements
+	if errors.HasErrors() {
+		return nil, errc.Wrap(&errors, "get all measurements")
+	}
+
+	for timeIdx, timepoint := range times {
+		forecast.Prognosis[timepoint] = measurements[timeIdx]
+	}
+
+	return forecast, nil
 }
