@@ -1,10 +1,10 @@
 name:                turplanering
 version:             0.1.0.0
-github:              "githubuser/turplanering"
+github:              "EmilGedda/turplanering"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
+author:              "Emil Gedda"
+maintainer:          "emil.gedda@emilgedda.se"
+copyright:           "2021 Emil Gedda"
 
 extra-source-files:
 - README.md
@@ -17,18 +17,42 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/turplanering#readme>
+description:         Please see the README on GitHub at <https://github.com/EmilGedda/turplanering#README>
 
 dependencies:
 - base >= 4.7 && < 5
 
+ghc-options:
+- -Wall
+- -Wno-missing-signatures
+- -Wno-type-defaults
+- -Wno-partial-type-signatures
+
 library:
   source-dirs: src
+  dependencies:
+  - bytestring          ^>= 0.10
+  - aeson               ^>= 1.5
+  - microlens           ^>= 0.4
+  - microlens-th        ^>= 0.4
+  - text                ^>= 1.2
+  - mtl                 ^>= 2.2
+  - opaleye             ^>= 0.7
+  - postgresql-simple   ^>= 0.6
+  - product-profunctors ^>= 0.11
+  - containers          ^>= 0.6
+  - unordered-containers
+  - wkt-geom            ^>= 0.0 # eWKB -> GeoJSON
+  - geojson
+  - async # ? or lifted-async
 
 executables:
-  turplanering-exe:
+  turplanering:
     main:                Main.hs
     source-dirs:         app
+    when:
+    - condition: false
+      other-modules: Paths_turplanering
     ghc-options:
     - -threaded
     - -rtsopts
@@ -37,9 +61,12 @@ executables:
     - turplanering
 
 tests:
-  turplanering-test:
+  test:
     main:                Spec.hs
     source-dirs:         test
+    when:
+    - condition: false
+      other-modules: Paths_turplanering
     ghc-options:
     - -threaded
     - -rtsopts

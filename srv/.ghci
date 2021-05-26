@@ -1,0 +1,5 @@
+:set +s
+:set prompt "> "
+:set prompt-cont "| "
+:set -XTypeApplications
+:set -XOverloadedStrings

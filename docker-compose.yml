@@ -1,0 +1,16 @@
+version: '2.0'
+services:
+  db:
+    image: postgis/postgis
+    environment:
+    - POSTGRES_USER=user
+    - POSTGRES_PASSWORD=password
+    - POSTGRES_DB=turplanering
+    ports:
+    - "5432:5432"
+    volumes:
+    - dbdata:/var/lib/postgresql/data/
+    - ./cfg/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+    dbdata: {}

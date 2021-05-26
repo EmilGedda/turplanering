@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import Turplanering.Config
+
 
 main :: IO ()
-main = someFunc
+main = putStrLn "Hello"
