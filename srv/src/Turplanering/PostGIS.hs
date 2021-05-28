@@ -10,20 +10,17 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module Turplanering.PostGIS where
 
-import Control.Exception
-import Data.Proxy
-import Database.PostgreSQL.Simple
-import GHC.TypeLits
-import Turplanering.Map
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as B8
-import qualified Data.Text as T
-import qualified Database.PostgreSQL.Simple.FromField as PQ
-import qualified Opaleye.Internal.Column as C
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import Opaleye
-import Data.Profunctor.Product.Default
-import Data.Profunctor.Product
+import           Control.Exception
+import           Data.Proxy
+import           Database.PostgreSQL.Simple
+import           GHC.TypeLits
+import           Opaleye
+import           Turplanering.Map
+import qualified Data.ByteString                        as B
+import qualified Data.ByteString.Char8                  as B8
+import qualified Database.PostgreSQL.Simple.FromField   as PQ
+import qualified Opaleye.Internal.Column                as C
+import qualified Opaleye.Internal.HaskellDB.PrimQuery   as HPQ
 
 -- TODO: Parse this properly
 newtype WKB = WKB B.ByteString
@@ -76,7 +73,7 @@ instance KnownSymbol a => DefaultFromField (Spatial a b) (Spatial a b) where
 makeEnvelope :: Box -> Field (Spatial Geometry Polygon)
 makeEnvelope (Box (Coord a b) (Coord x y))
   = C.Column . HPQ.FunExpr "ST_MakeEnvelope"
-  $ map (HPQ.ConstExpr . HPQ.DoubleLit) [a, b, x, y]
+  $ map (HPQ.ConstExpr . HPQ.DoubleLit . realToFrac) [a, b, x, y]
 
 (&&:) :: Field (Spatial a b) -> Field (Spatial a c) -> Field SqlBool
 (&&:) = C.binOp (HPQ.:&&)

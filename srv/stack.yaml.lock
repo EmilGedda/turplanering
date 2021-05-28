@@ -11,6 +11,13 @@ packages:
       sha256: bd68d8ad7cdc9f0d1d737edf23ab98713f127a15c7dd0f04c52d6169d49e73d4
   original:
     hackage: wkt-geom-0.0.11@sha256:10a77bbe4adc56748d4c73db5a3fee49140e3ca7b297915617a03456b2e16f56,5368
+- completed:
+    hackage: wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
+    pantry-tree:
+      size: 346
+      sha256: 95718554d90b90bf5744d0d80affa8f4be66cc3ea813422efcd9c742e991227e
+  original:
+    hackage: wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
 snapshots:
 - completed:
     size: 567669

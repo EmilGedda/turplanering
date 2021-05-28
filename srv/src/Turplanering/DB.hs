@@ -6,10 +6,12 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Turplanering.DB where
 
-
-import           Control.Arrow
 import           Control.Monad.Reader
 import           Data.Maybe
 import           Data.Profunctor.Product.Default
@@ -18,14 +20,21 @@ import           Database.PostgreSQL.Simple
 import           Opaleye
 import           Turplanering.Map
 import           Turplanering.PostGIS
+import Data.Ewkb
+import Data.Geospatial
+import Data.Hex
+import Turplanering.Collections
 import qualified Data.Map.Strict                as M
 import qualified Data.Text                      as T
-
+import Data.Aeson
+import Data.Text.Encoding
+import qualified Data.ByteString.Lazy as B
 
 newtype Config = DBConfig ConnectInfo
 
 newtype Handle m a = DBHandle (ReaderT Connection m a)
-  deriving (Functor, Applicative, Monad, MonadReader Connection)
+    deriving (Functor, Applicative, Monad, MonadReader Connection, MonadIO)
+
 
 data DBSections' a b c d e = DBSections
     { dbSectionId :: a
@@ -41,9 +50,6 @@ data DBTrail' a b c d = DBTrail
       dbTrailName :: c,
       dbTrailDescription :: d
     }
-
-$(makeAdaptorAndInstance "pDBSections" ''DBSections')
-$(makeAdaptorAndInstance "pDBTrail" ''DBTrail')
 
 type TrailID = Int
 
@@ -64,7 +70,14 @@ type DBTrailField = DBTrail'
 
 type Table' t = Table t t
 
-type Selector a b = forall m. (MonadIO m, MonadReader Connection m) => Select a -> m [b]
+class Monad m => MonadRDBMS m where
+    select' :: Default FromFields a b => Select a -> m [b]
+
+select :: forall b a m. (Default FromFields a b, MonadRDBMS m) => Select a -> m [b]
+select = select'
+
+$(makeAdaptorAndInstance "pDBSections" ''DBSections')
+$(makeAdaptorAndInstance "pDBTrail" ''DBTrail')
 
 trailsTable :: Table' DBTrailField
 trailsTable = table "trails" $
@@ -98,30 +111,45 @@ trailsFrom ids = do
     where_ $ map sqlInt4 ids `in_` dbTrailID t
     return t
 
-runDB :: MonadIO m => Config -> Handle m a -> m a
-runDB (DBConfig cfg) (DBHandle r) = runReaderT r =<< liftIO (connect cfg)
 
-instance MonadIO m => MonadIO (Handle m) where
-    liftIO = DBHandle . liftIO
+runHandle :: MonadIO m => Config -> Handle m a -> m a
+runHandle (DBConfig cfg) (DBHandle r) = runReaderT r =<< liftIO (connect cfg)
 
-instance MonadIO m => MonadStorage (Handle m) where
-    getDetails = DBHandle . fetchDetails
 
 printSql :: Default Unpackspec a a => Select a -> IO ()
 printSql = putStrLn . fromMaybe "No query" . showSql
 
-select :: forall b a m. (Default FromFields a b, MonadIO m, MonadReader Connection m) => Select a -> m [b]
-select s = liftIO . flip runSelect s =<< ask
+trailFromDB :: DBTrail -> Trail
+trailFromDB (DBTrail _ c n d) = Trail n c d []
 
-fetchDetails :: (MonadIO m, MonadReader Connection m) => Box -> m Details
+wkbToGeoJSON :: Spatial a b -> GeospatialGeometry
+wkbToGeoJSON (SpatialObject (WKB bs))
+    = let Right x = parseHexByteString (Hex bs) in x
+
+sectionFromDB :: DBSections -> TrailSection
+sectionFromDB (DBSections _ _ n d spatial)
+  = TrailSection n d (decodeUtf8 . B.toStrict . encode $ wkbToGeoJSON spatial)
+
+insertSection :: TrailSection -> Trail -> Trail
+insertSection s t = t { trailSections = s:trailSections t }
+
+fetchDetails :: MonadRDBMS m => Box -> m Details
 fetchDetails bbox = do
-        sections' <- select @DBSections (sectionsInside bbox)
-        trails'   <- select @DBTrail . trailsFrom $ map dbTrailOwnerID sections'
-        let trailTable = M.fromList $ map (dbTrailID &&& fromDB) trails'
-            fromDB (DBTrail _ _ n d) = Trail n d []
-            insert (DBSections _ _ n d _) t = t { trailSections = TrailSection n d []:trailSections t }
-            complete = foldr (\s -> M.adjust (insert s) (dbTrailOwnerID s)) trailTable sections'
-        return $ Details (M.elems complete) []
+        sections  <- select @DBSections (sectionsInside bbox)
+        trailData <- select . trailsFrom $ map dbTrailOwnerID sections
+        let trailTbl = trailFromDB <$> bucketOn dbTrailID trailData
+            insert   = M.adjust <$> insertSection . sectionFromDB <*> dbTrailOwnerID
+            trails'  = foldr insert trailTbl sections
+        return $ Details (M.elems trails') []
+
+instance MonadIO m => MonadStorage (Handle m) where
+    getDetails = DBHandle . fetchDetails
+
+instance MonadIO m => MonadRDBMS (ReaderT Connection m) where
+    select' s = ReaderT $ \c -> liftIO (runSelect c s)
+
+instance MonadIO m => MonadRDBMS (Handle m) where
+    select' = DBHandle . select'
 
 devConfig :: Config
 devConfig = DBConfig (ConnectInfo "localhost" 5432 "user" "password" "turplanering")

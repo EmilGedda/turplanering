@@ -1,22 +1,31 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE TypeFamilies #-}
 module Turplanering.Map where
 
-import qualified Data.Text as T
+import           GHC.Generics
+import           Data.Morpheus.Types
+import qualified Data.Text          as T
+import Data.Morpheus.Kind
 
 -- TODO: Improve type safety, and specify datum?
 data Coordinate = Coord
-  { x :: Double,
-    y :: Double
-  } deriving Show
+  { x :: Float,
+    y :: Float
+  } deriving (Show, Generic)
 
-point :: (Double, Double) -> Coordinate
+instance GQLType Coordinate where
+    type KIND Coordinate = INPUT
+
+point :: (Float, Float) -> Coordinate
 point = uncurry Coord
 
 data Box = Box
   { topLeft :: Coordinate,
     bottomRight :: Coordinate
-  } deriving Show
+  } deriving (Show, Generic, GQLType)
 
-box :: (Double, Double) -> (Double, Double) -> Box
+box :: (Float, Float) -> (Float, Float) -> Box
 box x y = Box (point x) (point y)
 
 class Monad m => MonadStorage m where
@@ -24,20 +33,19 @@ class Monad m => MonadStorage m where
 
 data Details = Details
   { trails :: [Trail]
-  , areas :: [Area]
-  } deriving Show
+  , areas :: [Int]
+  } deriving (Show, Generic, GQLType)
 
 data TrailSection = TrailSection
   { sectionName ::T.Text,
     sectionDescription ::T.Text,
-    sectionPath :: [Coordinate]
-  } deriving Show
+    sectionPath :: T.Text -- TODO: Custom GeoJSON type
+  } deriving (Show, Generic, GQLType)
+
 
 data Trail = Trail
   { trailName :: T.Text,
+    trailColor :: T.Text,
     trailDescription :: T.Text,
     trailSections :: [TrailSection]
-  } deriving Show
-
-data Area = Area deriving Show
-type Trails = [Trail]
+  } deriving (Show, Generic, GQLType)

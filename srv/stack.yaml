@@ -41,6 +41,7 @@ packages:
 #
 extra-deps:
 - wkt-geom-0.0.11@sha256:10a77bbe4adc56748d4c73db5a3fee49140e3ca7b297915617a03456b2e16f56,5368
+- wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
 
   # ghc-options:
     #    "$everything": "-split-sections"

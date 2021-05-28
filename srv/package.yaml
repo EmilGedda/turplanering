@@ -25,25 +25,29 @@ dependencies:
 ghc-options:
 - -Wall
 - -Wno-missing-signatures
+- -Wno-name-shadowing
 - -Wno-type-defaults
 - -Wno-partial-type-signatures
 
 library:
   source-dirs: src
   dependencies:
-  - bytestring          ^>= 0.10
-  - aeson               ^>= 1.5
-  - microlens           ^>= 0.4
-  - microlens-th        ^>= 0.4
-  - text                ^>= 1.2
-  - mtl                 ^>= 2.2
-  - opaleye             ^>= 0.7
-  - postgresql-simple   ^>= 0.6
-  - product-profunctors ^>= 0.11
-  - containers          ^>= 0.6
-  - unordered-containers
-  - wkt-geom            ^>= 0.0 # eWKB -> GeoJSON
-  - geojson
+  - aeson                   ^>= 1.5
+  - bytestring              ^>= 0.10
+  - containers              ^>= 0.6
+  - geojson                 ^>= 4.0
+  - http-types              ^>= 0.12
+  - microlens               ^>= 0.4
+  - microlens-th            ^>= 0.4
+  - morpheus-graphql        ^>= 0.16
+  - mtl                     ^>= 2.2
+  - opaleye                 ^>= 0.7
+  - postgresql-simple       ^>= 0.6
+  - product-profunctors     ^>= 0.11
+  - text                    ^>= 1.2
+  - unordered-containers    ^>= 0.2
+  - wai                     ^>= 3.2
+  - wkt-geom                ^>= 0.0
   - async # ? or lifted-async
 
 executables:
@@ -59,6 +63,11 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - turplanering
+    - morpheus-graphql        ^>= 0.16
+    - bytestring              ^>= 0.10
+    - http-types              ^>= 0.12
+    - wai                     ^>= 3.2
+    - warp                    ^>= 3.3
 
 tests:
   test:

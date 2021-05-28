@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6c672d26ead625409c0f026c3ffbaa4c452d1b8b5fb49ae0ca7d65d5fa30765b
+-- hash: f0812033d7200233f965b74290eea724f2afb5b04227ed403483ee8974b2c47c
 
 name:           turplanering
 version:        0.1.0.0
@@ -38,22 +38,25 @@ library
       Paths_turplanering
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wno-missing-signatures -Wno-type-defaults -Wno-partial-type-signatures
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures
   build-depends:
       aeson ==1.5.*
     , async
     , base >=4.7 && <5
     , bytestring ==0.10.*
     , containers ==0.6.*
-    , geojson
+    , geojson ==4.0.*
+    , http-types ==0.12.*
     , microlens ==0.4.*
     , microlens-th ==0.4.*
+    , morpheus-graphql ==0.16.*
     , mtl ==2.2.*
     , opaleye ==0.7.*
     , postgresql-simple ==0.6.*
     , product-profunctors ==0.11.*
     , text ==1.2.*
-    , unordered-containers
+    , unordered-containers ==0.2.*
+    , wai ==3.2.*
     , wkt-geom ==0.0.*
   default-language: Haskell2010
 
@@ -61,10 +64,15 @@ executable turplanering
   main-is: Main.hs
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wno-missing-signatures -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , bytestring ==0.10.*
+    , http-types ==0.12.*
+    , morpheus-graphql ==0.16.*
     , turplanering
+    , wai ==3.2.*
+    , warp ==3.3.*
   default-language: Haskell2010
 
 test-suite test
@@ -72,7 +80,7 @@ test-suite test
   main-is: Spec.hs
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wno-missing-signatures -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , turplanering
