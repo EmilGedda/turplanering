@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3a8c22f4fda271caa6ff346b6f64d5a249bc2341b53f9340454a0f663f9dd152
+-- hash: 6b01db50a897abb010fc7588d8e183a56f5521832804ef7f028e4575459dba5b
 
 name:           turplanering
 version:        0.1.0.0
@@ -15,7 +15,6 @@ author:         Emil Gedda
 maintainer:     emil.gedda@emilgedda.se
 copyright:      2021 Emil Gedda
 license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
