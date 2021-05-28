@@ -10,25 +10,27 @@
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TypeFamilies #-}
 module Turplanering.DB where
 
 import           Control.Monad.Reader
+import           Data.Aeson
+import           Data.Ewkb
+import           Data.Geospatial
+import           Data.Hex
 import           Data.Maybe
 import           Data.Profunctor.Product.Default
 import           Data.Profunctor.Product.TH
+import           Data.Text.Encoding
 import           Database.PostgreSQL.Simple
 import           Opaleye
+import           Turplanering.Collections
 import           Turplanering.Map
 import           Turplanering.PostGIS
-import Data.Ewkb
-import Data.Geospatial
-import Data.Hex
-import Turplanering.Collections
+import qualified Data.ByteString.Lazy           as B
 import qualified Data.Map.Strict                as M
 import qualified Data.Text                      as T
-import Data.Aeson
-import Data.Text.Encoding
-import qualified Data.ByteString.Lazy as B
 
 newtype Config = DBConfig ConnectInfo
 
