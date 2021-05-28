@@ -112,8 +112,11 @@ trailsFrom ids = do
     return t
 
 
-runHandle :: MonadIO m => Config -> Handle m a -> m a
-runHandle (DBConfig cfg) (DBHandle r) = runReaderT r =<< liftIO (connect cfg)
+connectDB :: MonadIO m => Config -> Handle m a -> m a
+connectDB (DBConfig cfg) (DBHandle r) = runReaderT r =<< liftIO (connect cfg)
+
+withConnection :: MonadIO m => Connection -> Handle m a -> m a
+withConnection conn (DBHandle hndl) = runReaderT hndl conn
 
 
 printSql :: Default Unpackspec a a => Select a -> IO ()

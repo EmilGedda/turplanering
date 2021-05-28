@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f0812033d7200233f965b74290eea724f2afb5b04227ed403483ee8974b2c47c
+-- hash: 3a8c22f4fda271caa6ff346b6f64d5a249bc2341b53f9340454a0f663f9dd152
 
 name:           turplanering
 version:        0.1.0.0
@@ -70,6 +70,7 @@ executable turplanering
     , bytestring ==0.10.*
     , http-types ==0.12.*
     , morpheus-graphql ==0.16.*
+    , mtl ==2.2.*
     , turplanering
     , wai ==3.2.*
     , warp ==3.3.*

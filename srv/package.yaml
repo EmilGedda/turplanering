@@ -63,6 +63,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - turplanering
+    - mtl                     ^>= 2.2
     - morpheus-graphql        ^>= 0.16
     - bytestring              ^>= 0.10
     - http-types              ^>= 0.12

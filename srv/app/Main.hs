@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Main where
 
+import Control.Monad.Reader
 import Data.Morpheus
 import Network.Wai
 import Network.Wai.Handler.Warp
@@ -10,17 +12,24 @@ import Turplanering.DB
 import Turplanering.Logger
 import Data.Data
 import Data.Morpheus.Document
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Lazy.Char8 as BL
 
-gqlApi :: Config -> Application
-gqlApi cfg req resp = strictRequestBody req
-                  >>= runHandle cfg . interpreter gqlResolver
-                  >>= resp . responseLBS status200 []
+
+logger :: B.ByteString -> LogLevel -> B.ByteString -> IO ()
+logger = consoleLogger
+
+gqlApi :: Handle IO Application
+gqlApi = do
+    conn <- ask
+    return $ \req resp ->
+        strictRequestBody req
+            >>= withConnection conn . interpreter gqlResolver
+            >>= resp . responseLBS status200 []
 
 main :: IO ()
 main = do
-    let log = consoleLogger "main"
-    log Info "Generating schema:\n"
-    B.putStrLn $ toGraphQLDocument (Proxy :: Proxy (GQLAPI IO))
-    log Info "Serving GraphQL on localhost:4000"
-    run 4000 (gqlApi devConfig)
+    logger "main" Info "Generating schema:\n"
+    BL.putStrLn $ toGraphQLDocument (Proxy :: Proxy (GQLAPI IO))
+    logger "main" Info "serving GraphQL on localhost:4000"
+    run 4000 =<< connectDB devConfig gqlApi
