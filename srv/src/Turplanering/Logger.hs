@@ -126,12 +126,12 @@ structuredLogger = newLogger $ (console <*> jsonFormat) . _entry
 consoleLogger    = newLogger $ (console <*> readableFormat) . _entry
 
 shortFmt :: LogLevel -> B.ByteString
-shortFmt Trace   = "TRC"
-shortFmt Debug   = "DBG"
-shortFmt Info    = "INF"
-shortFmt Warning = "WRN"
-shortFmt Error   = "ERR"
-shortFmt Fatal   = "***"
+shortFmt Trace   = "TRACE"
+shortFmt Debug   = "DEBUG"
+shortFmt Info    = " INFO"
+shortFmt Warning = " WARN"
+shortFmt Error   = "ERROR"
+shortFmt Fatal   = "FATAL"
 
 console :: LogEntry -> B.ByteString -> IO ()
 console (LogEntry _ lvl _ _) msg = do
@@ -140,9 +140,9 @@ console (LogEntry _ lvl _ _) msg = do
     where handle = bool stdout stderr $ lvl >= Warning
 
 readableFormat :: LogEntry -> B.ByteString
-readableFormat (LogEntry ns lvl msg fields) =
+readableFormat (LogEntry _ lvl msg fields) =
     let fmt (Field k v) = k <> "=" <> L.toStrict (encode v)
-    in shortFmt lvl <> "|" <> ns <> ": " <> msg <> " "
+    in shortFmt lvl <> "  " <> msg <> " "
        <> C.intercalate " " (map fmt fields)
 
 jsonFormat :: LogEntry -> B.ByteString
