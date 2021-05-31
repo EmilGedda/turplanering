@@ -21,9 +21,13 @@ import           Lens.Micro
 import           Lens.Micro.TH
 import           System.IO
 import           System.Exit
+import           System.Console.ANSI.Types
 import qualified Data.ByteString       as B
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy  as L
+import qualified Data.ByteString.Char8 as B8
+import Data.Char
+import System.Console.ANSI
 
 data LogLevel = Trace | Debug | Info | Warning | Error | Fatal
     deriving (Eq, Ord, Show, Generic, ToJSON)
@@ -116,6 +120,7 @@ err :: Exception e => e -> Modifier
 err e = field "error" (displayException e) . level Error
 
 infixl 1 &
+(&) :: a -> (a -> b) -> b
 (&) = (Data.Function.&)
 
 newLogger :: LogType r => LogConsumer -> B.ByteString -> LogLevel -> B.ByteString -> r
@@ -126,12 +131,27 @@ structuredLogger = newLogger $ (console <*> jsonFormat) . _entry
 consoleLogger    = newLogger $ (console <*> readableFormat) . _entry
 
 shortFmt :: LogLevel -> B.ByteString
-shortFmt Trace   = "TRACE"
-shortFmt Debug   = "DEBUG"
-shortFmt Info    = " INFO"
-shortFmt Warning = " WARN"
-shortFmt Error   = "ERROR"
-shortFmt Fatal   = "FATAL"
+shortFmt Trace   = "TRAC"
+shortFmt Debug   = "DEBU"
+shortFmt Info    = "INFO"
+shortFmt Warning = "WARN"
+shortFmt Error   = "ERRO"
+shortFmt Fatal   = "FATA"
+
+levelColor :: LogLevel -> SGR
+levelColor lvl = case lvl of
+        Trace   -> SetColor Foreground Dull White
+        Debug   -> SetColor Foreground Vivid White
+        Info    -> SetColor Foreground Vivid Blue
+        Warning -> SetColor Foreground Dull Yellow
+        Error   -> SetColor Foreground Dull Red
+        Fatal   -> SetColor Foreground Vivid Red
+
+levelStyle :: LogLevel -> [SGR]
+levelStyle lvl = case lvl of
+        Error -> [SetBlinkSpeed SlowBlink]
+        Fatal -> SetConsoleIntensity BoldIntensity:levelStyle Error
+        _     -> []
 
 console :: LogEntry -> B.ByteString -> IO ()
 console (LogEntry _ lvl _ _) msg = do
@@ -141,15 +161,23 @@ console (LogEntry _ lvl _ _) msg = do
 
 readableFormat :: LogEntry -> B.ByteString
 readableFormat (LogEntry _ lvl msg fields) =
-    let fmt (Field k v) = k <> "=" <> L.toStrict (encode v)
-    in shortFmt lvl <> "  " <> msg <> " "
-       <> C.intercalate " " (map fmt fields)
+    let fmt (Field k v) = color k <> "=" <> L.toStrict (encode v)
+        rightPad str minLen = mappend str .  B8.replicate (minLen - B.length str)
+        capitalize s = B8.pack [toUpper $ B8.head s] <> B.drop 1 s
+        color f = B8.pack (setSGRCode [levelColor lvl]) <> f
+               <> B8.pack (setSGRCode [])
+        dispLevel = (<>) <$> B8.pack . setSGRCode . levelStyle
+                         <*> color . shortFmt
+    in C.intercalate " "
+        $ dispLevel lvl
+        : rightPad (capitalize msg) 40 ' '
+        : map fmt fields
 
 jsonFormat :: LogEntry -> B.ByteString
 jsonFormat = L.toStrict . encode
 
 autoFormat :: IO (LogEntry -> B.ByteString)
 autoFormat = hIsTerminalDevice stdout
-         >>= \case
-            True -> return readableFormat
-            _    -> return jsonFormat
+         <&> \case
+            True -> readableFormat
+            _    -> jsonFormat

@@ -5,6 +5,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE StandaloneKindSignatures #-}
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
 module Turplanering.DB where
 
 import           Control.Monad.Reader
@@ -30,7 +35,8 @@ import qualified Data.Map.Strict                as M
 newtype Config = DBConfig ConnectInfo
 
 newtype Handle m a = DBHandle (ReaderT Connection m a)
-    deriving (Functor, Applicative, Monad, MonadReader Connection, MonadIO)
+    deriving ( Functor, Applicative, Monad, MonadIO
+             , MonadReader Connection, MonadRDBMS )
 
 
 class Monad m => MonadRDBMS m where
@@ -76,8 +82,8 @@ trailsFrom ids = do
     return t
 
 
-connectDB :: MonadIO m => Config -> Handle m a -> m a
-connectDB (DBConfig cfg) (DBHandle r) = runReaderT r =<< liftIO (connect cfg)
+withConfig :: MonadIO m => Config -> Handle m a -> m a
+withConfig (DBConfig cfg) hndl = liftIO (connect cfg) >>= flip withConnection hndl
 
 
 withConnection :: Connection -> Handle m a -> m a
@@ -103,7 +109,7 @@ sectionFromDB (DBSections _ _ n d spatial)
 
 
 insertSection :: TrailSection -> Trail -> Trail
-insertSection s = over trailSections (s:)
+insertSection s = over _trailSections (s:)
 
 
 fetchDetails :: MonadRDBMS m => Box -> m Details
@@ -124,7 +130,4 @@ instance MonadIO m => MonadStorage (Handle m) where
     getDetails = fetchDetails
 
 instance MonadIO m => MonadRDBMS (ReaderT Connection m) where
-    select' s = ReaderT $ \c -> liftIO (runSelect c s)
-
-instance MonadIO m => MonadRDBMS (Handle m) where
-    select' = DBHandle . select'
+    select' query = ReaderT $ \conn -> liftIO (runSelect conn query)

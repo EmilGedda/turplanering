@@ -4,8 +4,8 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 module Turplanering.DB.Section where
 
-import          Opaleye
-import          Turplanering.PostGIS
+import           Opaleye
+import           Turplanering.PostGIS
 import           Data.Profunctor.Product.TH
 import qualified Data.Text as T
 

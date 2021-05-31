@@ -12,50 +12,51 @@ import Data.Morpheus.Kind
 
 -- TODO: Improve type safety, and specify datum?
 data Coordinate = Coord
-  { _x :: Float,
-    _y :: Float
+  { x :: Float,
+    y :: Float
   } deriving (Show, Generic)
 
 instance GQLType Coordinate where
     type KIND Coordinate = INPUT
 
 data Box = Box
-  { _topLeft :: Coordinate,
-    _bottomRight :: Coordinate
+  { topLeft :: Coordinate,
+    bottomRight :: Coordinate
   } deriving (Show, Generic, GQLType)
 
 class Monad m => MonadStorage m where
   getDetails :: Box -> m Details
 
 data Details = Details
-  { _trails :: [Trail]
-  , _areas :: [Int]
+  { trails :: [Trail]
+  , areas :: [Int]
   } deriving (Show, Generic, GQLType)
 
 data TrailSection = TrailSection
-  { _sectionName ::T.Text,
-    _sectionDescription ::T.Text,
-    _sectionPath :: T.Text -- TODO: Custom GeoJSON type
+  { sectionName ::T.Text,
+    sectionDescription ::T.Text,
+    sectionPath :: T.Text -- TODO: Custom GeoJSON type
   } deriving (Show, Generic, GQLType)
 
 
 data Trail = Trail
-  { _trailName :: T.Text,
-    _trailColor :: T.Text,
-    _trailDescription :: T.Text,
-    _trailSections :: [TrailSection]
+  { trailName :: T.Text,
+    trailColor :: T.Text,
+    trailDescription :: T.Text,
+    trailSections :: [TrailSection]
   } deriving (Show, Generic, GQLType)
 
 
-makeLenses ''Coordinate
-makeLenses ''Box
-makeLenses ''Details
-makeLenses ''TrailSection
-makeLenses ''Trail
+
+mkCoord :: (Float, Float) -> Coordinate
+mkCoord = uncurry Coord
+
+mkBox :: (Float, Float) -> (Float, Float) -> Box
+mkBox x y = Box (mkCoord x) (mkCoord y)
 
 
-point :: (Float, Float) -> Coordinate
-point = uncurry Coord
-
-box :: (Float, Float) -> (Float, Float) -> Box
-box x y = Box (point x) (point y)
+makeClassy_ ''Coordinate
+makeClassy_ ''Box
+makeClassy_ ''Details
+makeClassy_ ''TrailSection
+makeClassy_ ''Trail

@@ -4,17 +4,17 @@ module Turplanering.API where
 
 import Data.Morpheus.Types
 import GHC.Generics
-import Turplanering.Map
+import qualified Turplanering.Map as Map
 
 type GQLAPI m = RootResolver m () GQLQuery Undefined Undefined
 
-newtype GQLQuery m = Query { details :: Box -> m Details }
+newtype GQLQuery m = Query { getDetails :: Map.Box -> m Map.Details }
     deriving (Generic, GQLType)
 
-gqlResolver :: MonadStorage m => GQLAPI m
+gqlResolver :: Map.MonadStorage m => GQLAPI m
 gqlResolver =
       RootResolver
-        { queryResolver        = Query {details = lift . getDetails},
+        { queryResolver        = Query {getDetails = lift . Map.getDetails},
           mutationResolver     = Undefined,
           subscriptionResolver = Undefined
         }
