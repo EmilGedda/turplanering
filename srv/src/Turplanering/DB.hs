@@ -1,15 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
 module Turplanering.DB where
 
 import           Control.Monad.Reader
@@ -40,12 +32,7 @@ newtype Handle m a = DBHandle (ReaderT Connection m a)
 
 
 class Monad m => MonadRDBMS m where
-    select' :: Default FromFields a b => Select a -> m [b]
-
-select :: forall b a m. (Default FromFields a b, MonadRDBMS m)
-       => Select a -> m [b]
-select = select'
-
+    select :: Default FromFields a b => Select a -> m [b]
 
 trailsTable :: Table' DBTrailField
 trailsTable = table "trails"
@@ -130,4 +117,4 @@ instance MonadIO m => MonadStorage (Handle m) where
     getDetails = fetchDetails
 
 instance MonadIO m => MonadRDBMS (ReaderT Connection m) where
-    select' query = ReaderT $ \conn -> liftIO (runSelect conn query)
+    select query = ReaderT $ \conn -> liftIO (runSelect conn query)

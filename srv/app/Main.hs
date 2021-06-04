@@ -2,23 +2,20 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Main where
 
+import           Control.Concurrent
 import           Control.Monad.Reader
 import           Data.Morpheus
+import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp
-import           Network.HTTP.Types
 import           Turplanering.API
-import qualified Turplanering.DB as DB
 import           Turplanering.Logger
-import           Data.Data
-import           Data.Morpheus.Document
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Lazy.Char8 as BL
-import Control.Concurrent
+import qualified Turplanering.DB as DB
 
 
 logger :: LogType t => LogLevel -> B.ByteString -> t
-logger = consoleLogger "main"
+logger = consoleLogger Trace "main"
 
 gqlApi :: DB.Handle IO Application
 gqlApi = do

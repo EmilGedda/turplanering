@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 681119a6374be0463bb29aaa9f01e64dc0b959f65f9cee19c78f4761cb899b00
+-- hash: 9f95efbd7c1d22528999a77c1decce63c17ba9180f760705c263a695d02f294a
 
 name:           turplanering
 version:        0.1.0.0
@@ -47,11 +47,10 @@ library
     , base >=4.7 && <5
     , bytestring ==0.10.*
     , containers ==0.6.*
+    , dhall ==1.37.*
     , geojson ==4.0.*
     , http-types ==0.12.*
     , lens ==4.19.*
-    , microlens ==0.4.*
-    , microlens-th ==0.4.*
     , morpheus-graphql ==0.16.*
     , mtl ==2.2.*
     , opaleye ==0.7.*

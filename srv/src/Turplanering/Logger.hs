@@ -17,8 +17,7 @@ import           Data.Bool
 import           Data.Function
 import           Data.Text.Encoding
 import           GHC.Generics
-import           Lens.Micro
-import           Lens.Micro.TH
+import           Control.Lens         hiding ((.=))
 import           System.IO
 import           System.Exit
 import           System.Console.ANSI.Types
@@ -53,13 +52,6 @@ instance ToJSON LogEntry where
                   , "message"   .= decodeUtf8 str
                   , "data"      .= object (map keyval fields)]
 
-    toEncoding (LogEntry ns lvl str fields) =
-        let keyval (Field k v) = decodeUtf8 k .= v
-        in pairs ("namespace" .= decodeUtf8 ns
-               <> "level"     .= lvl
-               <> "message"   .= decodeUtf8 str
-               <> "data"      .= object (map keyval fields))
-
 
 type LogConsumer = LogAction -> IO ()
 
@@ -86,6 +78,9 @@ instance (a ~ (LogAction -> LogAction), LogType r) => LogType (a -> r) where
     log' f ns lvl msg args = \mod -> log' (f . mod) ns lvl msg args
 
 type Modifier = forall r. LogType r => LogAction -> r
+type Formatter = Bool -> LogEntry -> B8.ByteString
+type Logger = forall r.  LogType r => LogLevel -> B.ByteString -> LogLevel -> B.ByteString -> r
+
 
 liftAction :: LogType r => LogAction -> r
 liftAction (LogAction f (LogEntry ns lvl str args))
@@ -107,7 +102,7 @@ namespace ns = overMsg logNamespace (\n -> n <> "." <> ns)
 level :: LogLevel -> Modifier
 level lvl = overMsg logLevel (max lvl)
 
-debug, info, warn, fatal:: Modifier
+debug, info, warn, fatal :: Modifier
 debug = level Debug
 info  = level Info
 warn  = level Warning
@@ -123,20 +118,28 @@ infixl 1 &
 (&) :: a -> (a -> b) -> b
 (&) = (Data.Function.&)
 
-newLogger :: LogType r => LogConsumer -> B.ByteString -> LogLevel -> B.ByteString -> r
-newLogger f ns lvl msg = log' f ns lvl msg []
+newLogger :: LogType r => LogLevel -> LogConsumer -> B.ByteString -> LogLevel -> B.ByteString -> r
+newLogger verbosity consumer namespace level message = log' output namespace level message []
+  where output = filterLogs ((>= verbosity) . view logLevel) consumer
 
-structuredLogger, consoleLogger :: LogType r => B.ByteString -> LogLevel -> B.ByteString -> r
-structuredLogger = newLogger $ (console <*> jsonFormat) . _entry
-consoleLogger    = newLogger $ (console <*> readableFormat) . _entry
+mkLogger :: (a -> LogEntry -> IO ()) -> a -> Logger
+mkLogger out format v = newLogger v $ out format . _entry
+
+structuredLogger :: Logger
+structuredLogger = mkLogger console jsonFormat
+
+consoleLogger :: Logger
+consoleLogger = mkLogger console readableFormat
+
 
 shortFmt :: LogLevel -> B.ByteString
-shortFmt Trace   = "TRAC"
-shortFmt Debug   = "DEBU"
-shortFmt Info    = "INFO"
-shortFmt Warning = "WARN"
-shortFmt Error   = "ERRO"
-shortFmt Fatal   = "FATA"
+shortFmt lvl = case lvl of
+         Trace   -> "TRAC"
+         Debug   -> "DEBU"
+         Info    -> "INFO"
+         Warning -> "WARN"
+         Error   -> "ERRO"
+         Fatal   -> "FATA"
 
 levelColor :: LogLevel -> SGR
 levelColor lvl = case lvl of
@@ -153,30 +156,37 @@ levelStyle lvl = case lvl of
         Fatal -> SetConsoleIntensity BoldIntensity:levelStyle Error
         _     -> []
 
-console :: LogEntry -> B.ByteString -> IO ()
-console (LogEntry _ lvl _ _) msg = do
+console :: Formatter -> LogEntry -> IO ()
+console formatter entry@(LogEntry _ lvl _ _) = do
+    color <- hSupportsANSIColor handle
+    let msg = formatter color entry
     C.hPutStrLn handle msg
     when (lvl >= Fatal) exitFailure
     where handle = bool stdout stderr $ lvl >= Warning
 
-readableFormat :: LogEntry -> B.ByteString
-readableFormat (LogEntry _ lvl msg fields) =
-    let fmt (Field k v) = color k <> "=" <> L.toStrict (encode v)
+filterLogs :: Applicative f =>
+    (LogEntry -> Bool) -> (LogAction -> f ()) -> LogAction -> f ()
+filterLogs p f x | p (_entry x) = f x
+                 | otherwise = pure ()
+
+readableFormat :: Formatter
+readableFormat hasColor (LogEntry _ lvl msg fields) =
+    let pack = B8.pack . setSGRCode
+        fmt (Field k v) = color k <> "=" <> L.toStrict (encode v)
         rightPad str minLen = mappend str .  B8.replicate (minLen - B.length str)
         capitalize s = B8.pack [toUpper $ B8.head s] <> B.drop 1 s
-        color f = B8.pack (setSGRCode [levelColor lvl]) <> f
-               <> B8.pack (setSGRCode [])
-        dispLevel = (<>) <$> B8.pack . setSGRCode . levelStyle
-                         <*> color . shortFmt
+        dispLevel = (<>) <$> pack . levelStyle <*> color . shortFmt
+        color f | hasColor = pack [levelColor lvl] <> f <> pack []
+                | otherwise = f
     in C.intercalate " "
-        $ dispLevel lvl
-        : rightPad (capitalize msg) 40 ' '
-        : map fmt fields
+       $ dispLevel lvl
+       : rightPad (capitalize msg) 40 ' '
+       : map fmt fields
 
-jsonFormat :: LogEntry -> B.ByteString
-jsonFormat = L.toStrict . encode
+jsonFormat :: Formatter
+jsonFormat _ = L.toStrict . encode
 
-autoFormat :: IO (LogEntry -> B.ByteString)
+autoFormat :: IO Formatter
 autoFormat = hIsTerminalDevice stdout
          <&> \case
             True -> readableFormat
