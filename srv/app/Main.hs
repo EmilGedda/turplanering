@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Main where
 
-import           Control.Monad.IO.Class
 import           Data.String
 import           Database.PostgreSQL.Simple
 import           Dhall (input, auto)
@@ -34,7 +33,7 @@ main = do
         & field "url"  (dbAddr dbConfig)
         . field "port" (dbPort dbConfig)
 
-    dbConn <- liftIO . connect $ getConnectionInfo dbConfig
+    dbConn <- connect $ getConnectionInfo dbConfig
 
     let httpConfig   = http config
         appContext   = AppContext config dbConn
@@ -48,4 +47,5 @@ main = do
 
     runSettings warpSettings
         . gzip def
+        . requestLogger
         $ api appContext
