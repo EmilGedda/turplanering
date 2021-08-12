@@ -1,20 +1,43 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Turplanering.API where
 
-import Data.Morpheus.Types
-import GHC.Generics
-import qualified Turplanering.Map as Map
+import           Control.Monad.Reader
+import           Database.PostgreSQL.Simple
+import           Servant
+import           Servant.API.Generic
+import           Servant.Server.Generic
+import           Turplanering.Map
+import           Turplanering.DB
+import qualified Turplanering.Config as Config
 
-type GQLAPI m = RootResolver m () GQLQuery Undefined Undefined
+newtype Routes route = Routes
+    { _get :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details }
+    deriving (Generic)
 
-newtype GQLQuery m = Query { getDetails :: Map.Box -> m Map.Details }
-    deriving (Generic, GQLType)
+data AppContext = AppContext
+    { config :: Config.App
+    , dbConn :: Connection
+    }
 
-gqlResolver :: Map.MonadStorage m => GQLAPI m
-gqlResolver =
-      RootResolver
-        { queryResolver        = Query {getDetails = lift . Map.getDetails},
-          mutationResolver     = Undefined,
-          subscriptionResolver = Undefined
-        }
+newtype ContextM a = ContextM
+    { runContext :: ReaderT AppContext Handler a }
+    deriving (Functor, Applicative, Monad, MonadReader AppContext, MonadIO)
+
+instance MonadStorage ContextM where
+    getDetails box = withConnection (getDetails box) =<< asks dbConn
+
+routes :: MonadStorage m => Routes (AsServerT m)
+routes = Routes
+    { _get = getDetails }
+
+runApp :: AppContext -> ContextM a -> Handler a
+runApp cfg = flip runReaderT cfg . runContext
+
+api :: AppContext -> Application
+api cfg = genericServeT (runApp cfg) routes

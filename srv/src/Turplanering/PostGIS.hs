@@ -21,6 +21,7 @@ import qualified Data.ByteString.Char8                  as B8
 import qualified Database.PostgreSQL.Simple.FromField   as PQ
 import qualified Opaleye.Internal.Column                as C
 import qualified Opaleye.Internal.HaskellDB.PrimQuery   as HPQ
+import Data.Geospatial
 
 -- TODO: Parse this properly
 newtype WKB = WKB B.ByteString
@@ -71,7 +72,7 @@ instance KnownSymbol a => DefaultFromField (Spatial a b) (Spatial a b) where
     defaultFromField = fromPGSFromField
 
 makeEnvelope :: Box -> Field (Spatial Geometry Polygon)
-makeEnvelope (Box (Coord a b) (Coord x y))
+makeEnvelope (Box (PointXY a b) (PointXY x y))
   = C.Column . HPQ.FunExpr "ST_MakeEnvelope"
   $ map (HPQ.ConstExpr . HPQ.DoubleLit . realToFrac) [a, b, x, y]
 

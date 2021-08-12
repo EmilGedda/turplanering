@@ -5,22 +5,19 @@
 
 packages:
 - completed:
-    hackage: wkt-geom-0.0.11@sha256:10a77bbe4adc56748d4c73db5a3fee49140e3ca7b297915617a03456b2e16f56,5368
+    name: wkt-geom
+    version: 0.0.11
+    git: https://github.com/EmilGedda/wkt-geom.git
     pantry-tree:
-      size: 2853
-      sha256: bd68d8ad7cdc9f0d1d737edf23ab98713f127a15c7dd0f04c52d6169d49e73d4
+      size: 3244
+      sha256: bf068595084f88762d7b8e12f47009ec56e7d0b01b4e86142f0a4bc4e85ab7bd
+    commit: 93f6c47012e3ee3919203b511fa8a14785044f53
   original:
-    hackage: wkt-geom-0.0.11@sha256:10a77bbe4adc56748d4c73db5a3fee49140e3ca7b297915617a03456b2e16f56,5368
-- completed:
-    hackage: wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
-    pantry-tree:
-      size: 346
-      sha256: 95718554d90b90bf5744d0d80affa8f4be66cc3ea813422efcd9c742e991227e
-  original:
-    hackage: wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
+    git: https://github.com/EmilGedda/wkt-geom.git
+    commit: 93f6c47012e3ee3919203b511fa8a14785044f53
 snapshots:
 - completed:
-    size: 567669
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/12.yaml
-    sha256: facf6cac73b22a83ca955b580a98a7a09ed71f8f974c7a55d28e608c23e689a9
-  original: lts-17.12
+    size: 585817
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/5.yaml
+    sha256: 22d24d0dacad9c1450b9a174c28d203f9bb482a2a8da9710a2f2a9f4afee2887
+  original: lts-18.5

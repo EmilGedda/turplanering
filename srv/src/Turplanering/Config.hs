@@ -1,19 +1,22 @@
 {-# LANGUAGE DeriveAnyClass     #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings  #-}
-{-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Turplanering.Config where
 
 import Dhall
+import Data.Word
 
 data LogLevel = Trace
                | Debug
                | Info
                | Warning
                | Error
-  deriving stock (Generic, Show)
+               | Fatal
+               | Silent
+  deriving stock (Generic, Show, Enum, Bounded)
   deriving anyclass (FromDhall, ToDhall)
 
 data LogStyle = Auto
@@ -27,8 +30,10 @@ data Environment = Production
   deriving stock (Generic, Show)
   deriving anyclass (FromDhall, ToDhall)
 
-newtype GQL = GQL
-    { port :: Natural }
+data HTTP = HTTP
+    { httpPort :: Word16
+    , httpAddr :: String
+    }
   deriving stock (Generic, Show)
   deriving anyclass (FromDhall, ToDhall)
 
@@ -40,8 +45,8 @@ data Logger = Logger
   deriving anyclass (FromDhall, ToDhall)
 
 data DB = DB
-    { address  :: String
-    , port     :: Natural
+    { dbAddr   :: String
+    , dbPort   :: Word16
     , username :: String
     , password :: String
     , database :: String
@@ -51,9 +56,10 @@ data DB = DB
 
 data App = App
     { db      :: DB
-    , gql     :: GQL
+    , http    :: HTTP
     , logger  :: Logger
     , environ :: Environment
     }
   deriving stock (Generic, Show)
   deriving anyclass (FromDhall, ToDhall)
+

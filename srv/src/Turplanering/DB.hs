@@ -2,17 +2,17 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module Turplanering.DB where
 
 import           Control.Monad.Reader
 import           Control.Lens
-import           Data.Aeson
 import           Data.Ewkb
 import           Data.Geospatial
 import           Data.Hex
 import           Data.Maybe
 import           Data.Profunctor.Product.Default
-import           Data.Text.Encoding
 import           Database.PostgreSQL.Simple
 import           Opaleye
 import           Turplanering.Collections
@@ -21,15 +21,16 @@ import           Turplanering.PostGIS
 import           Turplanering.DB.Types
 import qualified Turplanering.DB.Section        as Section
 import qualified Turplanering.DB.Trail          as Trail
-import qualified Data.ByteString.Lazy           as B
 import qualified Data.Map.Strict                as M
+import qualified Turplanering.Config as Config
 
-newtype Config = DBConfig ConnectInfo
-
-newtype Handle m a = DBHandle (ReaderT Connection m a)
+newtype Handle m a = Handle (ReaderT Connection m a)
     deriving ( Functor, Applicative, Monad, MonadIO
-             , MonadReader Connection, MonadRDBMS )
+             , MonadReader Connection, MonadRDBMS)
 
+getConnectionInfo :: Config.DB -> ConnectInfo
+getConnectionInfo (Config.DB addr port user pass db)
+    = ConnectInfo addr (fromIntegral port) user pass db
 
 class Monad m => MonadRDBMS m where
     select :: Default FromFields a b => Select a -> m [b]
@@ -68,13 +69,8 @@ trailsFrom ids = do
     where_ $ map sqlInt4 ids `in_` Trail.id t
     return t
 
-
-withConfig :: MonadIO m => Config -> Handle m a -> m a
-withConfig (DBConfig cfg) hndl = liftIO (connect cfg) >>= flip withConnection hndl
-
-
-withConnection :: Connection -> Handle m a -> m a
-withConnection conn (DBHandle hndl) = runReaderT hndl conn
+withConnection :: Handle m a -> Connection -> m a
+withConnection (Handle hndl) = runReaderT hndl
 
 
 printSql :: Default Unpackspec a a => Select a -> IO ()
@@ -92,26 +88,24 @@ wkbToGeoJSON (SpatialObject (WKB bs))
 
 sectionFromDB :: DBSections -> TrailSection
 sectionFromDB (DBSections _ _ n d spatial)
-  = TrailSection n d (decodeUtf8 . B.toStrict . encode $ wkbToGeoJSON spatial)
+  = TrailSection n d (wkbToGeoJSON spatial)
 
 
 insertSection :: TrailSection -> Trail -> Trail
 insertSection s = over _trailSections (s:)
+
+buildTrails :: [DBTrail] -> [DBSections] -> [Trail]
+buildTrails trailData = M.elems . foldr insert trailTbl
+    where trailTbl = trailFromDB <$> bucketOn Trail.id trailData
+          insert   = M.adjust <$> insertSection . sectionFromDB
+                              <*> Section.trailId
 
 
 fetchDetails :: MonadRDBMS m => Box -> m Details
 fetchDetails bbox = do
         sections  <- select (sectionsInside bbox)
         trailData <- select . trailsFrom $ map Section.trailId sections
-        let insert = M.adjust <$> insertSection . sectionFromDB
-                              <*> Section.trailId
-            trailTbl = trailFromDB <$> bucketOn Trail.id trailData
-            trails'  = foldr insert trailTbl sections
-        return $ Details (M.elems trails') []
-
-
-devConfig :: Config
-devConfig = DBConfig (ConnectInfo "localhost" 5432 "user" "password" "turplanering")
+        return $ Details (buildTrails trailData sections) []
 
 instance MonadIO m => MonadStorage (Handle m) where
     getDetails = fetchDetails

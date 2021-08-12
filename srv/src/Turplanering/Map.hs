@@ -2,27 +2,25 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module Turplanering.Map where
 
 import           GHC.Generics
-import           Data.Morpheus.Types
 import           Control.Lens
+import           Data.Geospatial
+import           Data.Attoparsec.Text
+import           Servant.API
 import qualified Data.Text          as T
-import Data.Morpheus.Kind
-
--- TODO: Improve type safety, and specify datum?
-data Coordinate = Coord
-  { x :: Float,
-    y :: Float
-  } deriving (Show, Generic)
-
-instance GQLType Coordinate where
-    type KIND Coordinate = INPUT
+import Control.Arrow
+import Data.Aeson
 
 data Box = Box
-  { topLeft :: Coordinate,
-    bottomRight :: Coordinate
-  } deriving (Show, Generic, GQLType)
+  { topLeft :: PointXY
+  , bottomRight :: PointXY
+  } deriving (Show, Generic)
 
 class Monad m => MonadStorage m where
   getDetails :: Box -> m Details
@@ -30,32 +28,36 @@ class Monad m => MonadStorage m where
 data Details = Details
   { trails :: [Trail]
   , areas :: [Int]
-  } deriving (Show, Generic, GQLType)
+  } deriving (Show, Generic, ToJSON)
 
 data TrailSection = TrailSection
-  { sectionName ::T.Text,
-    sectionDescription ::T.Text,
-    sectionPath :: T.Text -- TODO: Custom GeoJSON type
-  } deriving (Show, Generic, GQLType)
+  { sectionName ::T.Text
+  , sectionDescription ::T.Text
+  , sectionPath :: GeospatialGeometry
+  } deriving (Show, Generic, ToJSON)
 
 
 data Trail = Trail
-  { trailName :: T.Text,
-    trailColor :: T.Text,
-    trailDescription :: T.Text,
-    trailSections :: [TrailSection]
-  } deriving (Show, Generic, GQLType)
+  { trailName :: T.Text
+  , trailColor :: T.Text
+  , trailDescription :: T.Text
+  , trailSections :: [TrailSection]
+  } deriving (Show, Generic, ToJSON)
+
+boxParser :: Parser Box
+boxParser = mkBox <$> point <*> (char ',' *> point)
+    where point = (,) <$> double <*> (char ',' *> double)
+
+instance FromHttpApiData Box where
+    parseUrlPiece = left T.pack . parseOnly boxParser
+
+mkCoord :: (Double, Double) -> PointXY
+mkCoord = uncurry PointXY
+
+mkBox :: (Double, Double) -> (Double, Double) -> Box
+mkBox a b = Box (mkCoord a) (mkCoord b)
 
 
-
-mkCoord :: (Float, Float) -> Coordinate
-mkCoord = uncurry Coord
-
-mkBox :: (Float, Float) -> (Float, Float) -> Box
-mkBox x y = Box (mkCoord x) (mkCoord y)
-
-
-makeClassy_ ''Coordinate
 makeClassy_ ''Box
 makeClassy_ ''Details
 makeClassy_ ''TrailSection

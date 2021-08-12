@@ -7,24 +7,27 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
-module Turplanering.Logger where
+module Turplanering.Logger
+       ( module Turplanering.Logger
+       , (Data.Function.&)
+       ) where
 
-import           Prelude               hiding (log)
+import           Prelude                    hiding (log)
 import           Control.Monad
 import           Control.Exception
-import           Data.Aeson            hiding (Error)
+import           Data.Aeson                 hiding (Error)
 import           Data.Bool
 import           Data.Function
 import           Data.Text.Encoding
 import           GHC.Generics
-import           Control.Lens         hiding ((.=))
+import           Control.Lens               hiding ((.=))
 import           System.IO
 import           System.Exit
 import           System.Console.ANSI.Types
-import qualified Data.ByteString       as B
-import qualified Data.ByteString.Char8 as C
-import qualified Data.ByteString.Lazy  as L
-import qualified Data.ByteString.Char8 as B8
+import qualified Data.ByteString            as B
+import qualified Data.ByteString.Char8      as C
+import qualified Data.ByteString.Lazy       as L
+import qualified Data.ByteString.Char8      as B8
 import Data.Char
 import System.Console.ANSI
 
@@ -113,10 +116,6 @@ logStr = setMsg message
 
 err :: Exception e => e -> Modifier
 err e = field "error" (displayException e) . level Error
-
-infixl 1 &
-(&) :: a -> (a -> b) -> b
-(&) = (Data.Function.&)
 
 newLogger :: LogType r => LogLevel -> LogConsumer -> B.ByteString -> LogLevel -> B.ByteString -> r
 newLogger verbosity consumer namespace level message = log' output namespace level message []

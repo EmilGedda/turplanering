@@ -2,54 +2,50 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Main where
 
-import           Control.Concurrent
-import           Control.Monad.Reader
-import           Data.Morpheus
-import           Network.HTTP.Types
-import           Network.Wai
+import           Control.Monad.IO.Class
+import           Data.String
+import           Database.PostgreSQL.Simple
+import           Dhall (input, auto)
 import           Network.Wai.Handler.Warp
+import           Network.Wai.Middleware.Gzip
+import           System.Directory
+import           System.FilePath
 import           Turplanering.API
+import           Turplanering.Config hiding (LogLevel, logger, Trace, Info)
+import           Turplanering.DB
 import           Turplanering.Logger
-import qualified Data.ByteString as B
-import qualified Turplanering.DB as DB
+import qualified Data.ByteString     as B
+import qualified Data.Text           as T
 
 
 logger :: LogType t => LogLevel -> B.ByteString -> t
 logger = consoleLogger Trace "main"
 
-gqlApi :: DB.Handle IO Application
-gqlApi = do
-    conn <- ask
-    return $ \req resp ->
-        strictRequestBody req
-            >>= DB.withConnection conn . interpreter gqlResolver
-            >>= resp . responseLBS status200 [] -- TODO: use bracket for error handling
-
 main :: IO ()
 main = do
-    logger Info "Generating schema...\n"
-    threadDelay 1000000
-   -- BL.putStrLn $ toGraphQLDocument (Proxy :: Proxy (GQLAPI IO))
-    logger Info "Testing logger output"
-    threadDelay 1000000
-    logger Trace "trace log message"
-        & field "field one" ("value one" :: String)
-        . field "two"    (2 :: Int)
-    threadDelay 1000000
-    logger Debug "debug message in logger"
-        & field "address" ("localhost" :: String)
-    threadDelay 1000000
-    logger Error  "very dangerous error here"
-        & field "statusCode" (500 :: Int)
-    threadDelay 1000000
-    logger Warning  "a little warning coming through"
-        & field "text" ("string" :: String)
-        . field "elapsed" ("time" :: String)
-        . field "lorem"   ("ipsum" :: String)
-    threadDelay 1000000
-    logger Info "serving GraphQL"
-        & field "foo" ("bar" :: String)
-        . field "int"    (1234 :: Int)
-    threadDelay 1000000
-    api <- DB.withConfig DB.devConfig gqlApi
-    run 4000 api
+    cfgDir <- getXdgDirectory XdgConfig "turplanering"
+    let cfgPath = cfgDir </> "config.dhall"
+    logger Info "loading config"
+        & field "path" cfgPath
+
+    config <- input auto . T.pack $ cfgPath
+    let dbConfig = db config
+    logger Info "connecting to DB"
+        & field "url"  (dbAddr dbConfig)
+        . field "port" (dbPort dbConfig)
+
+    dbConn <- liftIO . connect $ getConnectionInfo dbConfig
+
+    let httpConfig   = http config
+        appContext   = AppContext config dbConn
+        warpSettings = setPort (fromIntegral $ httpPort httpConfig)
+                     . setHost (fromString   $ httpAddr httpConfig)
+                     $ defaultSettings
+
+    logger Info "serving requests"
+        & field "url"  (httpAddr httpConfig)
+        . field "port" (httpPort httpConfig)
+
+    runSettings warpSettings
+        . gzip def
+        $ api appContext

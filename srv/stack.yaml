@@ -17,7 +17,7 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver: lts-17.12
+resolver: lts-18.5
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -40,11 +40,8 @@ packages:
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
 extra-deps:
-- wkt-geom-0.0.11@sha256:10a77bbe4adc56748d4c73db5a3fee49140e3ca7b297915617a03456b2e16f56,5368
-- wai-transformers-0.1.0@sha256:82b47d17865904e436b71d497b6b71644ec5ed4169174ff488d1aeeeade31334,1253
-
-  # ghc-options:
-    #    "$everything": "-split-sections"
+  - git: https://github.com/EmilGedda/wkt-geom.git
+    commit: 93f6c47012e3ee3919203b511fa8a14785044f53
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

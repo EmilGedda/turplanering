@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9f95efbd7c1d22528999a77c1decce63c17ba9180f760705c263a695d02f294a
+-- hash: f51a744b4593524332c0a31b6230a1dda45bf61e446b40759f17ed9a4d73fe48
 
 name:           turplanering
 version:        0.1.0.0
@@ -42,20 +42,22 @@ library
   ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures
   build-depends:
       aeson ==1.5.*
-    , ansi-terminal ==0.10.*
+    , ansi-terminal ==0.11.*
     , async
+    , attoparsec ==0.13.*
     , base >=4.7 && <5
     , bytestring ==0.10.*
     , containers ==0.6.*
-    , dhall ==1.37.*
+    , dhall ==1.39.*
     , geojson ==4.0.*
     , http-types ==0.12.*
     , lens ==4.19.*
-    , morpheus-graphql ==0.16.*
     , mtl ==2.2.*
     , opaleye ==0.7.*
     , postgresql-simple ==0.6.*
     , product-profunctors ==0.11.*
+    , servant ==0.18.*
+    , servant-server ==0.18.*
     , text ==1.2.*
     , unordered-containers ==0.2.*
     , wai ==3.2.*
@@ -70,11 +72,17 @@ executable turplanering
   build-depends:
       base >=4.7 && <5
     , bytestring ==0.10.*
+    , dhall ==1.39.*
+    , directory ==1.3.*
+    , filepath ==1.4.*
     , http-types ==0.12.*
-    , morpheus-graphql ==0.16.*
     , mtl ==2.2.*
+    , postgresql-simple ==0.6.*
+    , servant ==0.18.*
+    , text ==1.2.*
     , turplanering
     , wai ==3.2.*
+    , wai-extra ==3.1.*
     , warp ==3.3.*
   default-language: Haskell2010
 
