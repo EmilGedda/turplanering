@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f51a744b4593524332c0a31b6230a1dda45bf61e446b40759f17ed9a4d73fe48
+-- hash: debb67d79a37669342a755b1e1d278a400c5bd78042dee9fa9fdbd37a564e6c0
 
 name:           turplanering
 version:        0.1.0.0
@@ -56,10 +56,12 @@ library
     , opaleye ==0.7.*
     , postgresql-simple ==0.6.*
     , product-profunctors ==0.11.*
+    , random ==1.2.*
     , servant ==0.18.*
     , servant-server ==0.18.*
     , text ==1.2.*
     , unordered-containers ==0.2.*
+    , vault ==0.3.*
     , wai ==3.2.*
     , wkt-geom ==0.0.*
   default-language: Haskell2010
@@ -81,6 +83,7 @@ executable turplanering
     , servant ==0.18.*
     , text ==1.2.*
     , turplanering
+    , vault ==0.3.*
     , wai ==3.2.*
     , wai-extra ==3.1.*
     , warp ==3.3.*

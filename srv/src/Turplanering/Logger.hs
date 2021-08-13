@@ -99,6 +99,10 @@ setMsg f x = overMsg f (const x)
 field :: ToJSON a => B.ByteString -> a -> Modifier
 field key value = overMsg fields (\args -> Field key (toJSON value):args)
 
+fieldMaybe :: ToJSON a => B.ByteString -> Maybe a -> Modifier
+fieldMaybe key (Just value) = overMsg fields (\args -> Field key (toJSON value):args)
+fieldMaybe _ Nothing        = liftAction
+
 namespace :: B.ByteString -> Modifier
 namespace ns = overMsg logNamespace (\n -> n <> "." <> ns)
 
@@ -179,7 +183,7 @@ readableFormat hasColor (LogEntry _ lvl msg fields) =
                 | otherwise = f
     in C.intercalate " "
        $ dispLevel lvl
-       : rightPad (capitalize msg) 40 ' '
+       : rightPad (capitalize msg) 30 ' '
        : map fmt fields
 
 jsonFormat :: Formatter

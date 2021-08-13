@@ -47,7 +47,9 @@ library:
   - text                    ^>= 1.2
   - servant                 ^>= 0.18
   - servant-server          ^>= 0.18
+  - random                  ^>= 1.2
   - unordered-containers    ^>= 0.2
+  - vault                   ^>= 0.3
   - wai                     ^>= 3.2
   - wkt-geom                ^>= 0.0
   - async # ? or lifted-async

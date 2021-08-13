@@ -46,6 +46,7 @@ main = do
         . field "port" (httpPort httpConfig)
 
     runSettings warpSettings
-        . gzip def
+        . withRequestID
+        $ gzip def
         . requestLogger
-        $ api appContext
+        . api appContext
