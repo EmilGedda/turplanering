@@ -27,7 +27,7 @@ data LogStyle = Auto
 
 data Environment = Production
                  | Development
-  deriving stock (Generic, Show)
+  deriving stock (Generic, Show, Eq)
   deriving anyclass (FromDhall, ToDhall)
 
 data HTTP = HTTP

@@ -36,7 +36,7 @@ main = do
     dbConn <- connect $ getConnectionInfo dbConfig
 
     let httpConfig   = http config
-        appContext   = AppContext config dbConn
+        context      = RequestContext config dbConn
         warpSettings = setPort (fromIntegral $ httpPort httpConfig)
                      . setHost (fromString   $ httpAddr httpConfig)
                      $ defaultSettings
@@ -46,7 +46,8 @@ main = do
         . field "port" (httpPort httpConfig)
 
     runSettings warpSettings
-        . withRequestID
+        . withRequestID RandomID
         $ gzip def
         . requestLogger
-        . api appContext
+        . api
+        . context

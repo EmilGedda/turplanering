@@ -24,31 +24,23 @@ import           Turplanering.Map
 import qualified Data.Text.Encoding as T
 import qualified Data.Vault.Lazy as V
 import qualified Turplanering.Config as Config
+import Data.IORef
+import Data.Tuple
 
 newtype Routes route = Routes
     { _get :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details }
     deriving (Generic)
 
-data AppContext = AppContext
+data RequestContext = RequestContext
     { config :: Config.App
     , dbConn :: Connection
-    }
-
-data IDGen = RandomID StdGen
-           | Sequential Int
-
-data RequestContext = RequestContext
-    { ctx :: AppContext
     , requestID :: RequestID
     }
 
+data IDGen = RandomID | SequentialID
+
 newtype RequestID = RequestID { getID :: Word16 }
     deriving (ToJSON)
-
-{-# NOINLINE requestIDKey #-}
-requestIDKey :: V.Key RequestID
-requestIDKey = unsafePerformIO V.newKey
-
 
 newtype ContextM a = ContextM
      -- drop Handler for IO and use MonadThrow and MonadCatch
@@ -56,18 +48,34 @@ newtype ContextM a = ContextM
     deriving (Functor, Applicative, Monad, MonadReader RequestContext, MonadIO)
 
 instance MonadStorage ContextM where
-    getDetails box = withConnection (getDetails box) =<< asks (dbConn . ctx)
+    getDetails box = withConnection (getDetails box) =<< asks dbConn
 
+
+{-# NOINLINE requestIDKey #-}
+requestIDKey :: V.Key RequestID
+requestIDKey = unsafePerformIO V.newKey
+
+{-# NOINLINE sequentialIDRef #-}
+sequentialIDRef :: IORef Word16
+sequentialIDRef = unsafePerformIO $ newIORef 1
+
+{-# NOINLINE randomIDRef #-}
+randomIDRef :: IORef StdGen
+randomIDRef = unsafePerformIO $ newIORef =<< newStdGen
+
+nextID :: IDGen -> IO Word16
+nextID SequentialID = atomicModifyIORef' sequentialIDRef $ \id -> (id + 1, id)
+nextID RandomID     = atomicModifyIORef' randomIDRef     $ swap . genWord16
 
 routes :: MonadStorage m => Routes (AsServerT m)
 routes = Routes
     { _get = getDetails }
 
-runApp :: AppContext -> RequestID -> ContextM a -> Handler a
-runApp cfg id handler = runReaderT (runContext handler) (RequestContext cfg id)
+toHandler :: RequestContext -> ContextM a -> Handler a
+toHandler ctx handler = runReaderT (runContext handler) ctx
 
-api :: AppContext -> RequestID -> Application
-api cfg id = genericServeT (runApp cfg id) routes
+api :: RequestContext -> Application
+api ctx = genericServeT (toHandler ctx) routes
 
 getRequestID :: Request -> Maybe RequestID
 getRequestID = V.lookup requestIDKey . vault
@@ -82,9 +90,9 @@ requestLogger app req resp = do
         app req resp
     where logger = consoleLogger Trace "http"
 
-withRequestID :: (RequestID -> Application) -> Application
-withRequestID app req resp = do
-        number <- randomIO
+withRequestID :: IDGen -> (RequestID -> Application) -> Application
+withRequestID rng app req resp = do
+        number <- nextID rng
         let id'    = RequestID number
             vault' = V.insert requestIDKey id' $ vault req
             req'   = req { vault = vault' }

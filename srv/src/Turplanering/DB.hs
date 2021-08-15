@@ -88,7 +88,7 @@ wkbToGeoJSON (SpatialObject (WKB bs))
 
 sectionFromDB :: DBSections -> TrailSection
 sectionFromDB (DBSections _ _ n d spatial)
-  = TrailSection n d (wkbToGeoJSON spatial)
+    = TrailSection n d (wkbToGeoJSON spatial)
 
 
 insertSection :: TrailSection -> Trail -> Trail
@@ -111,4 +111,4 @@ instance MonadIO m => MonadStorage (Handle m) where
     getDetails = fetchDetails
 
 instance MonadIO m => MonadRDBMS (ReaderT Connection m) where
-    select query = ReaderT $ \conn -> liftIO (runSelect conn query)
+    select query = liftIO . flip runSelect query =<< ask
