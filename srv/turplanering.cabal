@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 01cc0ec5b977cd4a4ecfbed79e3417153631d2c14d1711ca7eca0d8a7b942073
+-- hash: 555eda44416c6544c4824882cb3535149f2228187c668828c955d45ebedc0ce6
 
 name:           turplanering
 version:        0.1.0.0
@@ -31,7 +31,6 @@ library
       Turplanering.DB
       Turplanering.DB.Section
       Turplanering.DB.Trail
-      Turplanering.DB.Types
       Turplanering.Logger
       Turplanering.Map
       Turplanering.PostGIS
@@ -52,9 +51,9 @@ library
     , genvalidity-bytestring ==0.6.*
     , geojson ==4.0.*
     , http-types ==0.12.*
-    , lens ==4.19.*
     , mtl ==2.2.*
     , opaleye ==0.7.*
+    , optics ==0.3.*
     , postgresql-simple ==0.6.*
     , product-profunctors ==0.11.*
     , random ==1.2.*

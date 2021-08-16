@@ -9,7 +9,6 @@ import           Test.QuickCheck
 import           Turplanering.Map
 import           Turplanering.Collections
 import           Turplanering.DB
-import           Turplanering.DB.Types
 import           Turplanering.PostGIS       ()
 import qualified Data.Map                   as M
 import qualified Turplanering.DB.Section    as Section
@@ -37,13 +36,12 @@ main = hspec $ do
 
     describe "buildTrails" $ do
         it "trails should be preserved" . forAll genValid
-            $ \(ts :: [Trail.DBTrail], sections :: [Section.DBSections])
-                ->  let trails = nubSortOn Trail.id ts
-                    in map trailName (buildTrails trails sections)
-                       `shouldMatchList` map Trail.name trails
+            $ \ts -> let trails = nubSortOn Trail.id ts
+                     in  map trailName (buildTrails trails [])
+                         `shouldMatchList` map Trail.name trails
 
         it "sections should be preserved" . forAll genValid
-            $ \(xs :: [DBTrail], ys :: [DBSections])
-                ->  let (trails, sections) = coherentDBTrailData xs ys
-                    in concatMap (map sectionName . trailSections) (buildTrails trails sections)
-                       `shouldMatchList` map Section.name sections
+            $ \(xs, ys) -> let (trails, sections) = coherentDBTrailData xs ys
+                           in  concatMap (map sectionName . trailSections)
+                                         (buildTrails trails sections)
+                               `shouldMatchList` map Section.name sections

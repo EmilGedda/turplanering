@@ -1,24 +1,30 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE StandaloneDeriving #-}
-module Turplanering.DB where
+{-# LANGUAGE OverloadedLabels #-}
+module Turplanering.DB
+                 ( module Turplanering.DB.Section
+                 , module Turplanering.DB.Trail
+                 , Handle
+                 , MonadRDBMS
+                 , getConnectionInfo
+                 , withConnection
+                 , buildTrails
+                 ) where
 
 import           Control.Monad.Reader
-import           Control.Lens
 import           Data.Ewkb
 import           Data.Geospatial
 import           Data.Hex
-import           Data.Maybe
 import           Data.Profunctor.Product.Default
 import           Database.PostgreSQL.Simple
 import           Opaleye
+import           Optics
 import           Turplanering.Collections
+import           Turplanering.DB.Section
+import           Turplanering.DB.Trail
 import           Turplanering.Map
 import           Turplanering.PostGIS
-import           Turplanering.DB.Types
 import qualified Turplanering.DB.Section        as Section
 import qualified Turplanering.DB.Trail          as Trail
 import qualified Data.Map.Strict                as M
@@ -73,10 +79,6 @@ withConnection :: Handle m a -> Connection -> m a
 withConnection (Handle hndl) = runReaderT hndl
 
 
-printSql :: Default Unpackspec a a => Select a -> IO ()
-printSql = putStrLn . fromMaybe "No query" . showSql
-
-
 trailFromDB :: DBTrail -> Trail
 trailFromDB (DBTrail _ c n d) = Trail n c d []
 
@@ -86,25 +88,25 @@ wkbToGeoJSON (SpatialObject (WKB bs))
     = let Right x = parseHexByteString (Hex bs) in x
 
 
-sectionFromDB :: DBSections -> TrailSection
+sectionFromDB :: DBSections -> Section
 sectionFromDB (DBSections _ _ n d spatial)
-    = TrailSection n d (wkbToGeoJSON spatial)
+    = Section n d (wkbToGeoJSON spatial)
 
 
-insertSection :: TrailSection -> Trail -> Trail
-insertSection s = over _trailSections (s:)
+insertSection :: Section -> Trail -> Trail
+insertSection s = over #sections (s:)
 
 buildTrails :: [DBTrail] -> [DBSections] -> [Trail]
 buildTrails trailData = M.elems . foldr insert trailTbl
     where trailTbl = trailFromDB <$> bucketOn Trail.id trailData
           insert   = M.adjust <$> insertSection . sectionFromDB
-                              <*> Section.trailId
+                              <*> Section.id
 
 
 fetchDetails :: MonadRDBMS m => Box -> m Details
 fetchDetails bbox = do
         sections  <- select (sectionsInside bbox)
-        trailData <- select . trailsFrom $ map Section.trailId sections
+        trailData <- select . trailsFrom $ map trailId sections
         return $ Details (buildTrails trailData sections) []
 
 instance MonadIO m => MonadStorage (Handle m) where

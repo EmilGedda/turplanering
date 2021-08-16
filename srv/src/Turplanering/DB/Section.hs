@@ -4,9 +4,21 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
-module Turplanering.DB.Section where
+{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE DataKinds #-}
+module Turplanering.DB.Section
+                 ( DBSections'(..)
+                 , TrailID
+                 , DBSections
+                 , DBSectionsField
+                 , pDBSections
+                 ) where
 
-import           Data.Function
+import           Prelude                    hiding (id)
+import           Data.Function              (on)
 import           Data.GenValidity
 import           Data.Profunctor.Product.TH
 import           GHC.Generics
@@ -15,7 +27,7 @@ import           Turplanering.PostGIS
 import qualified Data.Text as T
 
 data DBSections' a b c d e = DBSections
-    { sectionId   :: a
+    { id          :: a
     , trailId     :: b
     , name        :: c
     , description :: d
@@ -29,7 +41,7 @@ instance (GenValid a, GenValid b, GenValid c, GenValid d, GenValid e)
 
 
 instance Eq a => Eq (DBSections' a b c d e) where
-    (==) = (==) `on` sectionId
+    (==) = (==) `on` id
 
 type TrailID = Int
 
@@ -47,4 +59,4 @@ type DBSectionsField = DBSections'
                         (Field SqlText)
                         (Field (Spatial Geography LineString))
 
-$(makeAdaptorAndInstance "pDBSections" ''DBSections')
+$(makeAdaptorAndInstanceInferrable' ''DBSections')

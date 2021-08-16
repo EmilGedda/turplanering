@@ -4,7 +4,17 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
-module Turplanering.DB.Trail where
+{-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
+module Turplanering.DB.Trail
+                 ( DBTrail'(..)
+                 , DBTrail
+                 , DBTrailField
+                 , Table'
+                 , pDBTrail
+                 ) where
 
 import           Opaleye
 import           Data.GenValidity
@@ -33,4 +43,4 @@ type DBTrailField = DBTrail'
 
 type Table' t = Table t t
 
-$(makeAdaptorAndInstance "pDBTrail" ''DBTrail')
+$(makeAdaptorAndInstanceInferrable' ''DBTrail')

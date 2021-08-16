@@ -15,8 +15,8 @@ nubSortOn :: Ord k => (a -> k) -> [a] -> [a]
 nubSortOn f = nubSortBy (compare `on` f)
 
 nubSortBy :: (a -> a -> Ordering) -> [a] -> [a]
-nubSortBy cmp = f . sortBy cmp
-    where f (x1:x2:xs) | cmp x1 x2 == EQ = f (x1:xs)
-          f (x:xs) = x : f xs
-          f [] = []
+nubSortBy cmp = uniq . sortBy cmp
+    where uniq (x:x':xs) | cmp x x' == EQ = uniq (x:xs)
+          uniq (x:xs) = x:uniq xs
+          uniq [] = []
 

@@ -12,18 +12,18 @@ module Turplanering.Logger
        , (Data.Function.&)
        ) where
 
-import           Prelude                    hiding (log)
-import           Control.Monad
 import           Control.Exception
+import           Control.Monad
 import           Data.Aeson                 hiding (Error)
 import           Data.Bool
 import           Data.Function
 import           Data.Text.Encoding
 import           GHC.Generics
-import           Control.Lens               hiding ((.=))
-import           System.IO
-import           System.Exit
+import           Optics
+import           Prelude                    hiding (log)
 import           System.Console.ANSI.Types
+import           System.Exit
+import           System.IO
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Char8      as C
 import qualified Data.ByteString.Lazy       as L
@@ -90,7 +90,7 @@ liftAction (LogAction f (LogEntry ns lvl str args))
   = log' f ns lvl str args
 
 overMsg :: Lens' LogEntry a -> (a -> a) -> Modifier
-overMsg f g = liftAction . over (entry . f) g
+overMsg f g = liftAction . over (entry % f) g
 
 setMsg :: Lens' LogEntry a -> a -> Modifier
 setMsg f x = overMsg f (const x)

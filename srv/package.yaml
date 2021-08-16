@@ -42,9 +42,9 @@ library:
   - genvalidity-bytestring  ^>= 0.6
   - geojson                 ^>= 4.0
   - http-types              ^>= 0.12
-  - lens                    ^>= 4.19
   - mtl                     ^>= 2.2
   - opaleye                 ^>= 0.7
+  - optics                  ^>= 0.3
   - postgresql-simple       ^>= 0.6
   - product-profunctors     ^>= 0.11
   - random                  ^>= 1.2
