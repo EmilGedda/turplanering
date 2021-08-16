@@ -104,6 +104,8 @@ tests:
     - genvalidity-text      ^>= 0.7
     - hspec                 ^>= 2.7
     - hspec-expectations    ^>= 0.8
+    - optics                ^>= 0.3
+    - text                  ^>= 1.2
     - validity              ^>= 0.11
     - validity-text         ^>= 0.3
     - QuickCheck            ^>= 2.14

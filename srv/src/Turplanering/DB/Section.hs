@@ -1,62 +1,69 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE DataKinds #-}
-module Turplanering.DB.Section
-                 ( DBSections'(..)
-                 , TrailID
-                 , DBSections
-                 , DBSectionsField
-                 , pDBSections
-                 ) where
 
-import           Prelude                    hiding (id)
-import           Data.Function              (on)
-import           Data.GenValidity
-import           Data.Profunctor.Product.TH
-import           GHC.Generics
-import           Opaleye
-import           Turplanering.PostGIS
+module Turplanering.DB.Section (
+    DBSections' (..),
+    TrailID,
+    DBSections,
+    DBSectionsField,
+    pDBSections,
+) where
+
+import Data.Function (on)
+import Data.GenValidity
+import Data.Profunctor.Product.TH
 import qualified Data.Text as T
+import GHC.Generics
+import Opaleye
+import Optics
+import Turplanering.PostGIS
+import Prelude hiding (id)
 
 data DBSections' a b c d e = DBSections
-    { id          :: a
-    , trailId     :: b
-    , name        :: c
+    { id :: a
+    , trailId :: b
+    , name :: c
     , description :: d
-    , path        :: e
-    } deriving (Show, Generic, Validity)
+    , path :: e
+    }
+    deriving (Show, Generic, Validity)
 
-instance (GenValid a, GenValid b, GenValid c, GenValid d, GenValid e)
-         => GenValid (DBSections' a b c d e) where
+instance
+    (GenValid a, GenValid b, GenValid c, GenValid d, GenValid e) =>
+    GenValid (DBSections' a b c d e)
+    where
     genValid = genValidStructurally
     shrinkValid = shrinkValidStructurally
-
 
 instance Eq a => Eq (DBSections' a b c d e) where
     (==) = (==) `on` id
 
 type TrailID = Int
 
-type DBSections = DBSections'
-                        Int
-                        Int
-                        T.Text
-                        T.Text
-                        (Spatial Geography LineString)
+type DBSections =
+    DBSections'
+        Int
+        Int
+        T.Text
+        T.Text
+        (Spatial Geography LineString)
 
-type DBSectionsField = DBSections'
-                        (Field SqlInt4)
-                        (Field SqlInt4)
-                        (Field SqlText)
-                        (Field SqlText)
-                        (Field (Spatial Geography LineString))
+type DBSectionsField =
+    DBSections'
+        (Field SqlInt4)
+        (Field SqlInt4)
+        (Field SqlText)
+        (Field SqlText)
+        (Field (Spatial Geography LineString))
 
 $(makeAdaptorAndInstanceInferrable' ''DBSections')
+makeFieldLabelsWith noPrefixFieldLabels ''DBSections'

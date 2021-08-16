@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 555eda44416c6544c4824882cb3535149f2228187c668828c955d45ebedc0ce6
+-- hash: dc9af8a9344b9010b649881a710bcdee34ffc28b3791ecafdead2c856f1b08cf
 
 name:           turplanering
 version:        0.1.0.0
@@ -106,6 +106,8 @@ test-suite test
     , genvalidity-text ==0.7.*
     , hspec ==2.7.*
     , hspec-expectations ==0.8.*
+    , optics ==0.3.*
+    , text ==1.2.*
     , turplanering
     , validity ==0.11.*
     , validity-text ==0.3.*
