@@ -1,44 +1,35 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE EmptyDataDeriving #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Turplanering.PostGIS where
 
-import Control.Exception
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as C
-import Data.Ewkb
-import Data.GenValidity
-import Data.GenValidity.ByteString ()
-import Data.Geospatial
-import Data.Hex
-import Data.Proxy
-import Data.Validity.ByteString ()
-import Database.PostgreSQL.Simple
+import           Control.Exception
+import           Data.Ewkb
+import           Data.GenValidity
+import           Data.GenValidity.ByteString          ()
+import           Data.Geospatial
+import           Data.Hex
+import           Data.Proxy
+import           Data.Validity.ByteString             ()
+import           Database.PostgreSQL.Simple
+import           GHC.Generics
+import           GHC.TypeLits
+import           Opaleye
+import qualified Data.ByteString                      as B
+import qualified Data.ByteString.Char8                as C
 import qualified Database.PostgreSQL.Simple.FromField as PQ
-import GHC.Generics
-import GHC.TypeLits
-import Opaleye
-import qualified Opaleye.Internal.Column as Opaleye
+import qualified Opaleye.Internal.Column              as Opaleye
 import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+
 import Turplanering.Map
 
 newtype WKB = WKB B.ByteString
     deriving (PQ.FromField) via (Binary B.ByteString)
-    deriving (Generic, Validity)
+    deriving stock (Generic)
+    deriving anyclass (Validity)
 
 instance GenValid WKB where
     genValid = genValidStructurally

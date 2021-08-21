@@ -6,18 +6,25 @@
 packages:
 - completed:
     name: wkt-geom
-    version: 0.0.11
-    git: https://github.com/EmilGedda/wkt-geom.git
+    version: 0.0.12
+    git: https://github.com/zellige/wkt-geom.git
     pantry-tree:
-      size: 3244
-      sha256: bf068595084f88762d7b8e12f47009ec56e7d0b01b4e86142f0a4bc4e85ab7bd
-    commit: 93f6c47012e3ee3919203b511fa8a14785044f53
+      size: 3183
+      sha256: 0c96a2047d5f29618dd0a0c7363ef40c117f611a0e857dda75b18e1023822690
+    commit: 8f794ff37f491b1af6e28471d0666d60cee3d7a2
   original:
-    git: https://github.com/EmilGedda/wkt-geom.git
-    commit: 93f6c47012e3ee3919203b511fa8a14785044f53
+    git: https://github.com/zellige/wkt-geom.git
+    commit: 8f794ff37f491b1af6e28471d0666d60cee3d7a2
+- completed:
+    hackage: streamly-0.8.0@sha256:9784c80ee1ada51477520cabc4e92a0c76a6bb265f968a188f2fce818e7398e0,19654
+    pantry-tree:
+      size: 21676
+      sha256: 42c3843e920955b647a25a125c090efa72e024d1ef73d8e3ccf5710dc9217940
+  original:
+    hackage: streamly-0.8.0@sha256:9784c80ee1ada51477520cabc4e92a0c76a6bb265f968a188f2fce818e7398e0,19654
 snapshots:
 - completed:
-    size: 585817
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/5.yaml
-    sha256: 22d24d0dacad9c1450b9a174c28d203f9bb482a2a8da9710a2f2a9f4afee2887
-  original: lts-18.5
+    size: 587113
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/6.yaml
+    sha256: f74c482d7c93739ecf3abfbc0f2dea1c20a2dfb2462c689846ed55a9653b66f7
+  original: lts-18.6

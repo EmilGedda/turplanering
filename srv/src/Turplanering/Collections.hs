@@ -1,8 +1,8 @@
 module Turplanering.Collections where
 
-import Control.Arrow
-import Data.Function
-import Data.List
+import           Control.Arrow
+import           Data.Function
+import           Data.List
 import qualified Data.Map.Strict as M
 
 bucketOn :: Ord k => (a -> k) -> [a] -> M.Map k a

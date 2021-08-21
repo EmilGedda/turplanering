@@ -1,10 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -18,15 +15,16 @@ module Turplanering.DB.Section (
     pDBSections,
 ) where
 
-import Data.Function (on)
-import Data.GenValidity
-import Data.Profunctor.Product.TH
-import qualified Data.Text as T
-import GHC.Generics
-import Opaleye
-import Optics
+import           Data.Function              (on)
+import           Data.GenValidity
+import           Data.Profunctor.Product.TH
+import           GHC.Generics
+import           Opaleye
+import           Optics
+import           Prelude                    hiding (id)
+import qualified Data.Text                  as T
+
 import Turplanering.PostGIS
-import Prelude hiding (id)
 
 data DBSections' a b c d e = DBSections
     { id :: a

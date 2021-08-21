@@ -1,7 +1,4 @@
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
@@ -13,23 +10,23 @@ module Turplanering.Logger (
     (Data.Function.&),
 ) where
 
-import Control.Exception
-import Control.Monad
-import Data.Aeson hiding (Error)
-import Data.Bool
-import qualified Data.ByteString as B
+import           Control.Exception
+import           Control.Monad
+import           Data.Aeson            hiding (Error)
+import           Data.Bool
+import           Data.Char
+import           Data.Function
+import           Data.Text.Encoding
+import           GHC.Generics
+import           Optics
+import           System.Console.ANSI
+import           System.Exit
+import           System.IO
+import           Prelude               hiding (log)
+import qualified Data.ByteString       as B
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Char8 as C
-import qualified Data.ByteString.Lazy as L
-import Data.Char
-import Data.Function
-import Data.Text.Encoding
-import GHC.Generics
-import Optics
-import System.Console.ANSI
-import System.Exit
-import System.IO
-import Prelude hiding (log)
+import qualified Data.ByteString.Lazy  as L
 
 data LogLevel = Trace | Debug | Info | Warning | Error | Fatal
     deriving (Eq, Ord, Show, Generic, ToJSON)

@@ -1,23 +1,22 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE NoDefaultSignatures #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE NoMonomorphismRestriction #-}
 
-import Control.Arrow
-import Data.Coerce
-import Data.GenValidity
-import Data.GenValidity.Text ()
-import qualified Data.Map as M
-import Data.Validity.Text ()
-import Optics
-import Test.Hspec
-import Test.QuickCheck
+import           Control.Arrow
+import           Data.Coerce
+import           Data.GenValidity
+import           Data.GenValidity.Text ()
+import           Data.Validity.Text    ()
+import           Optics
+import           Test.Hspec
+import           Test.QuickCheck
+import qualified Data.Map              as M
+
 import Turplanering.Collections
 import Turplanering.DB
-import Turplanering.DB.Trail ()
-import Turplanering.PostGIS ()
+import Turplanering.DB.Trail    ()
+import Turplanering.PostGIS     ()
 
 newtype WrappedInt = Wrap Int
     deriving (Ord, Eq)
@@ -31,6 +30,8 @@ coherentDBTrailData xs ys = (trails', sections')
         trailIds = trails' ^.. folded % #id
         sections' = filter (flip elem trailIds . view #id) ys
 
+names = folded % #name
+
 main :: IO ()
 main = hspec $ do
     describe "bucketOn" $ do
@@ -42,23 +43,13 @@ main = hspec $ do
 
     describe "buildTrails" $ do
         it "trails should be preserved" . forAll genValid $
-            \(ts :: [DBTrail]) ->
+            \dbTrails ->
                 let has = buildTrails wants []
-                    wants = nubSortOn (view #id) ts
-                 in (has ^.. folded % #name)
-                        `shouldMatchList` (wants ^.. folded % #name)
+                    wants = nubSortOn (view #id) dbTrails
+                 in toListOf names has `shouldMatchList` toListOf names wants
 
         it "sections should be preserved" . forAll genValid $
             \(xs, ys) ->
                 let (trails, sections') = coherentDBTrailData xs ys
-                    dbNames =
-                        sections'
-                            ^.. folded
-                                % #name
-                    sectionNames =
-                        buildTrails trails sections'
-                            ^.. folded
-                                % #sections
-                                % folded
-                                % #name
-                 in sectionNames `shouldMatchList` dbNames
+                    sectionNames = buildTrails trails sections' ^.. folded % #sections % names
+                 in sectionNames `shouldMatchList` toListOf names sections'

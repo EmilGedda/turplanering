@@ -1,25 +1,21 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Turplanering.Map where
 
-import Control.Arrow
-import Data.Aeson
-import Data.Attoparsec.Text
-import Data.Geospatial
-import qualified Data.Text as T
-import GHC.Generics
-import Optics
-import Servant.API
+import           Control.Arrow
+import           Data.Aeson
+import           Data.Attoparsec.Text
+import           Data.Geospatial
+import           GHC.Generics
+import           Optics
+import           Servant.API
+import qualified Data.Text            as T
 
 class Monad m => MonadStorage m where
     getDetails :: Box -> m Details

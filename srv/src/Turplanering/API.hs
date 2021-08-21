@@ -1,31 +1,29 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Turplanering.API where
 
-import Control.Monad.Reader
-import Data.Aeson
-import Data.IORef
-import qualified Data.Text.Encoding as T
-import Data.Tuple
-import qualified Data.Vault.Lazy as V
-import Data.Word
-import Database.PostgreSQL.Simple
-import GHC.IO
-import Network.Wai
-import Servant
-import Servant.API.Generic
-import Servant.Server.Generic
-import System.Random
+import           Control.Monad.Reader
+import           Data.Aeson
+import           Data.IORef
+import           Data.Tuple
+import           Data.Word
+import           Database.PostgreSQL.Simple
+import           GHC.IO
+import           Network.Wai
+import           Servant
+import           Servant.API.Generic
+import           Servant.Server.Generic
+import           System.Random
+import qualified Data.Text.Encoding         as T
+import qualified Data.Vault.Lazy            as V
+
+import           Turplanering.DB
+import           Turplanering.Logger
+import           Turplanering.Map
 import qualified Turplanering.Config as Config
-import Turplanering.DB
-import Turplanering.Logger
-import Turplanering.Map
 
 newtype Routes route = Routes
     {_get :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details}

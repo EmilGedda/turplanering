@@ -1,9 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -17,12 +14,12 @@ module Turplanering.DB.Trail (
     pDBTrail,
 ) where
 
-import Data.GenValidity
-import Data.Profunctor.Product.TH
-import qualified Data.Text as T
-import GHC.Generics
-import Opaleye
-import Optics
+import           Data.GenValidity
+import           Data.Profunctor.Product.TH
+import           GHC.Generics
+import           Opaleye
+import           Optics
+import qualified Data.Text                  as T
 
 data DBTrail' a b c d = DBTrail
     { id :: a

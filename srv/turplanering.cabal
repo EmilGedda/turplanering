@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dc9af8a9344b9010b649881a710bcdee34ffc28b3791ecafdead2c856f1b08cf
+-- hash: 1effef1ed9df2c60e67fdb5cdffceef9470a38d326da0e426f1f1d946cbe1fb5
 
 name:           turplanering
 version:        0.1.0.0
@@ -38,6 +38,29 @@ library
       Paths_turplanering
   hs-source-dirs:
       src
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
   ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures
   build-depends:
       aeson ==1.5.*
@@ -68,10 +91,72 @@ library
     , wkt-geom ==0.0.*
   default-language: Haskell2010
 
+executable datascraper
+  main-is: Main.hs
+  hs-source-dirs:
+      app/Datascraper
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson ==1.5.*
+    , base >=4.7 && <5
+    , bytestring ==0.10.*
+    , containers ==0.6.*
+    , curl ==1.3.*
+    , geojson ==4.0.*
+    , streamly ==0.8.*
+    , turplanering
+  default-language: Haskell2010
+
 executable turplanering
   main-is: Main.hs
   hs-source-dirs:
-      app
+      app/Turplanering
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
   ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
@@ -96,6 +181,29 @@ test-suite test
   main-is: Spec.hs
   hs-source-dirs:
       test
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
   ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       QuickCheck ==2.14.*

@@ -1,6 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedLabels #-}
 
 module Turplanering.DB (
@@ -13,23 +10,24 @@ module Turplanering.DB (
     buildTrails,
 ) where
 
-import Control.Monad.Reader
-import Data.Ewkb
-import Data.Geospatial
-import Data.Hex
-import qualified Data.Map.Strict as M
-import Data.Profunctor.Product.Default
-import Database.PostgreSQL.Simple
-import Opaleye
-import Optics
-import Turplanering.Collections
-import qualified Turplanering.Config as Config
-import Turplanering.DB.Section
-import qualified Turplanering.DB.Section as Section
-import Turplanering.DB.Trail
-import qualified Turplanering.DB.Trail as Trail
-import Turplanering.Map
-import Turplanering.PostGIS
+import           Control.Monad.Reader
+import           Data.Ewkb
+import           Data.Geospatial
+import           Data.Hex
+import           Data.Profunctor.Product.Default
+import           Database.PostgreSQL.Simple
+import           Opaleye
+import           Optics
+import qualified Data.Map.Strict                 as M
+
+import           Turplanering.Collections
+import           Turplanering.DB.Section
+import           Turplanering.DB.Trail
+import           Turplanering.Map
+import           Turplanering.PostGIS
+import qualified Turplanering.Config      as Config
+import qualified Turplanering.DB.Section  as Section
+import qualified Turplanering.DB.Trail    as Trail
 
 newtype Handle m a = Handle (ReaderT Connection m a)
     deriving
