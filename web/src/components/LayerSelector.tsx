@@ -43,8 +43,7 @@ const selectorCSS = makeStyles((theme) => ({
     }
   },
   selector: {
-    zIndex: 1005,
-    flexGrow: 1,
+    zIndex: 1002,
     position: 'absolute',
     padding: '8px 20px',
     right: 0
@@ -77,7 +76,7 @@ const SectionTitle: FC<TypographyProps> = (props) => {
 const LayerSelector: FC = () => {
   const css = selectorCSS();
   const [shown, setShown] = useState(false);
-  // const [hover, setHover] = useState(false);
+  const [hover, setHover] = useState(false);
 
   return (
     <ClickAwayListener
@@ -85,16 +84,13 @@ const LayerSelector: FC = () => {
       mouseEvent='onMouseDown'
     >
       <div className={css.container}>
-        <Grow
-          in={/* hover || */ shown}
-          style={{ transformOrigin: 'top right' }}
-        >
+        <Grow in={hover || shown} style={{ transformOrigin: 'top right' }}>
           <Paper
             elevation={4}
             className={css.selector}
-            // onMouseLeave={() => setHover(false)}
+            onMouseLeave={() => setHover(false)}
           >
-            <SectionTitle>Baslager</SectionTitle>
+            <SectionTitle>Karta</SectionTitle>
             <Grid
               container
               spacing={3}
@@ -112,7 +108,7 @@ const LayerSelector: FC = () => {
                 <Paper className={css.layer} />
               </Grid>
             </Grid>
-            <SectionTitle>Varianter</SectionTitle>
+            <SectionTitle>Variant</SectionTitle>
             <Grid
               container
               spacing={3}
@@ -130,13 +126,14 @@ const LayerSelector: FC = () => {
                 <Paper className={css.layer} />
               </Grid>
             </Grid>
+            <SectionTitle>Väder</SectionTitle>
             <SectionTitle>Detaljer</SectionTitle>
           </Paper>
         </Grow>
         <Fab
           className={css.button}
           onClick={() => setShown(true)}
-          //  onMouseEnter={() => setHover(true)}
+          onMouseEnter={() => setHover(true)}
         >
           <Layers className={css.icon} />
         </Fab>
