@@ -71,9 +71,10 @@ const App: React.FC<Props> = (props: Props) => {
   const { env, forecastAPI } = props;
   const css = appStyles();
 
-  useEffect(() => console.log('Running in ' + env.environment), [
-    env.environment
-  ]);
+  useEffect(
+    () => console.log('Running in ' + env.environment),
+    [env.environment]
+  );
 
   const mapRef = createRef<Map>();
   const groupRef = createRef<FeatureGroup>();
