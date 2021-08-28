@@ -14,10 +14,10 @@ import Timeline from './Timeline';
 import { WMSLayer } from './map/WMSTileLayer';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
 import {
-  TrailMap,
   GPSMarker,
-  WeatherLayer,
-  TemperatureLayer
+  TemperatureLayer,
+  TrailMap,
+  WeatherLayer
 } from './map/TrailMap';
 
 type Environment = {
@@ -93,7 +93,7 @@ const App: React.FC<Props> = (props: Props) => {
     layers: 0
   });
 
-  const [position, setPosition] = useState<Coordinates>();
+  const [position, setPosition] = useState<GeolocationCoordinates>();
   const [viewport, setViewPort] = useState<Viewport>({
     center: [59.334591, 18.06324],
     zoom: 8

@@ -11,7 +11,7 @@ import {
 import { LatLngTuple, CRS } from 'leaflet';
 import { WMSLayer, BufferedWMSLayerProps } from './WMSTileLayer';
 
-type GPSMarkerProps = { pos: Coordinates };
+type GPSMarkerProps = { pos: GeolocationCoordinates };
 
 export const GPSMarker: React.FC<GPSMarkerProps> = ({ pos }) => {
   const center: LatLngTuple = [pos.latitude, pos.longitude];
