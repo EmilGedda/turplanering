@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Layers } from '@material-ui/icons';
+import { Layers } from '@mui/icons-material';
 import {
   Fab,
   Grow,
@@ -7,9 +7,11 @@ import {
   Paper,
   Typography,
   Grid
-} from '@material-ui/core';
-import type { TypographyProps } from '@material-ui/core';
-import { makeStyles, emphasize } from '@material-ui/core/styles';
+} from '@mui/material';
+import type { TypographyProps } from '@mui/material';
+import { emphasize } from '@mui/material/styles';
+
+import makeStyles from '@mui/styles/makeStyles';
 
 const selectorCSS = makeStyles((theme) => ({
   container: {
@@ -24,7 +26,7 @@ const selectorCSS = makeStyles((theme) => ({
   button: {
     right: 0,
     position: 'relative',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginLeft: 10
     },
     [theme.breakpoints.up('sm')]: {
@@ -94,7 +96,7 @@ const LayerSelector: FC = () => {
             <Grid
               container
               spacing={3}
-              justify='flex-start'
+              justifyContent='flex-start'
               alignItems='center'
               style={{ marginBottom: '4px' }}
             >
@@ -112,7 +114,7 @@ const LayerSelector: FC = () => {
             <Grid
               container
               spacing={3}
-              justify='flex-start'
+              justifyContent='flex-start'
               alignItems='center'
               style={{ marginBottom: '4px' }}
             >

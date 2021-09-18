@@ -8,10 +8,10 @@ import {
   Slide,
   Slider,
   Typography
-} from '@material-ui/core';
-import { PlayCircleOutline, PauseCircleOutline } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/core/styles';
-import { common } from '@material-ui/core/colors';
+} from '@mui/material';
+import { PlayCircleOutline, PauseCircleOutline } from '@mui/icons-material';
+import makeStyles from '@mui/styles/makeStyles';
+import { common } from '@mui/material/colors';
 
 type LabelProps = {
   timepoint: Date;
@@ -64,10 +64,7 @@ type Props = {
   onChange: (timepoint: Date) => void;
 };
 
-type SliderCallback = (
-  event: React.ChangeEvent<unknown>,
-  value: number | number[]
-) => void;
+type SliderCallback = (event: Event, value: number | number[]) => void;
 
 const Timeline: FC<Props> = (props: Props) => {
   const { shown, timepoints, onChange } = props;
@@ -138,7 +135,7 @@ const Timeline: FC<Props> = (props: Props) => {
           <Grid
             container
             direction='row'
-            justify='flex-start'
+            justifyContent='flex-start'
             alignItems='center'
           >
             <PlayButton onClick={start} isplaying={running} />
@@ -178,6 +175,7 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
       classes={color}
       edge='end'
       {...baseProps}
+      size='large'
     >
       {isplaying ? (
         <PauseCircleOutline className={css.icon} />
@@ -191,7 +189,7 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
 const iconColor = makeStyles((theme) => ({
   colorPrimary: {
     color:
-      theme.palette.type == 'dark' ? common.white : theme.palette.primary.main
+      theme.palette.mode == 'dark' ? common.white : theme.palette.primary.main
   }
 }));
 
@@ -204,7 +202,7 @@ const timelineCSS = makeStyles((theme) => ({
     padding: '2px 4px',
     maxWidth: '95%',
     margin: '0 auto',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginBottom: '5px'
     },
     [theme.breakpoints.up('sm')]: {

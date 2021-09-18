@@ -14,11 +14,9 @@ export default {
             {
                 test: /\.js$/,
                 use: ['babel-loader', 'source-map-loader'],
-                exclude: /node_modules/
             },
             {
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
                 use: {
                     loader: 'ts-loader',
                     options: {
@@ -33,7 +31,11 @@ export default {
         ]
     },
     plugins: [
-        new ForkTsCheckerWebpackPlugin({typescript: {configFile: '../tsconfig.json'}}),
+        new ForkTsCheckerWebpackPlugin({
+            typescript: {
+                configFile: '../tsconfig.json',
+            }
+        }),
         new HtmlWebpackPlugin({
             template: 'index.html',
             favicon: '../assets/favicon.svg'

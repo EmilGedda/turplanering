@@ -20,11 +20,23 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import ScopedCssBaseline from '@material-ui/core/ScopedCssBaseline';
-import { createMuiTheme, ThemeProvider, fade } from '@material-ui/core/styles';
-import { orange, common, grey } from '@material-ui/core/colors';
+import ScopedCssBaseline from '@mui/material/ScopedCssBaseline';
+import {
+  createTheme,
+  ThemeProvider,
+  Theme,
+  StyledEngineProvider,
+  alpha,
+  adaptV4Theme
+} from '@mui/material/styles';
+import { orange, common, grey } from '@mui/material/colors';
 import { Smhi } from './forecast';
 import { App } from './components/App';
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
 
 const env = (() => {
   const browser = {
@@ -45,40 +57,44 @@ const env = (() => {
 })();
 
 const theme = {
-  light: createMuiTheme({
-    palette: {
-      type: 'light'
-    }
-  }),
-  dark: createMuiTheme({
-    palette: {
-      type: 'dark'
-    },
-    overrides: {
-      MuiSlider: {
-        // drag color and opacity
-        track: { backgroundColor: grey[500] },
-        rail: { backgroundColor: grey[600] },
-        thumb: {
-          backgroundColor: 'white',
-          '&$focusVisible,&:hover': {
-            boxShadow: `0px 0px 0px 8px ${fade(common.white, 0.16)}`,
-            '@media (hover: none)': {
-              boxShadow: 'none'
+  light: createTheme(
+    adaptV4Theme({
+      palette: {
+        mode: 'light'
+      }
+    })
+  ),
+  dark: createTheme(
+    adaptV4Theme({
+      palette: {
+        mode: 'dark'
+      },
+      overrides: {
+        MuiSlider: {
+          // drag color and opacity
+          track: { backgroundColor: grey[500] },
+          rail: { backgroundColor: grey[600] },
+          thumb: {
+            backgroundColor: 'white',
+            '&$focusVisible,&:hover': {
+              boxShadow: `0px 0px 0px 8px ${alpha(common.white, 0.16)}`,
+              '@media (hover: none)': {
+                boxShadow: 'none'
+              }
+            },
+            '&$active': {
+              boxShadow: `0px 0px 0px 14px ${alpha(common.white, 0.16)}`
             }
-          },
-          '&$active': {
-            boxShadow: `0px 0px 0px 14px ${fade(common.white, 0.16)}`
+          }
+        },
+        MuiIconButton: {
+          colorPrimary: {
+            color: orange[500]
           }
         }
-      },
-      MuiIconButton: {
-        colorPrimary: {
-          color: orange[500]
-        }
       }
-    }
-  })
+    })
+  )
 };
 
 // Opt-in to Webpack hot module replacement
@@ -88,11 +104,13 @@ if (module.hot) module.hot.accept();
 
 render(
   <React.StrictMode>
-    <ThemeProvider theme={theme.light}>
-      <ScopedCssBaseline>
-        <App env={env} forecastAPI={Smhi} />
-      </ScopedCssBaseline>
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme.light}>
+        <ScopedCssBaseline>
+          <App env={env} forecastAPI={Smhi} />
+        </ScopedCssBaseline>
+      </ThemeProvider>
+    </StyledEngineProvider>
   </React.StrictMode>,
   document.getElementById('root') as HTMLElement
 );

@@ -5,15 +5,15 @@ import {
   GpsNotFixed,
   GpsOff,
   Search
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import {
   Divider,
   IconButton,
   IconButtonProps,
   InputBase,
   Paper
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 
 const searchbarCSS = makeStyles((theme) => ({
   searchbar: {
@@ -53,25 +53,25 @@ const GPSButton: FC<GPSProps> = ({ status, ...props }: GPSProps) => {
   switch (status) {
     case GPSStatus.Inactive:
       return (
-        <IconButton {...props}>
+        <IconButton {...props} size='large'>
           <GpsNotFixed />
         </IconButton>
       );
     case GPSStatus.Loading:
       return (
-        <IconButton {...props} color='primary'>
+        <IconButton {...props} color='primary' size='large'>
           <GpsNotFixed />
         </IconButton>
       );
     case GPSStatus.Tracking:
       return (
-        <IconButton {...props} color='primary'>
+        <IconButton {...props} color='primary' size='large'>
           <GpsFixed />
         </IconButton>
       );
     case GPSStatus.Disabled:
       return (
-        <IconButton {...props} color='secondary'>
+        <IconButton {...props} color='secondary' size='large'>
           <GpsOff />
         </IconButton>
       );
@@ -119,12 +119,12 @@ const Searchbar: FC<Props> = (props: Props) => {
 
   return (
     <Paper className={css.searchbar} elevation={5}>
-      <IconButton className={css.iconButton}>
+      <IconButton className={css.iconButton} size='large'>
         <AccountCircle />
       </IconButton>
       <Divider className={css.divider} orientation='vertical' />
       <InputBase className={css.input} placeholder='Sök' />
-      <IconButton type='submit' className={css.iconButton}>
+      <IconButton type='submit' className={css.iconButton} size='large'>
         <Search />
       </IconButton>
       <Divider className={css.divider} orientation='vertical' />

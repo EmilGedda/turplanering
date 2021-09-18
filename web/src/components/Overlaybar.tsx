@@ -1,13 +1,7 @@
 import React, { FC, useState, ReactElement } from 'react';
 import { WeatherPouring, Thermometer, WeatherWindy } from 'mdi-material-ui';
-import {
-  Slide,
-  Paper,
-  Grid,
-  IconButton,
-  IconButtonProps
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Slide, Paper, Grid, IconButton, IconButtonProps } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 
 const overlaybarCSS = makeStyles((theme) => ({
   outer: {
@@ -19,7 +13,7 @@ const overlaybarCSS = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       marginRight: 10
     },
     [theme.breakpoints.up('sm')]: {
@@ -49,7 +43,7 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   };
 
   return (
-    <IconButton color={color} onClick={onClick}>
+    <IconButton color={color} onClick={onClick} size='large'>
       {props.children}
     </IconButton>
   );
@@ -91,7 +85,7 @@ export const Overlaybar: FC<Props> = (props: Props) => {
     <Slide direction='left' in={shown}>
       <div className={css.outer}>
         <Paper elevation={5} square={false} style={{ pointerEvents: 'auto' }}>
-          <Grid container direction='column' justify='space-around'>
+          <Grid container direction='column' justifyContent='space-around'>
             {...buttons}
           </Grid>
         </Paper>

@@ -1,24 +1,20 @@
-import React, { useState, useEffect, createRef } from 'react';
-import { FeatureGroup, Map, Viewport } from 'react-leaflet';
-import { Slide } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import Searchbar from './Searchbar';
 import LayerSelector from './LayerSelector';
+import React, { useState, useEffect } from 'react';
+import Searchbar from './Searchbar';
+import { Slide } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import {
   Overlaybar,
   WeatherToggleButton,
   WindToggleButton,
   TemperatureToggleButton
 } from './Overlaybar';
+import Map from './map/Map';
+import TileLayer, { wmtsCapabilities } from './map/TileLayer';
 import Timeline from './Timeline';
-import { WMSLayer } from './map/WMSTileLayer';
+import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
+import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
-import {
-  GPSMarker,
-  TemperatureLayer,
-  TrailMap,
-  WeatherLayer
-} from './map/TrailMap';
 
 type Environment = {
   apiURL: string;
@@ -34,13 +30,20 @@ type Props = {
 };
 
 const appStyles = makeStyles((theme) => ({
+  fullscreen_no_padding: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: '100%',
+    width: '100vw'
+  },
   fullscreen: {
     position: 'absolute',
     top: 0,
     right: 0,
     height: '100%',
     width: '100vw',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       paddingTop: 5,
       paddingRight: 10,
       paddingLeft: 10
@@ -61,7 +64,7 @@ const appStyles = makeStyles((theme) => ({
   },
   hiddenBox: {
     width: 64,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none'
     }
   }
@@ -75,9 +78,6 @@ const App: React.FC<Props> = (props: Props) => {
     () => console.log('Running in ' + env.environment),
     [env.environment]
   );
-
-  const mapRef = createRef<Map>();
-  const groupRef = createRef<FeatureGroup>();
 
   const [showBar, setShowBar] = useState(false);
   const [displayTime, setDisplayTime] = useState<Date>();
@@ -94,31 +94,8 @@ const App: React.FC<Props> = (props: Props) => {
     layers: 0
   });
 
-  const [position, setPosition] = useState<GeolocationCoordinates>();
-  const [viewport, setViewPort] = useState<Viewport>({
-    center: [59.334591, 18.06324],
-    zoom: 8
-  });
-
-  const hideGPSMarker = () => setPosition(undefined);
-
-  const updatePosition: PositionCallback = ({ coords }) => {
-    setPosition(coords);
-  };
-
-  const flyToPosition: PositionCallback = ({ coords }) => {
-    if (!mapRef.current || !groupRef.current || !coords) return;
-    const map = mapRef.current.leafletElement;
-    const group = groupRef.current.leafletElement;
-    if (!map || !group) return;
-    setPosition(coords);
-    const zoom = map.getBoundsZoom(group.getBounds());
-    const { latitude, longitude } = coords;
-    setViewPort({
-      center: [latitude, longitude],
-      zoom: zoom - 0.5
-    });
-  };
+  // center: [59.334591, 18.06324],
+  // zoom: 8
 
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -135,10 +112,23 @@ const App: React.FC<Props> = (props: Props) => {
     })();
   }, [forecastAPI]);
 
+  const opts = optionsFromCapabilities(
+    new WMTSCapabilities().read(wmtsCapabilities),
+    {
+      layer: 'topowebb',
+      matrixSet: '3857'
+    }
+  )!;
+
+  opts.url = 'https://minkarta.lantmateriet.se/map/topowebbcache/';
+  opts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
+
   useEffect(() => {
     const timeout = setTimeout(() => setShowBar(true), 500);
     return () => clearTimeout(timeout);
   }, []);
+
+  console.log(opts);
 
   const toggleOverlay = (key: 'weather' | 'wind' | 'temperature') => {
     return (enable: boolean) => {
@@ -151,6 +141,10 @@ const App: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={css.fullscreen}>
+      <Map zoom={3} center={[18, 58]} className={css.fullscreen_no_padding}>
+        <TileLayer zIndex={0} source={new WMTS(opts)} />
+      </Map>
+      {/*
       <TrailMap
         className={css.fullscreen}
         viewport={viewport}
@@ -162,7 +156,7 @@ const App: React.FC<Props> = (props: Props) => {
                         url="https://kso.etjanster.lantmateriet.se/karta/topowebb/v1.1/wmts"
                         layers="topowebb"
                     />
-                */}
+                }
 
         <WMSLayer // Terrain
           url='https://minkarta.lantmateriet.se/map/topowebb/'
@@ -181,7 +175,7 @@ const App: React.FC<Props> = (props: Props) => {
                       url='https://minkarta.lantmateriet.se/map/ortofoto/'
                       layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
                     />
-                */}
+                /}
         {overlays.temperature && !!displayTime && (
           <TemperatureLayer
             referenceTime={forecast.reference}
@@ -201,6 +195,7 @@ const App: React.FC<Props> = (props: Props) => {
         </FeatureGroup>
       </TrailMap>
 
+        */}
       <Timeline
         shown={overlays.layers > 0 && showBar}
         timepoints={forecast.validTimes}
@@ -212,9 +207,9 @@ const App: React.FC<Props> = (props: Props) => {
           <div className={css.hiddenBox} />
 
           <Searchbar
-            onGPSLocate={flyToPosition}
-            onGPSTrack={updatePosition}
-            onGPSDeactivate={hideGPSMarker}
+            onGPSLocate={console.log}
+            onGPSTrack={console.log}
+            onGPSDeactivate={console.log}
           />
 
           <LayerSelector />

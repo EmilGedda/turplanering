@@ -12,6 +12,5 @@ export default merge(commonConfig, {
         publicPath: './',
     },
     devtool: 'source-map',
-    plugins: [],
 });
 

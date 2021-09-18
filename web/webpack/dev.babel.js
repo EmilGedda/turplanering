@@ -15,9 +15,10 @@ export default merge(commonConfig, {
     devServer: {
         hot: true, // enable HMR on the server
         compress: true,
-        contentBase: resolve(__dirname, '../dist'),
-        publicPath: '/',
-        writeToDisk: true,
+        static: {
+            publicPath: '/',
+            directory: resolve(__dirname, '../dist'),
+        },
     },
     devtool: 'eval-source-map',
     resolve: {
