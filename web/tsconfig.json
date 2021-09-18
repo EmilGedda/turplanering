@@ -11,6 +11,7 @@
         "jsx": "react",
         "moduleResolution": "node",
         "removeComments": true,
+        "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
         "target": "ES2020",
@@ -21,11 +22,10 @@
         "types": ["jest", "node"]
     },
     "typedocOptions": {
-        "inputFiles": ["./src"],
-        "mode": "modules",
+        "entryPoints": ["./src"],
+        "entryPointStrategy": "expand",
         "out": "docs",
         "exclude": "**/*.test.jsx",
-        "includeDeclarations": true,
         "includeVersion": true,
         "excludeExternals": true
     },

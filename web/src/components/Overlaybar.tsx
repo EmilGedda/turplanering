@@ -23,9 +23,10 @@ const overlaybarCSS = makeStyles((theme) => ({
   }
 }));
 
-type ToggleLayerCallback = (shown: boolean) => void;
+export type ToggleLayerCallback = (shown: boolean) => void;
 
-type ToggleButtonProps = LayerToggleProps & Omit<IconButtonProps, 'onClick'>;
+export type ToggleButtonProps = LayerToggleProps &
+  Omit<IconButtonProps, 'onClick'>;
 
 const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   const [active, setIsActive] = useState(false);
@@ -49,11 +50,11 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   );
 };
 
-type LayerToggleProps = {
+export type LayerToggleProps = {
   onClick?: ToggleLayerCallback;
 };
 
-type Props = {
+export type OverlaybarProps = {
   shown: boolean;
   children: ReactElement<ToggleButtonProps>[];
 };
@@ -77,7 +78,7 @@ WeatherToggleButton.displayName = 'WeatherToggleButton';
 WindToggleButton.displayName = 'WindToggleButton';
 TemperatureToggleButton.displayName = 'TemperatureToggleButton';
 
-export const Overlaybar: FC<Props> = (props: Props) => {
+export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   const { shown, children: buttons } = props;
   const css = overlaybarCSS();
 

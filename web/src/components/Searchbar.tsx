@@ -40,9 +40,9 @@ const searchbarCSS = makeStyles((theme) => ({
   }
 }));
 
-type GPSProps = { status: GPSStatus } & IconButtonProps;
+export type GPSProps = { status: GPSStatus } & IconButtonProps;
 
-enum GPSStatus {
+export enum GPSStatus {
   Disabled,
   Tracking,
   Loading,
@@ -78,13 +78,13 @@ const GPSButton: FC<GPSProps> = ({ status, ...props }: GPSProps) => {
   }
 };
 
-type Props = {
+export type SearchbarProps = {
   onGPSTrack: PositionCallback;
   onGPSLocate: PositionCallback;
   onGPSDeactivate: VoidFunction;
 };
 
-const Searchbar: FC<Props> = (props: Props) => {
+const Searchbar: FC<SearchbarProps> = (props: SearchbarProps) => {
   const { onGPSTrack, onGPSDeactivate, onGPSLocate } = props,
     [watchID, setWatchID] = useState(0),
     [gpsStatus, setGPSStatus] = useState(GPSStatus.Inactive),

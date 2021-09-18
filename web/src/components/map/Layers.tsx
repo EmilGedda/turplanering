@@ -1,6 +1,6 @@
 import React from 'react';
 
-type LayersProps = {
+export type LayersProps = {
   children?: React.ReactNode;
 };
 

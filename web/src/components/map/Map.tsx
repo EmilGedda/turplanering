@@ -3,7 +3,7 @@ import MapContext from '../../contexts/MapContext';
 import { Coordinate } from 'ol/coordinate';
 import * as ol from 'ol';
 
-type Props = {
+export type Props = {
   zoom: number;
   className?: string;
   center: Coordinate;
@@ -50,4 +50,5 @@ const Map: React.FC<Props> = ({ children, zoom, center, className }) => {
     </MapContext.Provider>
   );
 };
+
 export default Map;

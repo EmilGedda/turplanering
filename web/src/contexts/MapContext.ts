@@ -1,7 +1,7 @@
 import React from "react";
 import * as ol from "ol";
 
-type MapContext = {
+export type MapContext = {
     map: ol.Map | undefined
 }
 

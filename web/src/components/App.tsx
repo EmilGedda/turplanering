@@ -16,7 +16,7 @@ import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
 
-type Environment = {
+export type Environment = {
   apiURL: string;
   environment: string;
   browser: {
@@ -24,7 +24,7 @@ type Environment = {
   };
 };
 
-type Props = {
+export type AppProps = {
   env: Environment;
   forecastAPI: ForecastAPI;
 };
@@ -70,7 +70,7 @@ const appStyles = makeStyles((theme) => ({
   }
 }));
 
-const App: React.FC<Props> = (props: Props) => {
+export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env, forecastAPI } = props;
   const css = appStyles();
 
@@ -224,6 +224,3 @@ const App: React.FC<Props> = (props: Props) => {
     </div>
   );
 };
-
-export { App };
-export type { Props as AppProps, Environment };

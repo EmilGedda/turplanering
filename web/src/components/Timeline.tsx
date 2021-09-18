@@ -58,15 +58,15 @@ const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
   );
 };
 
-type Props = {
+export type TimelineProps = {
   shown: boolean;
   timepoints: Date[];
   onChange: (timepoint: Date) => void;
 };
 
-type SliderCallback = (event: Event, value: number | number[]) => void;
+export type SliderCallback = (event: Event, value: number | number[]) => void;
 
-const Timeline: FC<Props> = (props: Props) => {
+const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   const { shown, timepoints, onChange } = props;
   const css = timelineCSS();
   const [currentIndex, setCurrentIndex] = useState(0);

@@ -4,7 +4,7 @@ import WMTS from 'ol/source/WMTS';
 import { Options } from 'ol/layer/Layer';
 import OLTileLayer from 'ol/layer/Tile';
 
-type TileLayerProps = Options<WMTS>;
+export type TileLayerProps = Options<WMTS>;
 
 const TileLayer: React.FC<TileLayerProps> = ({ source, zIndex = 0 }) => {
   const { map } = useContext(MapContext);
