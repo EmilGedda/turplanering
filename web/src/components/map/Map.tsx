@@ -16,6 +16,7 @@ const Map: React.FC<Props> = ({ children, zoom, center, className }) => {
 
   // on component mount
   useEffect(() => {
+    console.log('new map');
     const options = {
       view: new ol.View({ zoom, center }),
       layers: [],
@@ -28,19 +29,7 @@ const Map: React.FC<Props> = ({ children, zoom, center, className }) => {
     }
     setMap(mapObject);
     return () => mapObject.setTarget(undefined);
-  }, [zoom, center, mapRef]);
-
-  // zoom change handler
-  useEffect(() => {
-    if (!map) return;
-    map.getView().setZoom(zoom);
-  }, [zoom, map]);
-
-  // center change handler
-  useEffect(() => {
-    if (!map) return;
-    map.getView().setCenter(center);
-  }, [center, map]);
+  }, []);
 
   return (
     <MapContext.Provider value={{ map }}>

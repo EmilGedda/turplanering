@@ -1,26 +1,28 @@
 import React, { FC, useState, ReactElement } from 'react';
-import { WeatherPouring, Thermometer, WeatherWindy } from 'mdi-material-ui';
+import { styled } from '@mui/styles';
+import {
+  WeatherPouring,
+  Thermometer,
+  WeatherWindy
+} from '@mitch528/mdi-material-ui';
 import { Slide, Paper, Grid, IconButton, IconButtonProps } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 
-const overlaybarCSS = makeStyles((theme) => ({
-  outer: {
-    pointerEvents: 'none',
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    [theme.breakpoints.down('md')]: {
-      marginRight: 10
-    },
-    [theme.breakpoints.up('sm')]: {
-      marginRight: 25
-    },
-    zIndex: 1000
-  }
+const StyledDiv = styled('div')(({ theme }) => ({
+  pointerEvents: 'none',
+  position: 'fixed',
+  top: 0,
+  bottom: 0,
+  right: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  [theme.breakpoints.down('md')]: {
+    marginRight: 10
+  },
+  [theme.breakpoints.up('sm')]: {
+    marginRight: 25
+  },
+  zIndex: 1000
 }));
 
 export type ToggleLayerCallback = (shown: boolean) => void;
@@ -80,17 +82,16 @@ TemperatureToggleButton.displayName = 'TemperatureToggleButton';
 
 export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   const { shown, children: buttons } = props;
-  const css = overlaybarCSS();
 
   return (
     <Slide direction='left' in={shown}>
-      <div className={css.outer}>
+      <StyledDiv>
         <Paper elevation={5} square={false} style={{ pointerEvents: 'auto' }}>
           <Grid container direction='column' justifyContent='space-around'>
             {...buttons}
           </Grid>
         </Paper>
-      </div>
+      </StyledDiv>
     </Slide>
   );
 };

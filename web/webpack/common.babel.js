@@ -14,6 +14,7 @@ export default {
             {
                 test: /\.js$/,
                 use: ['babel-loader', 'source-map-loader'],
+                exclude: /node_modules/
             },
             {
                 test: /\.tsx?$/,

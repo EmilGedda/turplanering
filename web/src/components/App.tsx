@@ -1,8 +1,8 @@
 import LayerSelector from './LayerSelector';
+import { styled } from '@mui/styles';
 import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar';
 import { Slide } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import {
   Overlaybar,
   WeatherToggleButton,
@@ -15,6 +15,58 @@ import Timeline from './Timeline';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
+
+const PREFIX = 'App';
+
+const classes = {
+  fullscreen_no_padding: `${PREFIX}-fullscreen_no_padding`,
+  fullscreen: `${PREFIX}-fullscreen`,
+  topbar: `${PREFIX}-topbar`,
+  hiddenBox: `${PREFIX}-hiddenBox`
+};
+
+const Div = styled('div')(({ theme }) => ({
+  [`& .${classes.fullscreen_no_padding}`]: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: '100%',
+    width: '100vw'
+  },
+
+  [`&.${classes.fullscreen}`]: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    height: '100%',
+    width: '100vw',
+    [theme.breakpoints.down('md')]: {
+      paddingTop: '5px',
+      paddingRight: '10px',
+      paddingLeft: '10px'
+    },
+    [theme.breakpoints.up('sm')]: {
+      paddingTop: '15px',
+      paddingRight: '25px',
+      paddingLeft: '25px'
+    }
+  },
+
+  [`&.${classes.topbar}`]: {
+    position: 'relative',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    pointerEvents: 'none',
+    zIndex: 1001
+  },
+  [`&.${classes.hiddenBox}`]: {
+    width: 64,
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  }
+}));
 
 export type Environment = {
   apiURL: string;
@@ -29,58 +81,28 @@ export type AppProps = {
   forecastAPI: ForecastAPI;
 };
 
-const appStyles = makeStyles((theme) => ({
-  fullscreen_no_padding: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    height: '100%',
-    width: '100vw'
-  },
-  fullscreen: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    height: '100%',
-    width: '100vw',
-    [theme.breakpoints.down('md')]: {
-      paddingTop: 5,
-      paddingRight: 10,
-      paddingLeft: 10
-    },
-    [theme.breakpoints.up('sm')]: {
-      paddingTop: 15,
-      paddingRight: 25,
-      paddingLeft: 25
-    }
-  },
-  topbar: {
-    position: 'relative',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    pointerEvents: 'none',
-    zIndex: 1001
-  },
-  hiddenBox: {
-    width: 64,
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
-  }
-}));
-
 export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env, forecastAPI } = props;
-  const css = appStyles();
 
   useEffect(
     () => console.log('Running in ' + env.environment),
     [env.environment]
   );
 
+  const opts = optionsFromCapabilities(
+    new WMTSCapabilities().read(wmtsCapabilities),
+    {
+      layer: 'topowebb',
+      matrixSet: '3857'
+    }
+  )!;
+
+  opts.url = 'https://minkarta.lantmateriet.se/map/topowebbcache/';
+  opts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
+
   const [showBar, setShowBar] = useState(false);
   const [displayTime, setDisplayTime] = useState<Date>();
+  const [mapSource, _] = useState<WMTS>(new WMTS(opts));
 
   const [forecast, setForecast] = useState<ForecastTimestamps>({
     reference: new Date(),
@@ -112,23 +134,10 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     })();
   }, [forecastAPI]);
 
-  const opts = optionsFromCapabilities(
-    new WMTSCapabilities().read(wmtsCapabilities),
-    {
-      layer: 'topowebb',
-      matrixSet: '3857'
-    }
-  )!;
-
-  opts.url = 'https://minkarta.lantmateriet.se/map/topowebbcache/';
-  opts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
-
   useEffect(() => {
     const timeout = setTimeout(() => setShowBar(true), 500);
     return () => clearTimeout(timeout);
   }, []);
-
-  console.log(opts);
 
   const toggleOverlay = (key: 'weather' | 'wind' | 'temperature') => {
     return (enable: boolean) => {
@@ -140,9 +149,9 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
   };
 
   return (
-    <div className={css.fullscreen}>
-      <Map zoom={3} center={[18, 58]} className={css.fullscreen_no_padding}>
-        <TileLayer zIndex={0} source={new WMTS(opts)} />
+    <Div className={classes.fullscreen}>
+      <Map zoom={3} center={[18, 58]} className={classes.fullscreen_no_padding}>
+        <TileLayer zIndex={0} source={mapSource} />
       </Map>
       {/*
       <TrailMap
@@ -196,15 +205,10 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
       </TrailMap>
 
         */}
-      <Timeline
-        shown={overlays.layers > 0 && showBar}
-        timepoints={forecast.validTimes}
-        onChange={setDisplayTime}
-      />
 
       <Slide direction='down' in={showBar}>
-        <div className={css.topbar}>
-          <div className={css.hiddenBox} />
+        <Div className={classes.topbar}>
+          <Div className={classes.hiddenBox} />
 
           <Searchbar
             onGPSLocate={console.log}
@@ -213,7 +217,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
           />
 
           <LayerSelector />
-        </div>
+        </Div>
       </Slide>
 
       <Overlaybar shown={!!displayTime && showBar}>
@@ -221,6 +225,12 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
         <WindToggleButton onClick={toggleOverlay('wind')} />
         <TemperatureToggleButton onClick={toggleOverlay('temperature')} />
       </Overlaybar>
-    </div>
+
+      <Timeline
+        shown={overlays.layers > 0 && showBar}
+        timepoints={forecast.validTimes}
+        onChange={setDisplayTime}
+      />
+    </Div>
   );
 };

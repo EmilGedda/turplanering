@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import { styled } from '@mui/styles';
 import { Layers } from '@mui/icons-material';
 import {
   Fab,
@@ -11,72 +12,68 @@ import {
 import type { TypographyProps } from '@mui/material';
 import { emphasize } from '@mui/material/styles';
 
-import makeStyles from '@mui/styles/makeStyles';
+const StyledIcon = styled(Layers)(({ theme }) => ({
+  color: theme.palette.action.active,
+  width: '26px',
+  height: '26px'
+}));
 
-const selectorCSS = makeStyles((theme) => ({
-  container: {
-    position: 'static',
-    pointerEvents: 'auto'
+const StyledFab = styled(Fab)(({ theme }) => ({
+  right: 0,
+  position: 'relative',
+  [theme.breakpoints.down('md')]: {
+    marginLeft: 10
   },
-  icon: {
-    color: theme.palette.action.active,
-    width: '26px',
-    height: '26px'
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: 25
   },
-  button: {
-    right: 0,
-    position: 'relative',
-    [theme.breakpoints.down('md')]: {
-      marginLeft: 10
-    },
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: 25
-    },
-    width: '48px',
-    height: '48px',
-    zIndex: 1001,
-    borderRadius: 4,
-    backgroundColor: theme.palette.background.paper,
-    transition: theme.transitions.create('background-color', {
-      duration: theme.transitions.duration.shortest
-    }),
-    '&:hover': {
-      backgroundColor: emphasize(theme.palette.background.paper)
-    }
-  },
-  selector: {
-    zIndex: 1002,
-    position: 'absolute',
-    padding: '8px 20px',
-    right: 0
-  },
-  sectionTitle: {
-    color: 'grey',
-    fontWeight: 'bold',
-    fontSize: theme.typography.pxToRem(11)
-  },
-  layer: {
-    position: 'relative',
-    width: '64px',
-    height: '64px'
+  width: '48px',
+  height: '48px',
+  zIndex: 1001,
+  borderRadius: 4,
+  backgroundColor: theme.palette.background.paper,
+  transition: theme.transitions.create('background-color', {
+    duration: theme.transitions.duration.shortest
+  }),
+  '&:hover': {
+    backgroundColor: emphasize(theme.palette.background.paper)
   }
 }));
 
-const SectionTitle: FC<TypographyProps> = (props) => {
-  const css = selectorCSS();
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  color: 'grey',
+  fontWeight: 'bold',
+  fontSize: theme.typography.pxToRem(11)
+}));
 
+const SelectorBox = styled(Paper)((_) => ({
+  zIndex: 1002,
+  position: 'absolute',
+  padding: '8px 20px',
+  right: 0
+}));
+
+const StyledLayers = styled(Paper)((_) => ({
+  position: 'relative',
+  width: '64px',
+  height: '64px'
+}));
+
+const StyledDiv = styled('div')((_) => ({
+  position: 'static',
+  pointerEvents: 'auto'
+}));
+
+const SectionTitle: FC<TypographyProps> = (props) => {
   return (
     <>
-      <Typography variant='overline' className={css.sectionTitle}>
-        {props.children}
-      </Typography>
+      <StyledTypography variant='overline'>{props.children}</StyledTypography>
       <br />
     </>
   );
 };
 
 const LayerSelector: FC = () => {
-  const css = selectorCSS();
   const [shown, setShown] = useState(false);
   const [hover, setHover] = useState(false);
 
@@ -85,13 +82,9 @@ const LayerSelector: FC = () => {
       onClickAway={() => setShown(false)}
       mouseEvent='onMouseDown'
     >
-      <div className={css.container}>
+      <StyledDiv>
         <Grow in={hover || shown} style={{ transformOrigin: 'top right' }}>
-          <Paper
-            elevation={4}
-            className={css.selector}
-            onMouseLeave={() => setHover(false)}
-          >
+          <SelectorBox elevation={4} onMouseLeave={() => setHover(false)}>
             <SectionTitle>Karta</SectionTitle>
             <Grid
               container
@@ -101,13 +94,13 @@ const LayerSelector: FC = () => {
               style={{ marginBottom: '4px' }}
             >
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
             </Grid>
             <SectionTitle>Variant</SectionTitle>
@@ -119,27 +112,26 @@ const LayerSelector: FC = () => {
               style={{ marginBottom: '4px' }}
             >
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
               <Grid item>
-                <Paper className={css.layer} />
+                <StyledLayers />
               </Grid>
             </Grid>
             <SectionTitle>Väder</SectionTitle>
             <SectionTitle>Detaljer</SectionTitle>
-          </Paper>
+          </SelectorBox>
         </Grow>
-        <Fab
-          className={css.button}
+        <StyledFab
           onClick={() => setShown(true)}
           onMouseEnter={() => setHover(true)}
         >
-          <Layers className={css.icon} />
-        </Fab>
-      </div>
+          <StyledIcon />
+        </StyledFab>
+      </StyledDiv>
     </ClickAwayListener>
   );
 };

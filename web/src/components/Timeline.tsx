@@ -1,29 +1,29 @@
 import React, { FC, useState, useEffect } from 'react';
+import { styled } from '@mui/styles';
 import {
   Divider,
   Grid,
   IconButton,
-  IconButtonProps,
   Paper,
   Slide,
   Slider,
   Typography
 } from '@mui/material';
 import { PlayCircleOutline, PauseCircleOutline } from '@mui/icons-material';
-import makeStyles from '@mui/styles/makeStyles';
 import { common } from '@mui/material/colors';
 
-type LabelProps = {
-  timepoint: Date;
+const PREFIX = 'Timeline';
+
+const classes = {
+  time: `${PREFIX}-time`,
+  date: `${PREFIX}-date`
 };
 
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
-const labelCSS = makeStyles((theme) => ({
-  time: {
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  [`&.${classes.time}`]: {
     fontSize: theme.typography.pxToRem(24)
   },
-  date: {
+  [`&.${classes.date}`]: {
     fontStyle: 'italic',
     color: 'grey',
     marginLeft: '12px',
@@ -31,9 +31,14 @@ const labelCSS = makeStyles((theme) => ({
   }
 }));
 
+type LabelProps = {
+  timepoint: Date;
+};
+
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
 const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
   const locale = 'sv-SE';
-  const css = labelCSS();
 
   const time = timepoint.toLocaleTimeString(locale, {
     hour: 'numeric',
@@ -48,12 +53,18 @@ const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
 
   return (
     <div>
-      <Typography variantMapping={{ body1: 'span' }} className={css.time}>
+      <StyledTypography
+        variantMapping={{ body1: 'span' }}
+        className={classes.time}
+      >
         {time}
-      </Typography>
-      <Typography variantMapping={{ body1: 'span' }} className={css.date}>
+      </StyledTypography>
+      <StyledTypography
+        variantMapping={{ body1: 'span' }}
+        className={classes.date}
+      >
         {capitalize(date)}
-      </Typography>
+      </StyledTypography>
     </div>
   );
 };
@@ -66,9 +77,36 @@ export type TimelineProps = {
 
 export type SliderCallback = (event: Event, value: number | number[]) => void;
 
+const OuterDiv = styled('div')(({ theme }) => ({
+  position: 'fixed',
+  left: 0,
+  right: 0,
+  bottom: 0,
+  padding: '2px 4px',
+  maxWidth: '95%',
+  margin: '0 auto',
+  [theme.breakpoints.down('md')]: {
+    marginBottom: '5px'
+  },
+  [theme.breakpoints.up('sm')]: {
+    marginBottom: '15px'
+  },
+  width: 600,
+  zIndex: 1001
+}));
+
+const StyledPaper = styled(Paper)((_) => ({
+  width: '100%',
+  paddingRight: 32
+}));
+
+const StyledDivider = styled(Divider)((_) => ({
+  height: 60,
+  margin: 12
+}));
+
 const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   const { shown, timepoints, onChange } = props;
-  const css = timelineCSS();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [running, setRunning] = useState(false);
   const [watchID, setWatchID] = useState(-1);
@@ -130,8 +168,8 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
 
   return (
     <Slide direction='up' in={shown} mountOnEnter>
-      <div className={css.outer}>
-        <Paper elevation={5} square={false} className={css.bar}>
+      <OuterDiv>
+        <StyledPaper elevation={5} square={false}>
           <Grid
             container
             direction='row'
@@ -139,7 +177,7 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
             alignItems='center'
           >
             <PlayButton onClick={start} isplaying={running} />
-            <Divider className={css.divider} orientation='vertical' />
+            <StyledDivider orientation='vertical' />
             <div style={{ flex: 1, marginLeft: 2 }}>
               <TimepointLabel timepoint={timepoints[currentIndex]} />
               <Slider
@@ -149,84 +187,39 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
               />
             </div>
           </Grid>
-        </Paper>
-      </div>
+        </StyledPaper>
+      </OuterDiv>
     </Slide>
   );
 };
 
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  colorPrimary: {
+    color:
+      theme.palette.mode == 'dark' ? common.white : theme.palette.primary.main
+  },
+  fontSize: '60px'
+}));
+
 type PlayButtonProps = {
   isplaying: boolean;
   onClick: (play: boolean) => void;
-} & Omit<IconButtonProps, 'onClick'>;
+};
 
 const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
-  const { onClick: callback, isplaying, ...baseProps } = props;
-  const css = timelineCSS();
-  const color = iconColor();
+  const { onClick: callback, isplaying } = props;
 
   const onClick = () => callback(!isplaying);
 
   return (
-    <IconButton
-      color='primary'
-      onClick={onClick}
-      className={css.icon}
-      classes={color}
-      edge='end'
-      {...baseProps}
-      size='large'
-    >
+    <StyledIconButton color='primary' onClick={onClick} edge='end' size='large'>
       {isplaying ? (
-        <PauseCircleOutline className={css.icon} />
+        <PauseCircleOutline style={{ fontSize: '60px' }} />
       ) : (
-        <PlayCircleOutline className={css.icon} />
+        <PlayCircleOutline style={{ fontSize: '60px' }} />
       )}
-    </IconButton>
+    </StyledIconButton>
   );
 };
-
-const iconColor = makeStyles((theme) => ({
-  colorPrimary: {
-    color:
-      theme.palette.mode == 'dark' ? common.white : theme.palette.primary.main
-  }
-}));
-
-const timelineCSS = makeStyles((theme) => ({
-  outer: {
-    position: 'fixed',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: '2px 4px',
-    maxWidth: '95%',
-    margin: '0 auto',
-    [theme.breakpoints.down('md')]: {
-      marginBottom: '5px'
-    },
-    [theme.breakpoints.up('sm')]: {
-      marginBottom: '15px'
-    },
-    width: 600,
-    zIndex: 1001
-  },
-  bar: {
-    width: '100%',
-    paddingRight: 32
-  },
-  center: {
-    width: '100%',
-    left: 0,
-    right: 0
-  },
-  divider: {
-    height: 60,
-    margin: 12
-  },
-  icon: {
-    fontSize: 60
-  }
-}));
 
 export default Timeline;

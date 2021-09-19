@@ -22,20 +22,18 @@ import React from 'react';
 import { render } from 'react-dom';
 import ScopedCssBaseline from '@mui/material/ScopedCssBaseline';
 import {
-  createTheme,
-  ThemeProvider,
-  Theme,
-  StyledEngineProvider,
   alpha,
-  adaptV4Theme
+  createTheme,
+  StyledEngineProvider,
+  Theme,
+  ThemeProvider
 } from '@mui/material/styles';
 import { orange, common, grey } from '@mui/material/colors';
 import { Smhi } from './forecast';
 import { App } from './components/App';
 
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
+declare module '@mui/styles' {
+  type DefaultTheme = Theme;
 }
 
 const env = (() => {
@@ -57,44 +55,44 @@ const env = (() => {
 })();
 
 const theme = {
-  light: createTheme(
-    adaptV4Theme({
-      palette: {
-        mode: 'light'
-      }
-    })
-  ),
-  dark: createTheme(
-    adaptV4Theme({
-      palette: {
-        mode: 'dark'
-      },
-      overrides: {
-        MuiSlider: {
+  light: createTheme({
+    palette: {
+      mode: 'light'
+    }
+  }),
+  dark: createTheme({
+    palette: {
+      mode: 'dark'
+    },
+    components: {
+      MuiSlider: {
+        styleOverrides: {
           // drag color and opacity
           track: { backgroundColor: grey[500] },
           rail: { backgroundColor: grey[600] },
           thumb: {
             backgroundColor: 'white',
-            '&$focusVisible,&:hover': {
+            '&.Mui-focusVisible,&:hover': {
               boxShadow: `0px 0px 0px 8px ${alpha(common.white, 0.16)}`,
               '@media (hover: none)': {
                 boxShadow: 'none'
               }
             },
-            '&$active': {
+            '&.Mui-active': {
               boxShadow: `0px 0px 0px 14px ${alpha(common.white, 0.16)}`
             }
           }
-        },
-        MuiIconButton: {
+        }
+      },
+      MuiIconButton: {
+        styleOverrides: {
           colorPrimary: {
             color: orange[500]
           }
         }
       }
-    })
-  )
+    }
+  })
 };
 
 // Opt-in to Webpack hot module replacement

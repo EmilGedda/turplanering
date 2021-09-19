@@ -25,8 +25,5 @@ export default merge(commonConfig, {
         alias: {
             'react-dom': '@hot-loader/react-dom',
         },
-    },
-    plugins: [
-        new webpack.HotModuleReplacementPlugin(), // enable HMR globally
-    ],
+    }
 });

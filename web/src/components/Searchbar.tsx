@@ -1,4 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
+import { styled } from '@mui/styles';
 import {
   AccountCircle,
   GpsFixed,
@@ -6,41 +7,35 @@ import {
   GpsOff,
   Search
 } from '@mui/icons-material';
-import {
-  Divider,
-  IconButton,
-  IconButtonProps,
-  InputBase,
-  Paper
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Divider, IconButton, InputBase, Paper } from '@mui/material';
 
-const searchbarCSS = makeStyles((theme) => ({
-  searchbar: {
-    maxWidth: '800px',
-    width: '95%',
-    zIndex: 1000,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 48,
-    padding: '0px 4px',
-    pointerEvents: 'auto'
-  },
-  input: {
-    marginLeft: theme.spacing(1),
-    flex: 1
-  },
-  iconButton: {
-    padding: 8
-  },
-  divider: {
-    height: 28,
-    margin: 2
-  }
+const StyledPaper = styled(Paper)((_) => ({
+  maxWidth: '800px',
+  width: '95%',
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: 48,
+  padding: '0px 4px',
+  pointerEvents: 'auto'
 }));
 
-export type GPSProps = { status: GPSStatus } & IconButtonProps;
+const StyledInput = styled(InputBase)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  flex: 1
+}));
+
+const StyledDivider = styled(Divider)((_) => ({
+  height: 28,
+  margin: 2
+}));
+
+const StyledIconButton = styled(IconButton)((_) => ({
+  padding: 8
+}));
+
+export type GPSProps = { status: GPSStatus; onClick: () => void };
 
 export enum GPSStatus {
   Disabled,
@@ -53,27 +48,27 @@ const GPSButton: FC<GPSProps> = ({ status, ...props }: GPSProps) => {
   switch (status) {
     case GPSStatus.Inactive:
       return (
-        <IconButton {...props} size='large'>
+        <StyledIconButton {...props} size='large'>
           <GpsNotFixed />
-        </IconButton>
+        </StyledIconButton>
       );
     case GPSStatus.Loading:
       return (
-        <IconButton {...props} color='primary' size='large'>
+        <StyledIconButton {...props} color='primary' size='large'>
           <GpsNotFixed />
-        </IconButton>
+        </StyledIconButton>
       );
     case GPSStatus.Tracking:
       return (
-        <IconButton {...props} color='primary' size='large'>
+        <StyledIconButton {...props} color='primary' size='large'>
           <GpsFixed />
-        </IconButton>
+        </StyledIconButton>
       );
     case GPSStatus.Disabled:
       return (
-        <IconButton {...props} color='secondary' size='large'>
+        <StyledIconButton {...props} color='secondary' size='large'>
           <GpsOff />
-        </IconButton>
+        </StyledIconButton>
       );
   }
 };
@@ -88,7 +83,6 @@ const Searchbar: FC<SearchbarProps> = (props: SearchbarProps) => {
   const { onGPSTrack, onGPSDeactivate, onGPSLocate } = props,
     [watchID, setWatchID] = useState(0),
     [gpsStatus, setGPSStatus] = useState(GPSStatus.Inactive),
-    css = searchbarCSS(),
     gps = navigator.geolocation;
 
   const stopTracking = () => {
@@ -118,22 +112,21 @@ const Searchbar: FC<SearchbarProps> = (props: SearchbarProps) => {
   }, [gps, watchID]);
 
   return (
-    <Paper className={css.searchbar} elevation={5}>
-      <IconButton className={css.iconButton} size='large'>
+    <StyledPaper elevation={5}>
+      <StyledIconButton size='large'>
         <AccountCircle />
-      </IconButton>
-      <Divider className={css.divider} orientation='vertical' />
-      <InputBase className={css.input} placeholder='Sök' />
-      <IconButton type='submit' className={css.iconButton} size='large'>
+      </StyledIconButton>
+      <StyledDivider orientation='vertical' />
+      <StyledInput placeholder='Sök' />
+      <StyledIconButton type='submit' size='large'>
         <Search />
-      </IconButton>
-      <Divider className={css.divider} orientation='vertical' />
+      </StyledIconButton>
+      <StyledDivider orientation='vertical' />
       <GPSButton
         status={gps ? gpsStatus : GPSStatus.Disabled}
-        className={css.iconButton}
         onClick={gpsStatus == GPSStatus.Tracking ? stopTracking : watchGPS}
       />
-    </Paper>
+    </StyledPaper>
   );
 };
 
