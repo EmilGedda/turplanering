@@ -33,7 +33,8 @@ import { Smhi } from './forecast';
 import { App } from './components/App';
 
 declare module '@mui/styles' {
-  type DefaultTheme = Theme;
+  // eslint-disable-next-line
+  interface DefaultTheme extends Theme{}
 }
 
 const env = (() => {
