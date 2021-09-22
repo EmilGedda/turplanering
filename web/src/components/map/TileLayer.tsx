@@ -105,21 +105,6 @@ export const wmtsCapabilities = `
   </ows:OperationsMetadata>
   <Contents>
     <Layer>
-      <ows:Title>topowebb</ows:Title>
-      <ows:Identifier>topowebb</ows:Identifier>
-      <Style isDefault="true">
-        <ows:Identifier>default</ows:Identifier>
-      </Style>
-      <Format>image/png</Format>
-      <TileMatrixSetLink>
-        <TileMatrixSet>3006</TileMatrixSet>
-      </TileMatrixSetLink>
-      <TileMatrixSetLink>
-        <TileMatrixSet>3857</TileMatrixSet>
-      </TileMatrixSetLink>
-      <ResourceURL format="image/png" resourceType="tile" template="http://maps.lantmateriet.se/topowebb/v1.1/wmts/1.0.0/topowebb/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png" />
-    </Layer>
-    <Layer>
       <ows:Title>topowebb_nedtonad</ows:Title>
       <ows:Identifier>topowebb_nedtonad</ows:Identifier>
       <Style isDefault="true">
@@ -133,6 +118,21 @@ export const wmtsCapabilities = `
         <TileMatrixSet>3857</TileMatrixSet>
       </TileMatrixSetLink>
       <ResourceURL format="image/png" resourceType="tile" template="http://maps.lantmateriet.se/topowebb/v1.1/wmts/1.0.0/topowebb_nedtonad/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png" />
+    </Layer>
+    <Layer>
+      <ows:Title>topowebb</ows:Title>
+      <ows:Identifier>topowebb</ows:Identifier>
+      <Style isDefault="true">
+        <ows:Identifier>default</ows:Identifier>
+      </Style>
+      <Format>image/png</Format>
+      <TileMatrixSetLink>
+        <TileMatrixSet>3006</TileMatrixSet>
+      </TileMatrixSetLink>
+      <TileMatrixSetLink>
+        <TileMatrixSet>3857</TileMatrixSet>
+      </TileMatrixSetLink>
+      <ResourceURL format="image/png" resourceType="tile" template="http://maps.lantmateriet.se/topowebb/v1.1/wmts/1.0.0/topowebb/default/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png" />
     </Layer>
     <TileMatrixSet>
       <ows:Identifier>3857</ows:Identifier>

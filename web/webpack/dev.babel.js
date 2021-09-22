@@ -1,7 +1,6 @@
 // development config
 import commonConfig from './common.babel';
 import {merge} from 'webpack-merge';
-import webpack from 'webpack';
 import {resolve} from 'path';
 
 export default merge(commonConfig, {

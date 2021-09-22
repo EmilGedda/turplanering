@@ -2,7 +2,7 @@
 import {resolve} from 'path';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import webpack from 'webpack'
+import webpack from 'webpack';
 
 export default {
     resolve: {
