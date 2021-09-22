@@ -1,12 +1,13 @@
 module Turplanering.Collections where
 
 import           Control.Arrow
+import           Data.Foldable
 import           Data.Function
 import           Data.List
 import qualified Data.Map.Strict as M
 
-bucketOn :: Ord k => (a -> k) -> [a] -> M.Map k a
-bucketOn f = M.fromList . map (f &&& id)
+bucketOn :: (Traversable t, Ord k) => (a -> k) -> t a -> M.Map k a
+bucketOn f = M.fromList . toList . fmap (f &&& id)
 
 nubSort :: Ord a => [a] -> [a]
 nubSort = nubSortBy compare

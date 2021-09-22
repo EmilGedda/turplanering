@@ -1,7 +1,7 @@
 module Main where
 
-import           Control.Exception
 import           Control.Concurrent
+import           Control.Exception
 import           Data.Aeson
 import           Data.Function
 import           Data.Geospatial
@@ -49,7 +49,7 @@ serialize json = encodeFile file json *> printf "Saved data in %s\n" file
 
 main :: IO ()
 main = do
-    mgr <- newTlsManagerWith $ tlsManagerSettings { managerConnCount = 50 }
+    mgr <- newTlsManagerWith $ tlsManagerSettings{managerConnCount = 50}
     Streamly.fromList naturkartan
         & Streamly.fromSerial
         & Streamly.mapM (uncurry $ fetch mgr)

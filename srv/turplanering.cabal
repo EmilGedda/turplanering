@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 19d6cac739e5be3a63209bd5aef4f134843b2c805fcb027c874dc44315692236
+-- hash: aa4cf0ada7223261b4c19eddab47fb8524276b13ee72949ffe07472b1079d84d
 
 name:           turplanering
 version:        0.1.0.0
@@ -61,7 +61,7 @@ library
       StandaloneDeriving
       TupleSections
       TypeApplications
-  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson ==1.5.*
     , ansi-terminal ==0.11.*
@@ -89,48 +89,6 @@ library
     , vault ==0.3.*
     , wai ==3.2.*
     , wkt-geom ==0.0.*
-  default-language: Haskell2010
-
-executable datascraper
-  main-is: Main.hs
-  hs-source-dirs:
-      app/Datascraper
-  default-extensions:
-      BangPatterns
-      DeriveFoldable
-      DeriveFunctor
-      DeriveGeneric
-      DeriveTraversable
-      DerivingStrategies
-      EmptyDataDeriving
-      ExistentialQuantification
-      FlexibleContexts
-      FlexibleInstances
-      KindSignatures
-      GADTs
-      PolyKinds
-      GeneralizedNewtypeDeriving
-      ImportQualifiedPost
-      InstanceSigs
-      MultiParamTypeClasses
-      NamedFieldPuns
-      ScopedTypeVariables
-      StandaloneDeriving
-      TupleSections
-      TypeApplications
-  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      aeson ==1.5.*
-    , base >=4.7 && <5
-    , bytestring ==0.10.*
-    , containers ==0.6.*
-    , deepseq ==1.4.*
-    , geojson ==4.0.*
-    , http-client ==0.6.*
-    , http-client-tls ==0.3.*
-    , streamly ==0.8.*
-    , timeit ==2.0.*
-    , turplanering
   default-language: Haskell2010
 
 executable turplanering
@@ -177,6 +135,87 @@ executable turplanering
     , wai ==3.2.*
     , wai-extra ==3.1.*
     , warp ==3.3.*
+  default-language: Haskell2010
+
+executable turplanering-prepare-sql
+  main-is: Main.hs
+  hs-source-dirs:
+      app/PrepareSQL
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson ==1.5.*
+    , base >=4.7 && <5
+    , bytestring ==0.10.*
+    , containers ==0.6.*
+    , geojson ==4.0.*
+    , optics ==0.3.*
+    , text ==1.2.*
+    , turplanering
+  default-language: Haskell2010
+
+executable turplanering-scrape
+  main-is: Main.hs
+  hs-source-dirs:
+      app/Datascraper
+  default-extensions:
+      BangPatterns
+      DeriveFoldable
+      DeriveFunctor
+      DeriveGeneric
+      DeriveTraversable
+      DerivingStrategies
+      EmptyDataDeriving
+      ExistentialQuantification
+      FlexibleContexts
+      FlexibleInstances
+      KindSignatures
+      GADTs
+      PolyKinds
+      GeneralizedNewtypeDeriving
+      ImportQualifiedPost
+      InstanceSigs
+      MultiParamTypeClasses
+      NamedFieldPuns
+      ScopedTypeVariables
+      StandaloneDeriving
+      TupleSections
+      TypeApplications
+  ghc-options: -Wall -Wno-missing-signatures -Wno-name-shadowing -Wno-type-defaults -Wno-partial-type-signatures -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson ==1.5.*
+    , base >=4.7 && <5
+    , bytestring ==0.10.*
+    , containers ==0.6.*
+    , deepseq ==1.4.*
+    , geojson ==4.0.*
+    , http-client ==0.6.*
+    , http-client-tls ==0.3.*
+    , streamly ==0.8.*
+    , timeit ==2.0.*
+    , turplanering
   default-language: Haskell2010
 
 test-suite test

@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE NoMonomorphismRestriction #-}
 
 import           Control.Arrow
 import           Data.Coerce
@@ -27,10 +26,11 @@ coherentDBTrailData :: [DBTrail] -> [DBSections] -> ([DBTrail], [DBSections])
 coherentDBTrailData xs ys = (trails', sections')
     where
         trails' = nubSortOn (view #id) xs
-        trailIds = trails' ^.. folded % #id
+        trailIds = trails' ^.. traversed % #id
         sections' = filter (flip elem trailIds . view #id) ys
 
-names = folded % #name
+names :: LabelOptic' "name" A_Lens named name => Traversal' [named] name
+names = traversed % #name
 
 main :: IO ()
 main = hspec $ do
@@ -51,5 +51,5 @@ main = hspec $ do
         it "sections should be preserved" . forAll genValid $
             \(xs, ys) ->
                 let (trails, sections') = coherentDBTrailData xs ys
-                    sectionNames = buildTrails trails sections' ^.. folded % #sections % names
+                    sectionNames = buildTrails trails sections' ^.. traversed % #sections % names
                  in sectionNames `shouldMatchList` toListOf names sections'
