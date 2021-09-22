@@ -31,13 +31,14 @@ import {
 import { orange, common, grey } from '@mui/material/colors';
 import { Smhi } from './forecast';
 import { App } from './components/App';
+import EnvContext, { Environment, developmentDefault } from './contexts/EnvContext';
 
 declare module '@mui/styles' {
   // eslint-disable-next-line
   interface DefaultTheme extends Theme{}
 }
 
-const env = (() => {
+const env:Environment  = (() => {
   const browser = {
     hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
   };
@@ -45,12 +46,12 @@ const env = (() => {
     return {
       apiURL: 'localhost:8080',
       environment: 'production',
+      tileURL: '',
       browser
     };
   }
   return {
-    apiURL: 'localhost:8080',
-    environment: 'development',
+    ...developmentDefault,
     browser
   };
 })();
@@ -104,11 +105,13 @@ if (module.hot) module.hot.accept();
 render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme.light}>
-        <ScopedCssBaseline>
-          <App env={env} forecastAPI={Smhi} />
-        </ScopedCssBaseline>
-      </ThemeProvider>
+      <EnvContext.Provider value={env}>
+        <ThemeProvider theme={theme.light}>
+          <ScopedCssBaseline>
+            <App env={env} forecastAPI={Smhi} />
+          </ScopedCssBaseline>
+        </ThemeProvider>
+      </EnvContext.Provider>
     </StyledEngineProvider>
   </React.StrictMode>,
   document.getElementById('root') as HTMLElement

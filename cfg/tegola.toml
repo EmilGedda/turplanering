@@ -1,0 +1,32 @@
+[webserver]
+port = ":8081"
+
+# register data providers
+[[providers]]
+name = "turplanering"
+type = "mvt_postgis"
+host = "db"
+port = 5432
+database = "turplanering"
+user = "tegola"
+password = "password"
+srid = 4326
+
+    [[providers.layers]]
+    name = "trail_sections"
+    srid = 4326
+    geometry_type = "MultiLineString"
+    id_fieldname = "gid"
+    sql = """\
+        SELECT ST_AsMVTGeom(geog::geometry, !BBOX!) AS geom, trail_sections.id AS gid, color, trails.description, trails.name \
+        FROM trail_sections \
+            INNER JOIN trails ON trail_sections.trail_id = trails.id \
+        WHERE geog && !BBOX!\
+        """
+
+[[maps]]
+name = "trails"
+
+    [[maps.layers]]
+    name = "trail_sections"
+    provider_layer = "turplanering.trail_sections"

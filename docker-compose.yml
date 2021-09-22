@@ -1,5 +1,16 @@
 version: '2.0'
 services:
+
+  tegola:
+    image: gospatial/tegola
+    volumes:
+    - ./cfg/tegola.toml:/opt/tegola_config/config.toml
+    ports:
+    - "8081:8081"
+    depends_on:
+    - "db"
+    command: serve --config /opt/tegola_config/config.toml
+
   db:
     image: postgis/postgis
     environment:

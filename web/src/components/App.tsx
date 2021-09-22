@@ -13,9 +13,13 @@ import Map from './map/Map';
 import TileLayer, { wmtsCapabilities } from './map/TileLayer';
 import Timeline from './Timeline';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
+import VectorTileSource from 'ol/source/VectorTile';
+import MVT from 'ol/format/MVT';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import { fromLonLat } from 'ol/proj';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
+import VectorLayer from './map/VectorLayer';
+import { Environment } from '../contexts/EnvContext';
 
 const PREFIX = 'App';
 
@@ -62,14 +66,6 @@ const Div = styled('div')(({ theme }) => ({
   }
 }));
 
-export type Environment = {
-  apiURL: string;
-  environment: string;
-  browser: {
-    hasTouch: boolean;
-  };
-};
-
 export type AppProps = {
   env: Environment;
   forecastAPI: ForecastAPI;
@@ -101,6 +97,21 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     temperature: false,
     layers: 0
   });
+
+  const [trailSource, setTrailSource] = useState<VectorTileSource>();
+
+  useEffect(() => {
+    const source = env.environment != 'development' ? undefined 
+      : new VectorTileSource({
+        url: env.tileURL,
+        format: new MVT({
+          layerName: "trail_sections",
+          geometryName: "geom",
+          idProperty: "gid"
+        })
+    });
+    setTrailSource(source);
+  }, [env.tileURL]);
 
   useEffect(
     () => console.log('Running in ' + env.environment),
@@ -146,6 +157,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
         className={classes.fullscreen}
       >
         <TileLayer zIndex={0} source={mapSource} />
+        {trailSource && (<VectorLayer source={trailSource} />)}
       </Map>
 
       {/*
