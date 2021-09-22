@@ -16,7 +16,7 @@ import           Optics
 import           Text.Printf
 import           Turplanering.Collections
 import qualified Data.ByteString          as B
-import qualified Data.Map.Strict          as M
+import qualified Data.IntMap.Strict       as M
 import qualified Data.Text.Lazy           as T
 import qualified Data.Text.Lazy.Builder   as TB
 import qualified Data.Text.Lazy.IO        as TIO
@@ -167,7 +167,7 @@ trailsAndSections features = joinWith newline $ map prepareTrail trails
             fst . fromRight (-1, mempty) . TR.decimal . parent . fromChild . _properties
                 &&& return . _geometry
 
-        sections :: M.Map Int [GeospatialGeometry]
+        sections :: M.IntMap [GeospatialGeometry]
         sections =
             M.fromListWith (<>) . toList
                 . fmap mapping
@@ -197,9 +197,8 @@ main = do
              in TIO.putStrLn
                     . TB.toLazyText
                     . transaction
-                    $ foldMap
-                        ($ features)
-                        [ const preparedStatement
-                        , const newline
-                        , trailsAndSections
+                    $ mconcat
+                        [ preparedStatement
+                        , newline
+                        , trailsAndSections features
                         ]
