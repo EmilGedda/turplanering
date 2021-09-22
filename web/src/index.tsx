@@ -31,14 +31,17 @@ import {
 import { orange, common, grey } from '@mui/material/colors';
 import { Smhi } from './forecast';
 import { App } from './components/App';
-import EnvContext, { Environment, developmentDefault } from './contexts/EnvContext';
+import EnvContext, {
+  Environment,
+  developmentDefault
+} from './contexts/EnvContext';
 
 declare module '@mui/styles' {
   // eslint-disable-next-line
   interface DefaultTheme extends Theme{}
 }
 
-const env:Environment  = (() => {
+const env: Environment = (() => {
   const browser = {
     hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
   };

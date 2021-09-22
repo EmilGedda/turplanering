@@ -101,15 +101,17 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
   const [trailSource, setTrailSource] = useState<VectorTileSource>();
 
   useEffect(() => {
-    const source = env.environment != 'development' ? undefined 
-      : new VectorTileSource({
-        url: env.tileURL,
-        format: new MVT({
-          layerName: "trail_sections",
-          geometryName: "geom",
-          idProperty: "gid"
-        })
-    });
+    const source =
+      env.environment != 'development'
+        ? undefined
+        : new VectorTileSource({
+            url: env.tileURL,
+            format: new MVT({
+              layerName: 'trail_sections',
+              geometryName: 'geom',
+              idProperty: 'gid'
+            })
+          });
     setTrailSource(source);
   }, [env.tileURL]);
 
@@ -157,7 +159,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
         className={classes.fullscreen}
       >
         <TileLayer zIndex={0} source={mapSource} />
-        {trailSource && (<VectorLayer source={trailSource} />)}
+        {trailSource && <VectorLayer source={trailSource} />}
       </Map>
 
       {/*
