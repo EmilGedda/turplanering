@@ -82,6 +82,8 @@ const mapLayerOpts = optionsFromCapabilities(
 export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env, forecastAPI } = props;
 
+  mapLayerOpts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
+
   const [showBar, setShowBar] = useState(false);
   const [displayTime, setDisplayTime] = useState<Date>();
   const [mapSource, _] = useState<WMTS>(new WMTS(mapLayerOpts));
@@ -119,8 +121,6 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     () => console.log('Running in ' + env.environment),
     [env.environment]
   );
-
-  mapLayerOpts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
 
   useEffect(() => {
     void (async (): Promise<void> => {
