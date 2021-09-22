@@ -108,6 +108,7 @@ lineString line =
         point (GeoPointXY (PointXY x y)) = TB.fromString $ printf "%.6f %.6f" x y
         point _ = error "point: LineString contained something other than GeoPointXY"
 
+joinWith :: Monoid c => c -> [c] -> c
 joinWith f = mconcat . intersperse f
 
 preparedStatement :: TB.Builder
@@ -189,7 +190,7 @@ trailsAndSections features = joinWith newline $ map prepareTrail trails
 main :: IO ()
 main = do
     json <- B.getContents
-    case eitherDecodeStrict json of
+    case eitherDecodeStrict' json of
         Left err -> putStrLn err
         Right coll ->
             let features = toList $ _geofeatures coll
