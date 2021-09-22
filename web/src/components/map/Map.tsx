@@ -43,7 +43,8 @@ const Map: React.FC<Props> = ({ children, zoom, center, className }) => {
       }),
       layers: [],
       controls: mapControls,
-      overlays: []
+      overlays: [],
+      keyboardEventTarget: document
     };
     const mapObject = new ol.Map(options);
     if (mapRef.current) {
