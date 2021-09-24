@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import {
   AccountCircle,
   GpsFixed,

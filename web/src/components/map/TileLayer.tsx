@@ -31,6 +31,7 @@ const TileLayer: React.FC<TileLayerProps> = ({ source, zIndex = 0 }) => {
 
 export default TileLayer;
 
+// TODO: compile time process this with preval
 export const wmtsCapabilities = `
 <Capabilities xmlns="http://www.opengis.net/wmts/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd" version="1.0.0">
   <ows:ServiceIdentification>

@@ -1,5 +1,5 @@
 import LayerSelector from './LayerSelector';
-import { styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar';
 import { Slide } from '@mui/material';
@@ -18,14 +18,15 @@ import MVT from 'ol/format/MVT';
 import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import { fromLonLat } from 'ol/proj';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
+import { CoordURL, currentURLState } from '../URL';
 import VectorLayer from './map/VectorLayer';
 import { Environment } from '../contexts/EnvContext';
 
 const PREFIX = 'App';
 
 const classes = {
-  fullscreen: `${PREFIX}-fullscreen_no_padding`,
-  padded: `${PREFIX}-fullscreen`,
+  fullscreen: `${PREFIX}-fullscreen`,
+  padded: `${PREFIX}-padded`,
   topbar: `${PREFIX}-topbar`,
   hiddenBox: `${PREFIX}-hiddenBox`
 };
@@ -71,22 +72,29 @@ export type AppProps = {
   forecastAPI: ForecastAPI;
 };
 
-const mapLayerOpts = optionsFromCapabilities(
-  new WMTSCapabilities().read(wmtsCapabilities),
-  {
+const mapLayerSrc = new WMTS(
+  optionsFromCapabilities(new WMTSCapabilities().read(wmtsCapabilities), {
     layer: 'topowebb',
     matrixSet: '3857'
-  }
-)!;
+  })!
+);
+
+const initialView = () => {
+  const { state } = currentURLState();
+  return state instanceof CoordURL
+    ? { center: fromLonLat([state.lon, state.lat]), zoom: state.zoom ?? 8 }
+    : { center: fromLonLat([18.07, 59.324]), zoom: 8 };
+};
 
 export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env, forecastAPI } = props;
 
-  mapLayerOpts.urls = ['https://minkarta.lantmateriet.se/map/topowebbcache/?'];
+  mapLayerSrc.setUrls(['https://minkarta.lantmateriet.se/map/topowebbcache/?']);
 
   const [showBar, setShowBar] = useState(false);
   const [displayTime, setDisplayTime] = useState<Date>();
-  const [mapSource, _] = useState<WMTS>(new WMTS(mapLayerOpts));
+  const [mapSource, _1] = useState<WMTS>(mapLayerSrc);
+  const [view, _2] = useState(initialView());
 
   const [forecast, setForecast] = useState<ForecastTimestamps>({
     reference: new Date(),
@@ -102,6 +110,11 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
 
   const [trailSource, setTrailSource] = useState<VectorTileSource>();
 
+  useEffect(
+    () => console.log('Running in ' + env.environment),
+    [env.environment]
+  );
+
   useEffect(() => {
     const source =
       env.environment != 'development'
@@ -116,11 +129,6 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
           });
     setTrailSource(source);
   }, [env.tileURL]);
-
-  useEffect(
-    () => console.log('Running in ' + env.environment),
-    [env.environment]
-  );
 
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -153,11 +161,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map
-        zoom={8}
-        center={fromLonLat([18.07, 59.324])}
-        className={classes.fullscreen}
-      >
+      <Map view={view} className={classes.fullscreen}>
         <TileLayer zIndex={0} source={mapSource} />
         {trailSource && <VectorLayer source={trailSource} />}
       </Map>

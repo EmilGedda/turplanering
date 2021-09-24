@@ -36,7 +36,7 @@ import EnvContext, {
   developmentDefault
 } from './contexts/EnvContext';
 
-declare module '@mui/styles' {
+declare module '@mui/material/styles' {
   // eslint-disable-next-line
   interface DefaultTheme extends Theme{}
 }

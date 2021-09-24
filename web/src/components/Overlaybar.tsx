@@ -1,5 +1,5 @@
 import React, { FC, useState, ReactElement } from 'react';
-import { styled } from '@mui/styles';
+import { styled } from '@mui/material/styles';
 import {
   WeatherPouring,
   Thermometer,
