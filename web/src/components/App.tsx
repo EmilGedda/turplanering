@@ -13,14 +13,15 @@ import Map from './map/Map';
 import TileLayer, { wmtsCapabilities } from './map/TileLayer';
 import Timeline from './Timeline';
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
-import VectorTileSource from 'ol/source/VectorTile';
-import MVT from 'ol/format/MVT';
-import WMTSCapabilities from 'ol/format/WMTSCapabilities';
+import Feature from 'ol/Feature';
+import { MVT } from 'ol/format';
+import { TrailLayer } from './map/VectorLayer';
+import { VectorTile as VectorSource } from 'ol/source';
+import { WMTSCapabilities } from 'ol/format';
 import { fromLonLat } from 'ol/proj';
-import { ForecastAPI, ForecastTimestamps } from '../forecast';
 import { CoordURL, currentURLState } from '../URL';
-import VectorLayer from './map/VectorLayer';
 import { Environment } from '../contexts/EnvContext';
+import { ForecastAPI, ForecastTimestamps } from '../forecast';
 
 const PREFIX = 'App';
 
@@ -108,7 +109,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     layers: 0
   });
 
-  const [trailSource, setTrailSource] = useState<VectorTileSource>();
+  const [trailSource, setTrailSource] = useState<VectorSource>();
 
   useEffect(
     () => console.log('Running in ' + env.environment),
@@ -119,9 +120,10 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     const source =
       env.environment != 'development'
         ? undefined
-        : new VectorTileSource({
+        : new VectorSource({
             url: env.tileURL,
             format: new MVT({
+              featureClass: Feature,
               layerName: 'trail_sections',
               geometryName: 'geom',
               idProperty: 'gid'
@@ -163,7 +165,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
       <Map view={view} className={classes.fullscreen}>
         <TileLayer zIndex={0} source={mapSource} />
-        {trailSource && <VectorLayer source={trailSource} />}
+        {trailSource && <TrailLayer source={trailSource} />}
       </Map>
 
       {/*

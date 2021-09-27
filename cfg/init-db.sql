@@ -3,6 +3,8 @@ CREATE EXTENSION postgis;
 CREATE TABLE IF NOT EXISTS trails (
     id          SERIAL PRIMARY KEY,
     name        TEXT NOT NULL,
+    -- shortname   TEXT,
+    -- tags     TEXT[] NOT NULL check (array_position(tags, NULL) is NULL),
     description TEXT,
     color       CHAR(7),
     sectioned   BOOLEAN NOT NULL DEFAULT FALSE
@@ -11,6 +13,7 @@ CREATE TABLE IF NOT EXISTS trails (
 CREATE TABLE IF NOT EXISTS trail_sections (
     id          SERIAL PRIMARY KEY,
     trail_id    INT NOT NULL,
+    -- maybe?: num         INT,
     geog        GEOGRAPHY(LINESTRING, 4326) NOT NULL,
     name        TEXT,
     description TEXT,
@@ -19,20 +22,19 @@ CREATE TABLE IF NOT EXISTS trail_sections (
         ON DELETE CASCADE
 );
 
-CREATE TYPE SPOTTYPE AS ENUM (
+CREATE TYPE LOCATIONTYPE AS ENUM (
     'water',
     'shelter',
     'wc',
     'cabin'
 );
 
-CREATE TABLE IF NOT EXISTS spots (
+CREATE TABLE IF NOT EXISTS locations (
     id          SERIAL PRIMARY KEY,
     geog        GEOGRAPHY(POINT, 4326) NOT NULL,
-    spot        ICONTYPE               NOT NULL,
+    spot        LOCATIONTYPE           NOT NULL,
     name        TEXT                   NOT NULL,
-    description TEXT                   NOT NULL,
-    shown       BOOLEAN NOT NULL DEFAULT TRUE
+    description TEXT                   NOT NULL
 );
 
 CREATE TYPE AREATYPE AS ENUM (

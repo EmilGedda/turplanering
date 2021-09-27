@@ -16,7 +16,6 @@ srid = 4326
     name = "trail_sections"
     srid = 4326
     geometry_type = "MultiLineString"
-    id_fieldname = "gid"
     sql = """\
         SELECT ST_AsMVTGeom(geog::geometry, !BBOX!) AS geom, trail_sections.id AS gid, color, trails.description, trails.name \
         FROM trail_sections \
