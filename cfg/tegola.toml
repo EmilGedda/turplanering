@@ -17,7 +17,9 @@ srid = 4326
     srid = 4326
     geometry_type = "MultiLineString"
     sql = """\
-        SELECT ST_AsMVTGeom(geog::geometry, !BBOX!) AS geom, trail_sections.id AS gid, color, trails.description, trails.name \
+        SELECT ST_AsMVTGeom(geog::geometry, !BBOX!) AS geom, trail_sections.id AS gid \
+               , ST_Envelope(geog::geometry) as extent, color \
+               , trails.id as trail_id, trails.description, trails.name \
         FROM trail_sections \
             INNER JOIN trails ON trail_sections.trail_id = trails.id \
         WHERE geog && !BBOX!\

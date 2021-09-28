@@ -1,5 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import MapContext from '../../contexts/MapContext';
+import { styled, Tooltip } from '@mui/material';
+import { tooltipClasses } from '@mui/material/Tooltip';
+import type { TooltipProps } from '@mui/material/Tooltip';
 import { Coordinate, format } from 'ol/coordinate';
 import { Global } from '@emotion/react';
 import { toLonLat } from 'ol/proj';
@@ -19,6 +22,7 @@ export type Props = {
   };
   className?: string;
   children?: React.ReactNode;
+  setTooltipText: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const mapControls = defaultControls().extend([
@@ -43,50 +47,90 @@ const onMoveEnd = (event: MapEvent) => {
   }
 };
 
-const Map: React.FC<Props> = ({ children, view, className }) => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<ol.Map>();
+type StateCallBack<T> = (text: T) => void;
+export const setTooltip = (map?: ol.Map): StateCallBack<string> => {
+  const nofunc = (_: string) => {
+    return;
+  };
+  const func = map?.get('tooltip') as StateCallBack<string> | undefined;
+  return func ?? nofunc;
+};
 
-  // on component mount
-  useEffect(() => {
-    const { zoom, center } = view;
-    const options = {
-      view: new ol.View({
-        zoom,
-        center
-      }),
-      layers: [],
-      controls: mapControls,
-      overlays: [],
-      keyboardEventTarget: document
-    };
+const MemoMap: React.FC<Props> = React.memo(
+  ({ children, view, className, setTooltipText }) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const [map, setMap] = useState<ol.Map>();
 
-    const mapObject = new ol.Map(options);
-    if (mapRef.current) {
-      mapObject.setTarget(mapRef.current);
-    }
+    useEffect(() => {
+      const { zoom, center } = view;
+      const options = {
+        view: new ol.View({
+          zoom,
+          center
+        }),
+        layers: [],
+        controls: mapControls,
+        overlays: [],
+        keyboardEventTarget: document
+      };
 
-    setMap(mapObject);
-    mapObject.on('moveend', onMoveEnd);
+      const mapObject = new ol.Map(options);
+      if (mapRef.current) {
+        mapObject.setTarget(mapRef.current);
+      }
 
-    return () => mapObject.setTarget(undefined);
-  }, []);
+      setMap(mapObject);
+      mapObject.on('moveend', onMoveEnd);
+      mapObject.set('tooltip', setTooltipText, true);
 
+      return () => mapObject.setTarget(undefined);
+    }, []);
+
+    return (
+      <MapContext.Provider value={{ map }}>
+        <Global
+          styles={{
+            '.ol-coord-pos': {
+              bottom: '8px',
+              right: '8px',
+              position: 'absolute'
+            }
+          }}
+        />
+        <div ref={mapRef} className={className}>
+          {children}
+        </div>
+      </MapContext.Provider>
+    );
+  }
+);
+
+MemoMap.displayName = 'MemoMap';
+
+const LargeTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))((_) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    fontSize: 16
+  }
+}));
+
+const Map: React.FC<Omit<Props, 'setTooltipText'>> = (props) => {
+  const [tooltip, setTooltip] = useState<string>('');
   return (
-    <MapContext.Provider value={{ map }}>
-      <Global
-        styles={{
-          '.ol-coord-pos': {
-            bottom: '8px',
-            right: '8px',
-            position: 'absolute'
-          }
-        }}
-      />
-      <div ref={mapRef} className={className}>
-        {children}
+    <LargeTooltip
+      title={tooltip}
+      placement='top'
+      followCursor
+      open={true}
+      disableFocusListener
+      disableHoverListener
+      disableTouchListener
+    >
+      <div className={props.className}>
+        <MemoMap {...props} setTooltipText={setTooltip} />
       </div>
-    </MapContext.Provider>
+    </LargeTooltip>
   );
 };
 

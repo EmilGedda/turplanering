@@ -1,30 +1,18 @@
 import React, { useContext, useEffect } from 'react';
 import MapContext from '../../contexts/MapContext';
+import { setTooltip } from './Map';
 import Feature from 'ol/Feature';
 import { Geometry } from 'ol/geom';
 import { VectorTile } from 'ol/layer';
 import { Style, Stroke } from 'ol/style';
 import { MapBrowserEvent } from 'ol';
 import type { Options } from 'ol/layer/VectorTile';
+import RenderFeature from 'ol/render/Feature';
 
-export type TrailLayerProps = Omit<Options, 'style'>;
+const getTrailID = (feature: Feature<Geometry> | RenderFeature) =>
+  feature.getProperties()['trail_id'] as number;
 
-interface IDable {
-  getId(): string | number | undefined;
-}
-
-const parseID = (feature: IDable) => {
-  if (feature == null || feature.getId() == undefined) {
-    return null;
-  }
-
-  const id = feature.getId() ?? -1;
-  return typeof id === 'string' ? parseInt(id) : Math.round(id);
-};
-
-const highlightStyleFromFeature = (feature: IDable) => {
-  const id = parseID(feature) ?? 0;
-
+const highlightStyleFromFeature = (id: number) => {
   return [
     new Style({
       stroke: new Stroke({
@@ -34,7 +22,7 @@ const highlightStyleFromFeature = (feature: IDable) => {
     }),
     new Style({
       stroke: new Stroke({
-        color: `hsl(${id % 360}, 50%, 35%)`,
+        color: `hsl(${(id * 71) % 360}, 50%, 35%)`,
         lineDash: [6, 8],
         width: 6
       })
@@ -42,16 +30,17 @@ const highlightStyleFromFeature = (feature: IDable) => {
   ];
 };
 
+export type TrailLayerProps = Omit<Options, 'style'>;
+
 export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
   const { map } = useContext(MapContext);
 
   useEffect(() => {
-    let selectedID: number | null = -1;
+    let selectedID: number | null = null;
     const vectorLayer = new VectorTile({
       ...opts,
-      style: (f, _) => {
-        const feature = f as Feature<Geometry>;
-        const id = parseID(feature) ?? 0;
+      style: (feature, _) => {
+        const id = getTrailID(feature);
 
         return [
           new Style({
@@ -62,7 +51,7 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
           }),
           new Style({
             stroke: new Stroke({
-              color: `hsl(${id % 360}, 50%, 35%)`,
+              color: `hsl(${(id * 71) % 360}, 50%, 35%)`,
               lineDash: [4, 5],
               width: 3
             })
@@ -76,8 +65,9 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
       renderMode: 'vector',
       source: opts.source,
       style: (feature) => {
-        if (parseID(feature) == selectedID) {
-          return highlightStyleFromFeature(feature);
+        const id = getTrailID(feature);
+        if (id == selectedID) {
+          return highlightStyleFromFeature(id);
         }
       }
     });
@@ -85,15 +75,18 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
     const callback = (event: MapBrowserEvent<PointerEvent>) => {
       const prevID = selectedID;
       selectedID = null;
+      let name: string | null = null;
       map?.forEachFeatureAtPixel(
         event.pixel,
         (feature) => {
-          selectedID = parseID(feature);
+          selectedID = getTrailID(feature);
+          name = feature.getProperties()['name'] as string;
           return true;
         },
         { hitTolerance: 8 }
       );
       if (prevID != selectedID) {
+        setTooltip(map)(!name ? '' : name);
         selectionLayer.changed();
       }
     };
