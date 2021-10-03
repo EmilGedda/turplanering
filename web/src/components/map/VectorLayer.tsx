@@ -8,8 +8,6 @@ import { VectorTile } from 'ol/layer';
 import { Style, Stroke } from 'ol/style';
 import { MapBrowserEvent } from 'ol';
 import { WKB } from 'ol/format';
-import { transformExtent } from 'ol/proj';
-import { inAndOut } from 'ol/easing';
 import type { Options } from 'ol/layer/VectorTile';
 
 const getTrailID = (feature: Feature<Geometry> | RenderFeature) =>
@@ -65,25 +63,12 @@ const getTrailStyle = (id: number) => {
   return newStyles;
 };
 
-//let selectionListener: EventsKey;
-//const selectFeature = (feature: Feature<Geometry>) => {
-//  const start = Date.now();
-//  const id = getTrailID(feature);
-//  let offset = 0;
-//
-//  selectionListener = selectionLayer.on('postrender', (event) => {
-//    const vectorCtx = getVectorContext(event);
-//    vectorCtx.setStyle(highlightStyleFromFeature(id, offset)[1])
-//
-//
-//  });
-//};
-
-export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
+export const TrailLayer = React.memo((opts: TrailLayerProps) => {
   const { map } = useContext(MapContext);
 
   useEffect(() => {
     if (!map) return;
+    console.log('creating new TraiLayer');
     const vectorLayer = new VectorTile({
       ...opts,
       style: (feature, _) => {
@@ -94,26 +79,34 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
 
     map.addLayer(vectorLayer);
     return () => {
+      console.log('removing TraiLayer');
       map.removeLayer(vectorLayer);
     };
   }, [map, opts]);
 
+  const tooltip = setTooltip(map);
+  let selectedFeatureID: number | null = null;
+  let selectionLayer: VectorTile;
   useEffect(() => {
     if (!map) return;
     let hoveredFeatureID: number | null = null;
     let offset = 0;
     setInterval(() => (offset += 0.5), 50);
 
-    const selectionLayer = new VectorTile({
+    selectionLayer = new VectorTile({
       map: map,
       renderMode: 'vector',
       source: opts.source,
       style: (feature) => {
         const id = getTrailID(feature);
-        if (id == hoveredFeatureID) {
+        if (id == selectedFeatureID) {
           const style = highlightStyleFromFeature(id, offset);
           selectionLayer.changed();
           return style;
+        }
+
+        if (id == hoveredFeatureID) {
+          return highlightStyleFromFeature(id);
         }
       }
     });
@@ -133,13 +126,17 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
       );
 
       if (prevID != hoveredFeatureID) {
-        setTooltip(map)(!name ? '' : name);
-        offset = 0;
+        tooltip(!name ? '' : name);
         selectionLayer.changed();
       }
     };
 
     map.on('pointermove', callback);
+    map.on('movestart', () => {
+      hoveredFeatureID = null;
+      tooltip('');
+    });
+
     return () => {
       map.removeLayer(selectionLayer);
       map.un('pointermove', callback);
@@ -156,11 +153,12 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
           const wkb = feature.getProperties()['extent'] as string;
           const extent = new WKB().readGeometry(wkb).getExtent();
           const view = map.getView();
+          selectedFeatureID = getTrailID(feature);
+          selectionLayer.changed();
 
-          view.fit(transformExtent(extent, 'EPSG:4326', 'EPSG:3857'), {
+          view.fit(extent, {
             duration: 500,
-            padding: [150, 200, 150, 200],
-            easing: inAndOut
+            size: [550, 550]
           });
 
           return true;
@@ -171,4 +169,6 @@ export const TrailLayer: React.FC<TrailLayerProps> = (opts) => {
   }, [map]);
 
   return null;
-};
+});
+
+TrailLayer.displayName = 'TrailLayer';

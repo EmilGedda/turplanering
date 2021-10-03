@@ -1,11 +1,32 @@
 import React from 'react';
 
-export type LayersProps = {
-  children?: React.ReactNode;
+export type LayerProps = { children: React.ReactNode };
+
+const circular = () => {
+  const seen = new WeakSet();
+  return (key: string, value: string) => {
+    if (key.startsWith('_')) return; // Don't compare React's internal props.
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) return;
+      seen.add(value);
+    }
+    return value;
+  };
 };
 
-const Layers: React.FC<LayersProps> = ({ children }) => {
-  return <div>{children}</div>;
+type Obj = Record<string, unknown>;
+const jsonEq = (prevProps: Obj, nextProps: Obj) => {
+  const prev = JSON.stringify(prevProps, circular());
+  const next = JSON.stringify(nextProps, circular());
+  return prev === next;
 };
 
-export default Layers;
+export const Layers = React.memo(({ children }: LayerProps) => {
+  return <>{children}</>;
+}, jsonEq);
+
+Layers.displayName = 'Layers';
+
+export const Overlays = ({ children }: LayerProps): JSX.Element => {
+  return <>{children}</>;
+};

@@ -35,6 +35,8 @@ import EnvContext, {
   Environment,
   developmentDefault
 } from './contexts/EnvContext';
+import proj4 from 'proj4';
+import * as ol from 'ol/proj/proj4';
 
 declare module '@mui/material/styles' {
   // eslint-disable-next-line
@@ -102,6 +104,19 @@ const theme = {
 
 // Opt-in to Webpack hot module replacement
 if (module.hot) module.hot.accept();
+
+proj4.defs(
+  'EPSG:3006',
+  '+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
+);
+proj4.defs('SWEREF99', proj4.defs('EPSG:3006'));
+proj4.defs('urn:ogc:def:crs:EPSG:6.3:3006', proj4.defs('EPSG:3006'));
+proj4.defs('urn:ogc:def:crs:EPSG:6.3:3857', proj4.defs('EPSG:3857'));
+ol.register(proj4);
+
+//export const MAP_EXTENT = [-1200000, 4700000, 2600000, 8500000];
+// export const MAP_RESOLUTIONS = [4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0, 2.0, 1.0, 0.5, 0.25, 0.125];
+// export const MAP_WMTS_RESOLUTIONS = [4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0, 2.0, 1.0, 0.5];
 
 // TODO: load theme settings from localStorage or account preferences
 

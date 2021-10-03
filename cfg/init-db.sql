@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS trail_sections (
     id          SERIAL PRIMARY KEY,
     trail_id    INT NOT NULL,
     -- maybe?: num         INT,
-    geog        GEOGRAPHY(LINESTRING, 4326) NOT NULL,
+    geom        GEOGRAPHY(LINESTRING, 3006) NOT NULL,
     name        TEXT,
     description TEXT,
     FOREIGN KEY (trail_id)
@@ -31,7 +31,7 @@ CREATE TYPE LOCATIONTYPE AS ENUM (
 
 CREATE TABLE IF NOT EXISTS locations (
     id          SERIAL PRIMARY KEY,
-    geog        GEOGRAPHY(POINT, 4326) NOT NULL,
+    geom        GEOGRAPHY(POINT, 3006) NOT NULL,
     spot        LOCATIONTYPE           NOT NULL,
     name        TEXT                   NOT NULL,
     description TEXT                   NOT NULL
@@ -47,7 +47,7 @@ CREATE TYPE AREATYPE AS ENUM (
 
 CREATE TABLE IF NOT EXISTS areas (
     id          SERIAL PRIMARY KEY,
-    geog        GEOGRAPHY(MULTIPOLYGON, 4326) NOT NULL,
+    geom        GEOGRAPHY(MULTIPOLYGON, 3006) NOT NULL,
     area        AREATYPE                      NOT NULL,
     name        TEXT                          NOT NULL,
     description TEXT                          NOT NULL
@@ -60,5 +60,5 @@ CREATE USER tegola;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO tegola;
 
 -- Do this after insert:
-CREATE INDEX IF NOT EXISTS trail_sections_idx ON trail_sections USING GIST (geog);
+CREATE INDEX IF NOT EXISTS trail_sections_idx ON trail_sections USING GIST (geom);
 CLUSTER trail_sections_idx ON trail_sections;

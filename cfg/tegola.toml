@@ -10,18 +10,23 @@ port = 5432
 database = "turplanering"
 user = "tegola"
 password = "password"
-srid = 4326
+srid = 3857
 
     [[providers.layers]]
     name = "trail_sections"
-    srid = 4326
-    geometry_type = "MultiLineString"
+    geometry_type = "LineString"
+    srid = 3857
     sql = """\
-        SELECT ST_AsMVTGeom(geog::geometry, !BBOX!) AS geom, trail_sections.id AS gid \
-               , ST_Envelope(geog::geometry) as extent, color \
+        SELECT ST_AsMVTGeom(geog, !BBOX!) AS geom, sections.id AS gid \
+               , (SELECT ST_SetSRID(ST_Extent(geog), 3857) as extent    \
+                  FROM trail_sections                                   \
+                  WHERE trail_sections.trail_id = sections.trail_id)    \
+               , color                                                  \
                , trails.id as trail_id, trails.description, trails.name \
-        FROM trail_sections \
-            INNER JOIN trails ON trail_sections.trail_id = trails.id \
+
+        FROM trail_sections AS sections \
+            INNER JOIN trails ON sections.trail_id = trails.id \
+
         WHERE geog && !BBOX!\
         """
 

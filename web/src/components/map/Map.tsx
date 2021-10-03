@@ -27,7 +27,6 @@ export type Props = {
 
 const mapControls = defaultControls().extend([
   new MousePosition({
-    projection: 'EPSG:3857',
     className: 'ol-coord-pos',
     coordinateFormat: (coord) => {
       if (!coord) return '? ?';
@@ -61,9 +60,12 @@ const MemoMap: React.FC<Props> = React.memo(
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<ol.Map>();
 
+    console.log('mounting map');
+
     useEffect(() => {
       const { zoom, center } = view;
       const options = {
+        wrapX: true,
         view: new ol.View({
           zoom,
           center
@@ -74,6 +76,7 @@ const MemoMap: React.FC<Props> = React.memo(
         keyboardEventTarget: document
       };
 
+      console.log('creating new map');
       const mapObject = new ol.Map(options);
       if (mapRef.current) {
         mapObject.setTarget(mapRef.current);
@@ -83,7 +86,10 @@ const MemoMap: React.FC<Props> = React.memo(
       mapObject.on('moveend', onMoveEnd);
       mapObject.set('tooltip', setTooltipText, true);
 
-      return () => mapObject.setTarget(undefined);
+      return () => {
+        mapObject.setTarget(undefined);
+        console.log('unmounting map');
+      };
     }, []);
 
     return (
@@ -115,7 +121,7 @@ const LargeTooltip = styled(({ className, ...props }: TooltipProps) => (
   }
 }));
 
-const Map: React.FC<Omit<Props, 'setTooltipText'>> = (props) => {
+const Map = React.memo((props: Omit<Props, 'setTooltipText'>) => {
   const [tooltip, setTooltip] = useState<string>('');
   return (
     <LargeTooltip
@@ -132,6 +138,8 @@ const Map: React.FC<Omit<Props, 'setTooltipText'>> = (props) => {
       </div>
     </LargeTooltip>
   );
-};
+});
+
+Map.displayName = 'Map';
 
 export default Map;

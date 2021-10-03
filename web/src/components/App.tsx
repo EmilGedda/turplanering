@@ -10,18 +10,18 @@ import {
   TemperatureToggleButton
 } from './Overlaybar';
 import Map from './map/Map';
-import TileLayer, { wmtsCapabilities } from './map/TileLayer';
+import TileLayer, { topowebbSource } from './map/TileLayer';
 import Timeline from './Timeline';
-import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS';
 import Feature from 'ol/Feature';
 import { MVT } from 'ol/format';
 import { TrailLayer } from './map/VectorLayer';
 import { VectorTile as VectorSource } from 'ol/source';
-import { WMTSCapabilities } from 'ol/format';
 import { fromLonLat } from 'ol/proj';
 import { CoordURL, currentURLState } from '../URL';
 import { Environment } from '../contexts/EnvContext';
 import { ForecastAPI, ForecastTimestamps } from '../forecast';
+import { TemperatureLayer, WeatherLayer } from './map/WeatherOverlays';
+import { Layers, Overlays } from './map/Layers';
 
 const PREFIX = 'App';
 
@@ -73,13 +73,6 @@ export type AppProps = {
   forecastAPI: ForecastAPI;
 };
 
-const mapLayerSrc = new WMTS(
-  optionsFromCapabilities(new WMTSCapabilities().read(wmtsCapabilities), {
-    layer: 'topowebb',
-    matrixSet: '3857'
-  })!
-);
-
 const initialView = () => {
   const { state } = currentURLState();
   return state instanceof CoordURL
@@ -90,12 +83,9 @@ const initialView = () => {
 export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env, forecastAPI } = props;
 
-  mapLayerSrc.setUrls(['https://minkarta.lantmateriet.se/map/topowebbcache/?']);
-
   const [showBar, setShowBar] = useState(false);
   const [displayTime, setDisplayTime] = useState<Date>();
-  const [mapSource, _1] = useState<WMTS>(mapLayerSrc);
-  const [view, _2] = useState(initialView());
+  const [trailSource, setTrailSource] = useState<VectorSource>();
 
   const [forecast, setForecast] = useState<ForecastTimestamps>({
     reference: new Date(),
@@ -108,13 +98,6 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     temperature: false,
     layers: 0
   });
-
-  const [trailSource, setTrailSource] = useState<VectorSource>();
-
-  useEffect(
-    () => console.log('Running in ' + env.environment),
-    [env.environment]
-  );
 
   useEffect(() => {
     const source =
@@ -131,6 +114,11 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
           });
     setTrailSource(source);
   }, [env.tileURL]);
+
+  useEffect(
+    () => console.log('Running in ' + env.environment),
+    [env.environment]
+  );
 
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -163,18 +151,30 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map view={view} className={classes.fullscreen}>
-        <TileLayer zIndex={0} source={mapSource} />
-        {trailSource && <TrailLayer source={trailSource} />}
+      <Map view={initialView()} className={classes.fullscreen}>
+        <Layers>
+          <TileLayer source={topowebbSource} />
+          <TrailLayer source={trailSource} />
+        </Layers>
+
+        <Overlays>
+          {overlays.temperature && !!displayTime && (
+            <TemperatureLayer
+              referenceTime={forecast.reference}
+              displayTime={displayTime}
+            />
+          )}
+
+          {overlays.weather && !!displayTime && (
+            <WeatherLayer
+              referenceTime={forecast.reference}
+              displayTime={displayTime}
+            />
+          )}
+        </Overlays>
       </Map>
 
       {/*
-      <TrailMap
-        className={css.fullscreen}
-        viewport={viewport}
-        zoomControl={env.browser.hasTouch}
-        ref={mapRef}
-      >
         <WMSLayer // Hillshading layer
           url='https://minkarta.lantmateriet.se/map/hojdmodell/'
           layers='terrangskuggning'
@@ -188,20 +188,6 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
                       layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
                     />
                 /}
-        {overlays.temperature && !!displayTime && (
-          <TemperatureLayer
-            referenceTime={forecast.reference}
-            displayTime={displayTime}
-          />
-        )}
-
-        {overlays.weather && !!displayTime && (
-          <WeatherLayer
-            referenceTime={forecast.reference}
-            displayTime={displayTime}
-          />
-        )}
-
         <FeatureGroup ref={groupRef}>
           {position && <GPSMarker pos={position} />}
         </FeatureGroup>
