@@ -19,8 +19,8 @@ import { VectorTile as VectorSource } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
 import { CoordURL, currentURLState } from '../URL';
 import { Environment } from '../contexts/EnvContext';
-import { ForecastAPI, ForecastTimestamps } from '../forecast';
-import { TemperatureLayer, WeatherLayer } from './map/WeatherOverlays';
+import { ForecastAPI, ForecastTimestamps } from '../Forecast';
+import { SmhiLayer } from './map/WeatherOverlays';
 import { Layers, Overlays } from './map/Layers';
 
 const PREFIX = 'App';
@@ -73,101 +73,57 @@ export type AppProps = {
   forecastAPI: ForecastAPI;
 };
 
-const initialView = () => {
+const initialView = (() => {
   const { state } = currentURLState();
   return state instanceof CoordURL
     ? { center: fromLonLat([state.lon, state.lat]), zoom: state.zoom ?? 8 }
     : { center: fromLonLat([18.07, 59.324]), zoom: 8 };
-};
+})();
+
+const trailSource = new VectorSource({
+  format: new MVT({
+    featureClass: Feature,
+    layerName: 'trail_sections',
+    geometryName: 'geom',
+    idProperty: 'gid'
+  })
+});
 
 export const App: React.FC<AppProps> = (props: AppProps) => {
-  const { env, forecastAPI } = props;
+  const { env } = props;
 
   const [showBar, setShowBar] = useState(false);
-  const [displayTime, setDisplayTime] = useState<Date>();
-  const [trailSource, setTrailSource] = useState<VectorSource>();
-
-  const [forecast, setForecast] = useState<ForecastTimestamps>({
-    reference: new Date(),
-    validTimes: [new Date()]
-  });
-
-  const [overlays, setOverlays] = useState({
-    weather: false,
-    wind: false,
-    temperature: false,
-    layers: 0
-  });
+  const [displayIndex, setDisplayIndex] = useState<number>(-1);
+  const [forecast, setForecast] = useState<[string, ForecastTimestamps]>();
 
   useEffect(() => {
-    const source =
-      env.environment != 'development'
-        ? undefined
-        : new VectorSource({
-            url: env.tileURL,
-            format: new MVT({
-              featureClass: Feature,
-              layerName: 'trail_sections',
-              geometryName: 'geom',
-              idProperty: 'gid'
-            })
-          });
-    setTrailSource(source);
-  }, [env.tileURL]);
-
-  useEffect(
-    () => console.log('Running in ' + env.environment),
-    [env.environment]
-  );
-
-  useEffect(() => {
-    void (async (): Promise<void> => {
-      console.log('Fetching forecast...');
-      const before = new Date();
-      const forecast = await forecastAPI.ValidTimes();
-      const duration = new Date().getTime() - before.getTime();
-      console.log(
-        `Fetched forecast, reference time: ${forecast.reference.toUTCString()}` +
-          `, with ${forecast.validTimes.length} timestamps in ${duration}ms`
-      );
-      setForecast(forecast);
-      setDisplayTime(forecast.validTimes[0]);
-    })();
-  }, [forecastAPI]);
+    console.log('Running in ' + env.environment);
+    trailSource.setUrl(env.tileURL);
+  }, [env]);
 
   useEffect(() => {
     const timeout = setTimeout(() => setShowBar(true), 500);
     return () => clearTimeout(timeout);
   }, []);
 
-  const toggleOverlay = (key: 'weather' | 'wind' | 'temperature') => {
-    return (enable: boolean) => {
-      const count = overlays.layers + (enable ? 1 : -1);
-      const obj = { ...overlays, layers: count };
-      obj[key] = enable;
-      setOverlays(obj);
-    };
-  };
+  const displayTime = forecast
+    ? forecast[1].validTimes[displayIndex]
+    : undefined;
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map view={initialView()} className={classes.fullscreen}>
+      <Map view={initialView} className={classes.fullscreen}>
         <Layers>
           <TileLayer source={topowebbSource} />
           <TrailLayer source={trailSource} />
         </Layers>
 
         <Overlays>
-          {overlays.temperature && !!displayTime && (
-            <TemperatureLayer
-              referenceTime={forecast.reference}
-              displayTime={displayTime}
-            />
-          )}
-
-          {overlays.weather && !!displayTime && (
-            <WeatherLayer
-              referenceTime={forecast.reference}
+          {forecast && (
+            <SmhiLayer
+              layer={forecast[0]}
+              opacity={0.75}
+              referenceTime={forecast[1].reference}
               displayTime={displayTime}
             />
           )}
@@ -175,6 +131,7 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
       </Map>
 
       {/*
+
         <WMSLayer // Hillshading layer
           url='https://minkarta.lantmateriet.se/map/hojdmodell/'
           layers='terrangskuggning'
@@ -182,18 +139,13 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
           transparent={true}
           opacity={0.25}
         />
-        {/*
-                    <WMSLayer // Satellite
-                      url='https://minkarta.lantmateriet.se/map/ortofoto/'
-                      layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
-                    />
-                /}
-        <FeatureGroup ref={groupRef}>
-          {position && <GPSMarker pos={position} />}
-        </FeatureGroup>
-      </TrailMap>
 
-        */}
+        <WMSLayer // Satellite
+          url='https://minkarta.lantmateriet.se/map/ortofoto/'
+          layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
+        />
+
+      */}
 
       <Slide direction='down' in={showBar}>
         <Div className={classes.topbar}>
@@ -209,17 +161,18 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
         </Div>
       </Slide>
 
-      <Overlaybar shown={!!displayTime && showBar}>
-        <WeatherToggleButton onClick={toggleOverlay('weather')} />
-        <WindToggleButton onClick={toggleOverlay('wind')} />
-        <TemperatureToggleButton onClick={toggleOverlay('temperature')} />
+      <Overlaybar onClick={setForecast} shown={!!displayTime && showBar}>
+        <WeatherToggleButton layer='pmpfrekvent:wpt-overview_n-europe__' />
+        <WindToggleButton layer='pmp:windspeed-windarrows-avg-10m_n-europe__' />
+        <TemperatureToggleButton layer='pmpfrekvent:temperature-2m_n-europe_rainbow_' />
       </Overlaybar>
 
-      <Timeline
-        shown={overlays.layers > 0 && showBar}
-        timepoints={forecast.validTimes}
-        onChange={setDisplayTime}
-      />
+      {forecast && (
+        <Timeline
+          timepoints={forecast[1].validTimes}
+          onChange={setDisplayIndex}
+        />
+      )}
     </Div>
   );
 };

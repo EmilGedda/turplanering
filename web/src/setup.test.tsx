@@ -1,18 +1,19 @@
 /* eslint-disable */
-import { JSDOM } from 'jsdom'
+import { server } from './Mocks';
+import 'whatwg-fetch';
 
-// Setup JSDOM
-const dom = new JSDOM('', {
-    pretendToBeVisual: true,
-})
 
 // @ts-ignore
-global.Event = dom.window.Event
-// @ts-ignore
-global.Node = dom.window.Node
-// @ts-ignore
-global.window = dom.window
-// @ts-ignore
-global.document = dom.window.document
-// @ts-ignore
-global.requestAnimationFrame = dom.window.requestAnimationFrame
+jsdom.reconfigure({
+  pretendToBeVisual: true
+});
+
+// Establish API mocking before all tests.
+beforeAll(() => server.listen());
+
+// Reset any request handlers that we may add during the tests,
+// so they don't affect other tests.
+afterEach(() => server.resetHandlers());
+
+// Clean up after the tests are finished.
+afterAll(() => server.close());

@@ -7,8 +7,8 @@
         "dev": "webpack serve --config=webpack/dev.babel.js",
         "prod": "webpack --config=webpack/prod.babel.js",
         "compile": "tsc --incremental --noEmit",
-        "lint": "eslint src --ext .tsx",
-        "fix": "eslint src --ext .tsx --fix",
+        "lint": "eslint src --ext .tsx,.ts",
+        "fix": "eslint src --ext .tsx,.ts --fix",
         "test": "jest",
         "docs": "typedoc --out ./dist/docs"
     },
@@ -43,7 +43,6 @@
         "@hot-loader/react-dom": "^17.0.1",
         "@lingui/cli": "^3.2.1",
         "@lingui/macro": "^3.2.1",
-        "@types/enzyme": "^3.10.8",
         "@types/jest": "^27.0.1",
         "@types/jsdom": "^16.2.5",
         "@types/node": "^16.7.4",
@@ -55,7 +54,6 @@
         "babel-loader": "^8.2.1",
         "babel-plugin-macros": "^3.1.0",
         "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
-        "enzyme": "^3.11.0",
         "eslint": "^7.13.0",
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^4.0.0",
@@ -65,7 +63,9 @@
         "fork-ts-checker-webpack-plugin": "^6.0.3",
         "html-webpack-plugin": "^5.0.0-alpha.14",
         "jest": "^27.1.0",
-        "jsdom": "^17.0.0",
+        "jest-environment-jsdom-global": "^3.0.0",
+        "jsdom": "^18.0.0",
+        "msw": "^0.35.0",
         "prettier": "^2.1.2",
         "react-hot-loader": "^4.13.0",
         "source-map-loader": "^3.0.0",
@@ -76,7 +76,8 @@
         "webpack": "^5.6.0",
         "webpack-cli": "^4.2.0",
         "webpack-dev-server": "^4.0.0",
-        "webpack-merge": "^5.4.0"
+        "webpack-merge": "^5.4.0",
+        "whatwg-fetch": "^3.6.2"
     },
     "babel": {
         "presets": [
@@ -100,15 +101,30 @@
                 "ts-jest"
             ]
         },
+        "testEnvironment": "jest-environment-jsdom-global",
         "setupFilesAfterEnv": [
             "<rootDir>/src/setup.test.tsx"
         ],
+        "maxWorkers": 1,
         "coverageDirectory": "./coverage/",
         "collectCoverage": true,
+        "coveragePathIgnorePatterns": [
+            "/node_modules/",
+            "<rootDir>/src/Mocks.ts",
+            "<rootDir>/src/index*"
+        ],
+        "collectCoverageFrom": [
+            "<rootDir>/src/**/*.ts{,x}"
+        ],
         "testPathIgnorePatterns": [
             "setup\\.test\\.tsx?$"
         ]
     },
+    "eslintIgnore": [
+        "*.test.tsx",
+        "*.test.ts",
+        "Mocks.ts"
+    ],
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",
         "parserOptions": {
@@ -156,6 +172,5 @@
         "singleQuote": true,
         "jsxSingleQuote": true,
         "trailingComma": "none"
-    },
-    "packageManager": "yarn@3.0.1"
+    }
 }

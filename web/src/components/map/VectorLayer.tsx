@@ -68,7 +68,7 @@ export const TrailLayer = React.memo((opts: TrailLayerProps) => {
 
   useEffect(() => {
     if (!map) return;
-    console.log('creating new TraiLayer');
+    console.log('mounting TrailLayer');
     const vectorLayer = new VectorTile({
       ...opts,
       style: (feature, _) => {
@@ -79,7 +79,7 @@ export const TrailLayer = React.memo((opts: TrailLayerProps) => {
 
     map.addLayer(vectorLayer);
     return () => {
-      console.log('removing TraiLayer');
+      console.log('removing TrailLayer');
       map.removeLayer(vectorLayer);
     };
   }, [map, opts]);

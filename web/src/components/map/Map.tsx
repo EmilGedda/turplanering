@@ -60,7 +60,7 @@ const MemoMap: React.FC<Props> = React.memo(
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<ol.Map>();
 
-    console.log('mounting map');
+    console.log('rendering map');
 
     useEffect(() => {
       const { zoom, center } = view;
@@ -76,7 +76,7 @@ const MemoMap: React.FC<Props> = React.memo(
         keyboardEventTarget: document
       };
 
-      console.log('creating new map');
+      console.log('mounting map');
       const mapObject = new ol.Map(options);
       if (mapRef.current) {
         mapObject.setTarget(mapRef.current);

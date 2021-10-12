@@ -70,9 +70,8 @@ const TimepointLabel: FC<LabelProps> = ({ timepoint }) => {
 };
 
 export type TimelineProps = {
-  shown: boolean;
   timepoints: Date[];
-  onChange: (timepoint: Date) => void;
+  onChange: (timepoint: number) => void;
 };
 
 export type SliderCallback = (event: Event, value: number | number[]) => void;
@@ -106,7 +105,7 @@ const StyledDivider = styled(Divider)((_) => ({
 }));
 
 const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
-  const { shown, timepoints, onChange } = props;
+  const { timepoints, onChange } = props;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [running, setRunning] = useState(false);
   const [watchID, setWatchID] = useState(-1);
@@ -118,7 +117,7 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
     setRunning(run);
   };
 
-  const updateTime = (f: (timepoint: Date) => void): SliderCallback => {
+  const updateTime = (f: (timepoint: number) => void): SliderCallback => {
     return (_, value) => {
       const v = value as number;
       if (v == currentIndex || v < 0 || v >= timepoints.length) return;
@@ -136,7 +135,7 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
         window.setTimeout(
           (idx: number) => {
             setWatchID(-1);
-            f(timepoints[idx]);
+            f(idx);
           },
           300,
           v
@@ -148,7 +147,7 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   useEffect(() => {
     if (running) {
       const id = window.setTimeout(() => {
-        onChange(timepoints[currentIndex + 1]);
+        onChange(currentIndex + 1);
         setCurrentIndex(currentIndex + 1);
         if (currentIndex + 1 == timepoints.length - 1) {
           setWatchID(-1);
@@ -160,14 +159,16 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
     }
   }, [running, currentIndex, onChange, timepoints]);
 
-  if (!shown && watchID != -1) {
-    clearTimeout(watchID);
-    setWatchID(-1);
-    setRunning(false);
-  }
+  useEffect(() => {
+    return () => {
+      clearTimeout(watchID);
+      setWatchID(-1);
+      setRunning(false);
+    };
+  }, []);
 
   return (
-    <Slide direction='up' in={shown} mountOnEnter>
+    <Slide direction='up' in={true} mountOnEnter>
       <OuterDiv>
         <StyledPaper elevation={5} square={false}>
           <Grid

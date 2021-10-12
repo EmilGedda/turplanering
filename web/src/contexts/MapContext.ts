@@ -1,10 +1,10 @@
-import React from "react";
-import * as ol from "ol";
+import React from 'react';
+import * as ol from 'ol';
 
 export type MapContext = {
-    map: ol.Map | undefined
-}
+  map: ol.Map | undefined;
+};
 
-export default React.createContext<MapContext>({ 
-    map: undefined
+export default React.createContext<MapContext>({
+  map: undefined
 });

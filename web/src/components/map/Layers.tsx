@@ -21,12 +21,9 @@ const jsonEq = (prevProps: Obj, nextProps: Obj) => {
   return prev === next;
 };
 
-export const Layers = React.memo(({ children }: LayerProps) => {
-  return <>{children}</>;
-}, jsonEq);
-
-Layers.displayName = 'Layers';
-
 export const Overlays = ({ children }: LayerProps): JSX.Element => {
   return <>{children}</>;
 };
+
+export const Layers = React.memo(Overlays, jsonEq);
+Layers.displayName = 'Layers';

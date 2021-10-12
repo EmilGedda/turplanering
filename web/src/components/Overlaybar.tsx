@@ -1,4 +1,10 @@
-import React, { FC, useState, ReactElement } from 'react';
+import React, {
+  FC,
+  useState,
+  ReactElement,
+  useEffect,
+  useContext
+} from 'react';
 import { styled } from '@mui/material/styles';
 import {
   WeatherPouring,
@@ -6,6 +12,8 @@ import {
   WeatherWindy
 } from '@mitch528/mdi-material-ui';
 import { Slide, Paper, Grid, IconButton, IconButtonProps } from '@mui/material';
+import { ForecastTimestamps } from '../Forecast';
+import EnvContext from '../contexts/EnvContext';
 
 const StyledDiv = styled('div')(({ theme }) => ({
   pointerEvents: 'none',
@@ -25,7 +33,7 @@ const StyledDiv = styled('div')(({ theme }) => ({
   zIndex: 1000
 }));
 
-export type ToggleLayerCallback = (shown: boolean) => void;
+export type ToggleLayerCallback = (layer?: string) => void;
 
 export type ToggleButtonProps = LayerToggleProps &
   Omit<IconButtonProps, 'onClick'>;
@@ -41,7 +49,7 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
 
   const onClick = () => {
     if (props.disabled) return;
-    if (props.onClick) props.onClick(!active);
+    if (props.onClick) props.onClick(!active ? props.layer : undefined);
     setIsActive(!active);
   };
 
@@ -54,10 +62,12 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
 
 export type LayerToggleProps = {
   onClick?: ToggleLayerCallback;
+  layer: string;
 };
 
 export type OverlaybarProps = {
   shown: boolean;
+  onClick: (timestamps?: [string, ForecastTimestamps]) => void;
   children: ReactElement<ToggleButtonProps>[];
 };
 
@@ -81,14 +91,43 @@ WindToggleButton.displayName = 'WindToggleButton';
 TemperatureToggleButton.displayName = 'TemperatureToggleButton';
 
 export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
-  const { shown, children: buttons } = props;
+  const { shown, onClick, children: buttons } = props;
+  const [forecasts, setForecasts] = useState<
+    Record<string, ForecastTimestamps>
+  >({});
+  const { forecastAPI } = useContext(EnvContext);
+
+  const callback = (layer?: string) => {
+    onClick(layer ? [layer, forecasts[layer]] : undefined);
+  };
+
+  const toggleButtons = React.Children.map(buttons, (button) => {
+    if (React.isValidElement(button)) {
+      return React.cloneElement(button, { onClick: callback });
+    }
+    return button;
+  });
+
+  useEffect(() => {
+    void (async (): Promise<void> => {
+      const layers = buttons.map((btn) => btn.props.layer);
+      console.log('Fetching forecast...');
+      const before = new Date();
+      const forecasts = await forecastAPI.ValidTimes(layers);
+      const duration = new Date().getTime() - before.getTime();
+      console.log(
+        `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
+      );
+      setForecasts(forecasts);
+    })();
+  }, [forecastAPI]);
 
   return (
     <Slide direction='left' in={shown}>
       <StyledDiv>
         <Paper elevation={5} square={false} style={{ pointerEvents: 'auto' }}>
           <Grid container direction='column' justifyContent='space-around'>
-            {...buttons}
+            {toggleButtons}
           </Grid>
         </Paper>
       </StyledDiv>

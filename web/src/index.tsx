@@ -29,7 +29,7 @@ import {
   ThemeProvider
 } from '@mui/material/styles';
 import { orange, common, grey } from '@mui/material/colors';
-import { Smhi } from './forecast';
+import { Smhi } from './Forecast';
 import { App } from './components/App';
 import EnvContext, {
   Environment,
@@ -49,6 +49,7 @@ const env: Environment = (() => {
   };
   if (process.env.NODE_ENV == 'production') {
     return {
+      ...developmentDefault,
       apiURL: 'localhost:8080',
       environment: 'production',
       tileURL: '',
