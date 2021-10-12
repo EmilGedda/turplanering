@@ -132,7 +132,7 @@ export const fetchWMSTimes = async (
   const contentType = response.headers.get('Content-Type');
   if (contentType != 'application/xml' && contentType != 'text/xml') {
     throw new Error(
-      `failed to fetch forecast times: got content type ${contentType}`
+      `failed to fetch forecast times: got content type ${String(contentType)}`
     );
   }
 
