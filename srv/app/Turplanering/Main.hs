@@ -6,6 +6,7 @@ import           Data.String
 import           Database.PostgreSQL.Simple
 import           Dhall                       (auto, input)
 import           Network.Wai.Handler.Warp
+import           Network.Wai.Middleware.Cors
 import           Network.Wai.Middleware.Gzip
 import           System.Directory
 import           System.FilePath
@@ -17,8 +18,10 @@ import Turplanering.Config hiding (Info, LogLevel, Trace, logger)
 import Turplanering.DB
 import Turplanering.Logger
 
+
 logger :: LogType t => LogLevel -> B.ByteString -> t
 logger = consoleLogger Trace "main"
+
 
 main :: IO ()
 main = do
@@ -50,5 +53,6 @@ main = do
         . withRequestID RandomID
         $ gzip def
             . requestLogger
+            . simpleCors
             . api
             . context

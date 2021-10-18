@@ -21,6 +21,7 @@ import           Opaleye
 import           Optics
 import qualified Data.Text                  as T
 
+
 data DBTrail' a b c d = DBTrail
     { id :: a
     , color :: b
@@ -29,6 +30,7 @@ data DBTrail' a b c d = DBTrail
     }
     deriving (Show, Eq, Generic, Validity)
 
+
 instance
     (GenValid a, GenValid b, GenValid c, GenValid d) =>
     GenValid (DBTrail' a b c d)
@@ -36,7 +38,9 @@ instance
     genValid = genValidStructurally
     shrinkValid = shrinkValidStructurally
 
+
 type DBTrail = DBTrail' Int T.Text T.Text T.Text
+
 
 type DBTrailField =
     DBTrail'
@@ -45,7 +49,9 @@ type DBTrailField =
         (Field SqlText)
         (Field SqlText)
 
+
 type Table' t = Table t t
+
 
 $(makeAdaptorAndInstanceInferrable' ''DBTrail')
 makeFieldLabelsWith noPrefixFieldLabels ''DBTrail'

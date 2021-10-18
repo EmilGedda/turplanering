@@ -26,47 +26,64 @@ import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
 
 import Turplanering.Map
 
+
 newtype WKB = WKB B.ByteString
     deriving (PQ.FromField) via (Binary B.ByteString)
     deriving stock (Generic)
     deriving anyclass (Validity)
 
+
 instance GenValid WKB where
     genValid = genValidStructurally
     shrinkValid = shrinkValidStructurally
 
+
 instance Show WKB where
     show (WKB bs) = "WKB " <> show (parseHexByteString $ Hex bs)
 
+
 type Geometry = "geometry"
+
 
 type Geography = "geography"
 
+
 data LineString deriving (Show)
+
 
 data MultiLineString deriving (Show)
 
+
 data Polygon deriving (Show)
+
 
 data Point deriving (Show)
 
+
 class Show a => SpatialType a
+
 
 instance SpatialType LineString
 
+
 instance SpatialType MultiLineString
+
 
 instance SpatialType Polygon
 
+
 instance SpatialType Point
+
 
 data Spatial (geo :: Symbol) t where
     SpatialObject :: WKB -> Spatial geo t
     deriving (Show, Generic, Validity)
 
+
 instance GenValid (Spatial geo t) where
     genValid = genValidStructurally
     shrinkValid = shrinkValidStructurally
+
 
 throwErr ::
     Exception err =>
@@ -85,6 +102,7 @@ throwErr sym f mkErr msg = do
             ("expected: " ++ sym)
             msg
 
+
 instance KnownSymbol a => PQ.FromField (Spatial a t) where
     fromField field m = do
         dbType <- PQ.typename field
@@ -95,16 +113,20 @@ instance KnownSymbol a => PQ.FromField (Spatial a t) where
                 | Nothing <- m -> err UnexpectedNull "no data"
                 | Just bs <- m -> return . SpatialObject $ WKB bs
 
+
 instance KnownSymbol a => DefaultFromField (Spatial a b) (Spatial a b) where
     defaultFromField = fromPGSFromField
+
 
 makeEnvelope :: Box -> Field (Spatial Geometry Polygon)
 makeEnvelope (Box (PointXY a b) (PointXY x y)) =
     Opaleye.Column . HPQ.FunExpr "ST_MakeEnvelope" $
         map (HPQ.ConstExpr . HPQ.DoubleLit . realToFrac) [a, b, x, y]
 
+
 (&&:) :: Field (Spatial a b) -> Field (Spatial a c) -> Field SqlBool
 (&&:) = Opaleye.binOp (HPQ.:&&)
+
 
 toGeography :: Field (Spatial Geometry a) -> Field (Spatial Geography a)
 toGeography = unsafeCast "geography"

@@ -26,6 +26,7 @@ import qualified Data.Text                  as T
 
 import Turplanering.PostGIS
 
+
 data DBSections' a b c d e = DBSections
     { id :: a
     , trailId :: b
@@ -35,6 +36,7 @@ data DBSections' a b c d e = DBSections
     }
     deriving (Show, Generic, Validity)
 
+
 instance
     (GenValid a, GenValid b, GenValid c, GenValid d, GenValid e) =>
     GenValid (DBSections' a b c d e)
@@ -42,10 +44,13 @@ instance
     genValid = genValidStructurally
     shrinkValid = shrinkValidStructurally
 
+
 instance Eq a => Eq (DBSections' a b c d e) where
     (==) = (==) `on` id
 
+
 type TrailID = Int
+
 
 type DBSections =
     DBSections'
@@ -55,6 +60,7 @@ type DBSections =
         T.Text
         (Spatial Geography LineString)
 
+
 type DBSectionsField =
     DBSections'
         (Field SqlInt4)
@@ -62,6 +68,7 @@ type DBSectionsField =
         (Field SqlText)
         (Field SqlText)
         (Field (Spatial Geography LineString))
+
 
 $(makeAdaptorAndInstanceInferrable' ''DBSections')
 makeFieldLabelsWith noPrefixFieldLabels ''DBSections'

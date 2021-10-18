@@ -17,8 +17,10 @@ import           Optics
 import           Servant.API
 import qualified Data.Text            as T
 
+
 class Monad m => MonadStorage m where
     getDetails :: Box -> m Details
+
 
 data Box = Box
     { topLeft :: PointXY
@@ -26,13 +28,16 @@ data Box = Box
     }
     deriving (Show, Generic)
 
+
 boxParser :: Parser Box
 boxParser = mkBox <$> point <*> (char ',' *> point)
     where
         point = (,) <$> double <*> (char ',' *> double)
 
+
 instance FromHttpApiData Box where
     parseUrlPiece = left T.pack . parseOnly boxParser
+
 
 data Details = Details
     { trails :: [Trail]
@@ -40,12 +45,14 @@ data Details = Details
     }
     deriving (Show, Generic, ToJSON)
 
+
 data Section = Section
     { name :: T.Text
     , description :: T.Text
     , path :: GeospatialGeometry
     }
     deriving (Show, Generic, ToJSON)
+
 
 data Trail = Trail
     { name :: T.Text
@@ -55,11 +62,14 @@ data Trail = Trail
     }
     deriving (Show, Generic, ToJSON)
 
+
 mkCoord :: (Double, Double) -> PointXY
 mkCoord = uncurry PointXY
 
+
 mkBox :: (Double, Double) -> (Double, Double) -> Box
 mkBox a b = Box (mkCoord a) (mkCoord b)
+
 
 makeFieldLabelsWith noPrefixFieldLabels ''Trail
 makeFieldLabelsWith noPrefixFieldLabels ''Section

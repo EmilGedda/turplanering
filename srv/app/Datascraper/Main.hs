@@ -12,6 +12,7 @@ import           Text.Printf
 import qualified Data.Sequence           as Seq
 import qualified Streamly.Prelude        as Streamly
 
+
 naturkartan :: [(Int, String)]
 naturkartan = zip [1 ..] $ map baseUrl [1 .. 31]
     where
@@ -21,12 +22,16 @@ naturkartan = zip [1 ..] $ map baseUrl [1 .. 31]
                 ++ show n
                 ++ "&search%5Bimportance%5D=3"
 
+
 type GeoJSON = GeoFeatureCollection Value
+
 
 data ScrapingException = DecodeError Int String
     deriving (Show)
 
+
 instance Exception ScrapingException
+
 
 fetch :: Manager -> Int -> String -> IO GeoJSON
 fetch mgr n url = runInUnboundThread $ do
@@ -37,15 +42,18 @@ fetch mgr n url = runInUnboundThread $ do
         Left msg -> throwIO $ DecodeError n msg
         Right geojson -> return geojson
 
+
 mergeGeoJSON :: GeoJSON -> GeoJSON -> GeoJSON
 mergeGeoJSON a b =
     GeoFeatureCollection Nothing $
         _geofeatures a Seq.>< _geofeatures b
 
+
 serialize :: ToJSON a => a -> IO ()
 serialize json = encodeFile file json *> printf "Saved data in %s\n" file
     where
         file = "naturkartan.geojson"
+
 
 main :: IO ()
 main = do

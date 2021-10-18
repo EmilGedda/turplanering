@@ -17,8 +17,10 @@ import Turplanering.DB
 import Turplanering.DB.Trail    ()
 import Turplanering.PostGIS     ()
 
-newtype WrappedInt = Wrap Int
+
+newtype WrappedInt = Wrap {unwrap :: Int}
     deriving (Ord, Eq)
+
 
 -- TODO: Proper type for `DBTrailData [DBTrail] [DBSections]`
 -- to manage invariants and assert DB sanity
@@ -29,18 +31,33 @@ coherentDBTrailData xs ys = (trails', sections')
         trailIds = trails' ^.. traversed % #id
         sections' = filter (flip elem trailIds . view #id) ys
 
+
 names :: LabelOptic' "name" A_Lens named name => Traversal' [named] name
 names = traversed % #name
 
+
+list :: [a] -> [a]
+list xs = xs
+
+
 main :: IO ()
 main = hspec $ do
+    testBucketOn
+    testBuildTrails
+
+
+testBucketOn :: SpecWith ()
+testBucketOn =
     describe "bucketOn" $ do
         it "keeps unique values on keys" . forAll genValid $
             \xs -> M.elems (bucketOn Wrap xs) `shouldMatchList` nubSort xs
 
         it "key creation should be consistent" . forAll genValid $
-            uncurry shouldBe . first (map coerce) . unzip . M.toList . bucketOn Wrap
+            uncurry shouldBe . first (map unwrap) . unzip . M.toList . bucketOn Wrap . list
 
+
+testBuildTrails :: SpecWith ()
+testBuildTrails =
     describe "buildTrails" $ do
         it "trails should be preserved" . forAll genValid $
             \dbTrails ->

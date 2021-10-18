@@ -1,10 +1,12 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Turplanering.API where
 
+import           Control.Monad.Catch        hiding (Handler)
 import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.IORef
@@ -17,17 +19,24 @@ import           Servant
 import           Servant.API.Generic
 import           Servant.Server.Generic
 import           System.Random
+import qualified Control.Monad.Catch        as Exception (Handler (Handler))
 import qualified Data.Text.Encoding         as T
 import qualified Data.Vault.Lazy            as V
 
+import           Control.Monad.Except
 import           Turplanering.DB
+import           Turplanering.Forecast
 import           Turplanering.Logger
 import           Turplanering.Map
-import qualified Turplanering.Config as Config
+import qualified Turplanering.Config   as Config
 
-newtype Routes route = Routes
-    {_get :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details}
+
+data Routes route = Routes
+    { _getDetails :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details
+    , _getForecast :: route :- "forecast" :> Capture "layers" Layers :> Get '[JSON] Forecast
+    }
     deriving (Generic)
+
 
 data RequestContext = RequestContext
     { config :: Config.App
@@ -35,49 +44,87 @@ data RequestContext = RequestContext
     , requestID :: RequestID
     }
 
+
 data IDGen = RandomID | SequentialID
+
 
 newtype RequestID = RequestID {getID :: Word16}
     deriving (ToJSON)
 
+
 newtype ContextM a = ContextM
     -- drop Handler for IO and use MonadThrow and MonadCatch
-    {runContext :: ReaderT RequestContext Handler a}
-    deriving (Functor, Applicative, Monad, MonadReader RequestContext, MonadIO)
+    {runContext :: ReaderT RequestContext IO a}
+    deriving
+        ( Functor
+        , Applicative
+        , Monad
+        , MonadReader RequestContext
+        , MonadIO
+        , MonadThrow
+        , MonadCatch
+        )
+
 
 instance MonadStorage ContextM where
     getDetails box = withConnection (getDetails box) =<< asks dbConn
+
+
+instance MonadForecast ContextM
+
 
 {-# NOINLINE requestIDKey #-}
 requestIDKey :: V.Key RequestID
 requestIDKey = unsafePerformIO V.newKey
 
+
 {-# NOINLINE sequentialIDRef #-}
 sequentialIDRef :: IORef Word16
 sequentialIDRef = unsafePerformIO $ newIORef 1
+
 
 {-# NOINLINE randomIDRef #-}
 randomIDRef :: IORef StdGen
 randomIDRef = unsafePerformIO $ newIORef =<< newStdGen
 
+
 nextID :: IDGen -> IO Word16
 nextID SequentialID = atomicModifyIORef' sequentialIDRef $ \id -> (id + 1, id)
 nextID RandomID = atomicModifyIORef' randomIDRef $ swap . genWord16
 
-routes :: MonadStorage m => Routes (AsServerT m)
+
+routes :: (MonadForecast m, MonadStorage m) => Routes (AsServerT m)
 routes =
     Routes
-        { _get = getDetails
+        { _getDetails = getDetails
+        , _getForecast = getForecast
         }
 
+
 toHandler :: RequestContext -> ContextM a -> Handler a
-toHandler ctx handler = runReaderT (runContext handler) ctx
+toHandler ctx handler = handleErrors $ runReaderT (runContext handler) ctx
+
+
+handleErrors :: IO a -> Handler a
+handleErrors action =
+    Handler . ExceptT $
+        fmap Right action
+            `catches` fmap (fmap Left) exceptionHandlers
+
+
+exceptionHandlers :: Monad m => [Exception.Handler m ServerError]
+exceptionHandlers =
+    [ Exception.Handler (\(_ :: SomeException) -> return err500)
+    ]
+
 
 api :: RequestContext -> Application
 api ctx = genericServeT (toHandler ctx) routes
 
+
 getRequestID :: Request -> Maybe RequestID
 getRequestID = V.lookup requestIDKey . vault
+
 
 requestLogger :: Middleware
 requestLogger app req resp = do
@@ -89,6 +136,7 @@ requestLogger app req resp = do
     app req resp
     where
         logger = consoleLogger Trace "http"
+
 
 withRequestID :: IDGen -> (RequestID -> Application) -> Application
 withRequestID rng app req resp = do

@@ -6,6 +6,7 @@ module Turplanering.Config where
 import Data.Word
 import Dhall
 
+
 data LogLevel
     = Trace
     | Debug
@@ -17,6 +18,7 @@ data LogLevel
     deriving stock (Generic, Show, Enum, Bounded)
     deriving anyclass (FromDhall, ToDhall)
 
+
 data LogStyle
     = Auto
     | Pretty
@@ -24,11 +26,13 @@ data LogStyle
     deriving stock (Generic, Show)
     deriving anyclass (FromDhall, ToDhall)
 
+
 data Environment
     = Production
     | Development
     deriving stock (Generic, Show, Eq)
     deriving anyclass (FromDhall, ToDhall)
+
 
 data HTTP = HTTP
     { httpPort :: Word16
@@ -37,12 +41,14 @@ data HTTP = HTTP
     deriving stock (Generic, Show)
     deriving anyclass (FromDhall, ToDhall)
 
+
 data Logger = Logger
     { level :: LogLevel
     , style :: LogStyle
     }
     deriving stock (Generic, Show)
     deriving anyclass (FromDhall, ToDhall)
+
 
 data DB = DB
     { dbAddr :: String
@@ -53,6 +59,7 @@ data DB = DB
     }
     deriving stock (Generic, Show)
     deriving anyclass (FromDhall, ToDhall)
+
 
 data App = App
     { db :: DB
