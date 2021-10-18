@@ -93,7 +93,8 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
   const { env } = props;
 
   const [showBar, setShowBar] = useState(false);
-  const [displayIndex, setDisplayIndex] = useState<number>(-1);
+  const [displayIndex, setDisplayIndex] = useState<number>(0);
+  const [hasForecast, setHasForecast] = useState<boolean>(false);
   const [forecast, setForecast] = useState<[string, ForecastTimestamps]>();
 
   useEffect(() => {
@@ -110,6 +111,12 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
     ? forecast[1].validTimes[displayIndex]
     : undefined;
 
+  const nextDisplayTime = forecast
+    ? forecast[1].validTimes[(displayIndex + 1) % forecast[1].validTimes.length]
+    : undefined;
+
+  const showSidebar = hasForecast && showBar;
+
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
       <Map view={initialView} className={classes.fullscreen}>
@@ -120,12 +127,21 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
 
         <Overlays>
           {forecast && (
-            <SmhiLayer
-              layer={forecast[0]}
-              opacity={0.75}
-              referenceTime={forecast[1].reference}
-              displayTime={displayTime}
-            />
+            <>
+              <SmhiLayer
+                layer={forecast[0]}
+                opacity={0.75}
+                referenceTime={forecast[1].reference}
+                displayTime={displayTime}
+              />
+
+              <SmhiLayer
+                layer={forecast[0]}
+                opacity={0}
+                referenceTime={forecast[1].reference}
+                displayTime={nextDisplayTime}
+              />
+            </>
           )}
         </Overlays>
       </Map>
@@ -161,7 +177,11 @@ export const App: React.FC<AppProps> = (props: AppProps) => {
         </Div>
       </Slide>
 
-      <Overlaybar onClick={setForecast} shown={!!displayTime && showBar}>
+      <Overlaybar
+        onClick={setForecast}
+        onForecastLoad={setHasForecast}
+        shown={showSidebar}
+      >
         <WeatherToggleButton layer='pmpfrekvent:wpt-overview_n-europe__' />
         <WindToggleButton layer='pmp:windspeed-windarrows-avg-10m_n-europe__' />
         <TemperatureToggleButton layer='pmpfrekvent:temperature-2m_n-europe_rainbow_' />

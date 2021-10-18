@@ -1,9 +1,8 @@
-import { WTSURL, server, errHandler, mockWTSXMLResponse } from './Mocks';
+import { WTSURL, server, errHandler, mockForecastResponse } from './Mocks';
 import {
   parsePeriodicity,
   dateIncrementer,
   parseTimestamps,
-  parseWMSXMLTimeRange,
   fetchWMSTimes
 } from './Forecast';
 
@@ -94,42 +93,39 @@ describe('parseTimestamps', () => {
   });
 });
 
-describe('parseWMSXMLTimeRange', () => {
-  const layers = ['layer1', 'layer2'];
-  const xmlStr = mockWTSXMLResponse(layers); // mock should take ForecastTimestamps
-  const timestamps = {
-    reference: new Date(Date.UTC(2021, 9, 8, 20)),
-    validTimes: parseTimestamps(
-      [
-        '2021-10-11T06:00:00Z/2021-10-14T12:00:00Z/PT6H',
-        '2021-10-15T00:00:00Z/2021-10-18T00:00:00Z/PT12H'
-      ].join(',')
-    )
-  };
-
-  it('should return proper forecast timestamps for correct xml', () => {
-    expect(parseWMSXMLTimeRange(layers, xmlStr)).toStrictEqual({
-      layer1: timestamps,
-      layer2: timestamps
-    });
-  });
-});
-
 describe('fetchWMSTimes', () => {
-  it('should return timestamps on proper XML', async () => {
-    expect.assertions(1);
-    await expect(fetchWMSTimes(['layer'])).resolves.toHaveProperty('layer');
+  it('should return timestamps on proper JSON', async () => {
+    expect.assertions(2);
+    await expect(fetchWMSTimes('/forecast/', ['layer'])).resolves.toHaveProperty('layer');
+    server.use(mockForecastResponse({
+      forecast: {
+        'temp': {
+          validTimes: '2123-01-01Z',
+          reference: '2001-01-01Z'
+        },
+        'wind': {
+          validTimes: '2002-02-02Z',
+          reference: '2002-02-02Z'
+        }
+      }
+    }));
+    await expect(fetchWMSTimes('/forecast/', ['temp'])).resolves.toMatchObject({
+      'temp': {
+        validTimes: [new Date('2123-01-01Z')],
+        reference: new Date('2001-01-01Z')
+      }
+    })
   });
 
   it('should error on abnormal response', async () => {
     expect.assertions(2);
-    server.use(errHandler(WTSURL, 200, { 'Content-Type': 'text/json' }));
-    await expect(() => fetchWMSTimes(['layer'])).rejects.toThrowError(
+    server.use(errHandler(WTSURL, 200, { 'Content-Type': 'foo' }));
+    await expect(() => fetchWMSTimes('/forecast/', ['layer'])).rejects.toThrowError(
       /got content/
     );
 
     server.use(errHandler(WTSURL, 500));
-    await expect(() => fetchWMSTimes(['layer'])).rejects.toThrowError(
+    await expect(() => fetchWMSTimes('/forecast/', ['layer'])).rejects.toThrowError(
       /got status/
     );
   });

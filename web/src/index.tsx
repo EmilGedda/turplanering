@@ -50,7 +50,6 @@ const env: Environment = (() => {
   if (process.env.NODE_ENV == 'production') {
     return {
       ...developmentDefault,
-      apiURL: 'localhost:8080',
       environment: 'production',
       tileURL: '',
       browser

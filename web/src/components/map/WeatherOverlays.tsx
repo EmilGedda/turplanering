@@ -49,12 +49,7 @@ export const SmhiLayer = (props: SmhiLayerProps): JSX.Element | null => {
       extent: projExtent,
       resolutions: resolutions
     }),
-    urls: [
-      'https://wts1.smhi.se/tile/',
-      'https://wts2.smhi.se/tile/',
-      'https://wts3.smhi.se/tile/',
-      'https://wts4.smhi.se/tile/'
-    ]
+    url: 'https://wts{1-4}.smhi.se/tile/'
   });
 
   return <TileLayer {...opts} source={wmsSource} />;

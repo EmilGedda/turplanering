@@ -37,7 +37,7 @@ const lantmäterietWMTS = (layer: string) => {
 export const topowebbSource = new WMTS(lantmäterietWMTS('topowebb'));
 export const topowebbBWSource = new WMTS(lantmäterietWMTS('topowebb_nedtonad'));
 
-const TileLayer = React.memo(<T extends TileSource>(opts: Options<T>) => {
+const TileLayer = <T extends TileSource>(opts: Options<T>): JSX.Element => {
   const { map } = useContext(MapContext);
 
   useEffect(() => {
@@ -56,8 +56,6 @@ const TileLayer = React.memo(<T extends TileSource>(opts: Options<T>) => {
   }, [map, opts]);
 
   return <div />;
-});
-
-TileLayer.displayName = 'TileLayer';
+};
 
 export default TileLayer;

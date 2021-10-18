@@ -12,7 +12,7 @@ export type Environment = {
 };
 
 export const developmentDefault = {
-  apiURL: 'localhost:8080',
+  apiURL: 'http://localhost:4000',
   environment: 'development',
   tileURL:
     'http://localhost:8081/maps/trails/{z}/{x}/{y}.vector.pbf?debug=true',

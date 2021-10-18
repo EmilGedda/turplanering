@@ -1,19 +1,10 @@
-export type ForecastTimestamps = {
-  reference: Date;
-  validTimes: Date[];
-};
-
-export type ForecastAPI = {
-  ValidTimes(layers: string[]): Promise<Record<string, ForecastTimestamps>>;
-};
-
-type timeType = {
+type TimeType = {
   time: string;
   length: number;
 };
 
-export const parsePeriodicity = (str: string): timeType[] => {
-  const times: timeType[] = [];
+export const parsePeriodicity = (str: string): TimeType[] => {
+  const times: TimeType[] = [];
   let num = 0;
   for (const c of str) {
     const digit = parseFloat(c);
@@ -89,39 +80,22 @@ export const parseTimestamps = (wmsTime: string): Date[] => {
   return timestamps;
 };
 
-export const parseWMSXMLTimeRange = (
-  layers: string[],
-  xml: string
-): Record<string, ForecastTimestamps> => {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-  const xpath = (layer: string, extent: string) => {
-    const query = `//Layer[./Name='${layer}']/Extent[@name='${extent}']/text()`;
-    return doc.evaluate(query, doc, null, XPathResult.STRING_TYPE).stringValue;
-  };
-
-  const timepoints: Record<string, ForecastTimestamps> = {};
-
-  for (const layer of layers) {
-    timepoints[layer] = {
-      reference: new Date(xpath(layer, 'reftime')),
-      validTimes: parseTimestamps(xpath(layer, 'time'))
-    };
-  }
-
-  return timepoints;
+type Forecast<T, U = T> = {
+  reference: T;
+  validTimes: U;
 };
 
+export type ForecastResponse = {
+  forecast: Record<string, Forecast<string>>;
+};
+
+export type ForecastTimestamps = Forecast<Date, Date[]>;
+
 export const fetchWMSTimes = async (
+  baseURL: string,
   layers: string[]
 ): Promise<Record<string, ForecastTimestamps>> => {
-  const query = layers.join(',');
-
-  const capabilities = '?SERVICE=WMS&REQUEST=GetCapabilities';
-  const smhiDomain = 'https://wts.smhi.se/tile/';
-
-  const url = smhiDomain + query + capabilities;
-  const response = await fetch(url);
+  const response = await fetch(baseURL + layers.join(','));
 
   if (response.status != 200) {
     throw new Error(
@@ -130,14 +104,31 @@ export const fetchWMSTimes = async (
   }
 
   const contentType = response.headers.get('Content-Type');
-  if (contentType != 'application/xml' && contentType != 'text/xml') {
+  if (!contentType || !contentType.startsWith('application/json')) {
     throw new Error(
       `failed to fetch forecast times: got content type ${String(contentType)}`
     );
   }
 
-  const xml = await response.text();
-  return parseWMSXMLTimeRange(layers, xml);
+  const { forecast } = (await response.json()) as ForecastResponse;
+  const timepoints: Record<string, ForecastTimestamps> = {};
+
+  for (const key in forecast) {
+    const layer = forecast[key];
+    timepoints[key] = {
+      reference: new Date(layer.reference),
+      validTimes: parseTimestamps(layer.validTimes)
+    };
+  }
+
+  return timepoints;
+};
+
+export type ForecastAPI = {
+  ValidTimes(
+    baseURL: string,
+    layers: string[]
+  ): Promise<Record<string, ForecastTimestamps>>;
 };
 
 export const Smhi: ForecastAPI = {

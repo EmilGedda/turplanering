@@ -33,28 +33,23 @@ const StyledDiv = styled('div')(({ theme }) => ({
   zIndex: 1000
 }));
 
-export type ToggleLayerCallback = (layer?: string) => void;
+export type ToggleLayerCallback = (layer: string) => void;
 
 export type ToggleButtonProps = LayerToggleProps &
   Omit<IconButtonProps, 'onClick'>;
 
 const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
-  const [active, setIsActive] = useState(false);
+  const { active, color, layer, onClick } = props;
 
-  const color = (() => {
-    if (props.disabled) return 'secondary';
-    if (active) return 'primary';
-    return props.color ? props.color : 'default';
-  })();
-
-  const onClick = () => {
-    if (props.disabled) return;
-    if (props.onClick) props.onClick(!active ? props.layer : undefined);
-    setIsActive(!active);
+  const renderColor = active ? 'primary' : color ?? 'default';
+  const callback = () => {
+    if (onClick) {
+      onClick(layer);
+    }
   };
 
   return (
-    <IconButton color={color} onClick={onClick} size='large'>
+    <IconButton color={renderColor} onClick={callback} size='large'>
       {props.children}
     </IconButton>
   );
@@ -62,11 +57,13 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
 
 export type LayerToggleProps = {
   onClick?: ToggleLayerCallback;
+  active?: boolean;
   layer: string;
 };
 
 export type OverlaybarProps = {
   shown: boolean;
+  onForecastLoad: (success: boolean) => void;
   onClick: (timestamps?: [string, ForecastTimestamps]) => void;
   children: ReactElement<ToggleButtonProps>[];
 };
@@ -91,19 +88,32 @@ WindToggleButton.displayName = 'WindToggleButton';
 TemperatureToggleButton.displayName = 'TemperatureToggleButton';
 
 export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
-  const { shown, onClick, children: buttons } = props;
+  const { shown, onClick, onForecastLoad, children: buttons } = props;
+  const { apiURL } = useContext(EnvContext);
   const [forecasts, setForecasts] = useState<
     Record<string, ForecastTimestamps>
   >({});
   const { forecastAPI } = useContext(EnvContext);
+  const [activeLayer, setActiveLayer] = useState<string>();
 
-  const callback = (layer?: string) => {
-    onClick(layer ? [layer, forecasts[layer]] : undefined);
+  console.log(activeLayer);
+  const callback = (layer: string) => {
+    if (activeLayer == layer) {
+      setActiveLayer(undefined);
+      onClick(undefined);
+    } else {
+      setActiveLayer(layer);
+      onClick([layer, forecasts[layer]]);
+    }
   };
 
   const toggleButtons = React.Children.map(buttons, (button) => {
     if (React.isValidElement(button)) {
-      return React.cloneElement(button, { onClick: callback });
+      return React.cloneElement(button, {
+        onClick: callback,
+        active: button.props.layer == activeLayer,
+        layer: button.props.layer
+      });
     }
     return button;
   });
@@ -113,12 +123,16 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
       const layers = buttons.map((btn) => btn.props.layer);
       console.log('Fetching forecast...');
       const before = new Date();
-      const forecasts = await forecastAPI.ValidTimes(layers);
+      const forecasts = await forecastAPI.ValidTimes(
+        apiURL + '/forecast/',
+        layers
+      );
       const duration = new Date().getTime() - before.getTime();
       console.log(
         `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
       );
       setForecasts(forecasts);
+      onForecastLoad(true);
     })();
   }, [forecastAPI]);
 
