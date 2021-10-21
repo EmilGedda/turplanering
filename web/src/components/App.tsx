@@ -1,6 +1,6 @@
+import React, { useState, useEffect, useContext } from 'react';
 import LayerSelector from './LayerSelector';
 import { styled } from '@mui/material/styles';
-import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar';
 import { Slide } from '@mui/material';
 import {
@@ -18,10 +18,10 @@ import { TrailLayer } from './map/VectorLayer';
 import { VectorTile as VectorSource } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
 import { CoordURL, currentURLState } from '../URL';
-import { Environment } from '../contexts/EnvContext';
-import { ForecastAPI, ForecastTimestamps } from '../Forecast';
+import { ForecastTimestamps } from '../Forecast';
 import { SmhiLayer } from './map/WeatherOverlays';
 import { Layers, Overlays } from './map/Layers';
+import EnvContext from '../contexts/EnvContext';
 
 const PREFIX = 'App';
 
@@ -68,11 +68,6 @@ const Div = styled('div')(({ theme }) => ({
   }
 }));
 
-export type AppProps = {
-  env: Environment;
-  forecastAPI: ForecastAPI;
-};
-
 const initialView = (() => {
   const { state } = currentURLState();
   return state instanceof CoordURL
@@ -89,8 +84,8 @@ const trailSource = new VectorSource({
   })
 });
 
-export const App: React.FC<AppProps> = (props: AppProps) => {
-  const { env } = props;
+export const App: React.FC = () => {
+  const env = useContext(EnvContext);
 
   const [showBar, setShowBar] = useState(false);
   const [displayIndex, setDisplayIndex] = useState<number>(0);

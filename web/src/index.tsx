@@ -21,15 +21,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import ScopedCssBaseline from '@mui/material/ScopedCssBaseline';
-import {
-  alpha,
-  createTheme,
-  StyledEngineProvider,
-  Theme,
-  ThemeProvider
-} from '@mui/material/styles';
-import { orange, common, grey } from '@mui/material/colors';
-import { Smhi } from './Forecast';
+import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { App } from './components/App';
 import EnvContext, {
   Environment,
@@ -37,11 +29,7 @@ import EnvContext, {
 } from './contexts/EnvContext';
 import proj4 from 'proj4';
 import * as ol from 'ol/proj/proj4';
-
-declare module '@mui/material/styles' {
-  // eslint-disable-next-line
-  interface DefaultTheme extends Theme{}
-}
+import { theme } from './Theme';
 
 const env: Environment = (() => {
   const browser = {
@@ -61,47 +49,6 @@ const env: Environment = (() => {
   };
 })();
 
-const theme = {
-  light: createTheme({
-    palette: {
-      mode: 'light'
-    }
-  }),
-  dark: createTheme({
-    palette: {
-      mode: 'dark'
-    },
-    components: {
-      MuiSlider: {
-        styleOverrides: {
-          // drag color and opacity
-          track: { backgroundColor: grey[500] },
-          rail: { backgroundColor: grey[600] },
-          thumb: {
-            backgroundColor: 'white',
-            '&.Mui-focusVisible,&:hover': {
-              boxShadow: `0px 0px 0px 8px ${alpha(common.white, 0.16)}`,
-              '@media (hover: none)': {
-                boxShadow: 'none'
-              }
-            },
-            '&.Mui-active': {
-              boxShadow: `0px 0px 0px 14px ${alpha(common.white, 0.16)}`
-            }
-          }
-        }
-      },
-      MuiIconButton: {
-        styleOverrides: {
-          colorPrimary: {
-            color: orange[500]
-          }
-        }
-      }
-    }
-  })
-};
-
 // Opt-in to Webpack hot module replacement
 if (module.hot) module.hot.accept();
 
@@ -114,10 +61,6 @@ proj4.defs('urn:ogc:def:crs:EPSG:6.3:3006', proj4.defs('EPSG:3006'));
 proj4.defs('urn:ogc:def:crs:EPSG:6.3:3857', proj4.defs('EPSG:3857'));
 ol.register(proj4);
 
-//export const MAP_EXTENT = [-1200000, 4700000, 2600000, 8500000];
-// export const MAP_RESOLUTIONS = [4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0, 2.0, 1.0, 0.5, 0.25, 0.125];
-// export const MAP_WMTS_RESOLUTIONS = [4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0, 2.0, 1.0, 0.5];
-
 // TODO: load theme settings from localStorage or account preferences
 
 render(
@@ -126,7 +69,7 @@ render(
       <EnvContext.Provider value={env}>
         <ThemeProvider theme={theme.light}>
           <ScopedCssBaseline>
-            <App env={env} forecastAPI={Smhi} />
+            <App />
           </ScopedCssBaseline>
         </ThemeProvider>
       </EnvContext.Provider>

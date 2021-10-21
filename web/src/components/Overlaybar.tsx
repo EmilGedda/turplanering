@@ -2,6 +2,7 @@ import React, {
   FC,
   useState,
   ReactElement,
+  cloneElement,
   useEffect,
   useContext
 } from 'react';
@@ -39,7 +40,7 @@ export type ToggleButtonProps = LayerToggleProps &
   Omit<IconButtonProps, 'onClick'>;
 
 const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
-  const { active, color, layer, onClick } = props;
+  const { active, color, layer, onClick, ...rest } = props;
 
   const renderColor = active ? 'primary' : color ?? 'default';
   const callback = () => {
@@ -49,7 +50,7 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   };
 
   return (
-    <IconButton color={renderColor} onClick={callback} size='large'>
+    <IconButton color={renderColor} onClick={callback} size='large' {...rest}>
       {props.children}
     </IconButton>
   );
@@ -89,14 +90,12 @@ TemperatureToggleButton.displayName = 'TemperatureToggleButton';
 
 export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   const { shown, onClick, onForecastLoad, children: buttons } = props;
-  const { apiURL } = useContext(EnvContext);
+  const { forecastAPI } = useContext(EnvContext);
+  const [activeLayer, setActiveLayer] = useState<string>();
   const [forecasts, setForecasts] = useState<
     Record<string, ForecastTimestamps>
   >({});
-  const { forecastAPI } = useContext(EnvContext);
-  const [activeLayer, setActiveLayer] = useState<string>();
 
-  console.log(activeLayer);
   const callback = (layer: string) => {
     if (activeLayer == layer) {
       setActiveLayer(undefined);
@@ -108,32 +107,32 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   };
 
   const toggleButtons = React.Children.map(buttons, (button) => {
-    if (React.isValidElement(button)) {
-      return React.cloneElement(button, {
-        onClick: callback,
-        active: button.props.layer == activeLayer,
-        layer: button.props.layer
-      });
-    }
-    return button;
+    return cloneElement(button, {
+      ...button.props,
+      onClick: callback,
+      active: button.props.layer == activeLayer,
+      layer: button.props.layer
+    });
   });
 
   useEffect(() => {
-    void (async (): Promise<void> => {
-      const layers = buttons.map((btn) => btn.props.layer);
-      console.log('Fetching forecast...');
-      const before = new Date();
-      const forecasts = await forecastAPI.ValidTimes(
-        apiURL + '/forecast/',
-        layers
-      );
-      const duration = new Date().getTime() - before.getTime();
-      console.log(
-        `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
-      );
-      setForecasts(forecasts);
-      onForecastLoad(true);
-    })();
+    const layers = buttons.map((btn) => btn.props.layer);
+    const before = new Date();
+
+    forecastAPI
+      .ForecastTimes(layers)
+      .then((forecasts) => {
+        const duration = new Date().getTime() - before.getTime();
+        console.log(
+          `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
+        );
+        setForecasts(forecasts);
+        onForecastLoad(true);
+      })
+      .catch((err) => {
+        console.log('Failed fetching forecast: ', err);
+        onForecastLoad(false);
+      });
   }, [forecastAPI]);
 
   return (

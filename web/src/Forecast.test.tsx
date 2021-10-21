@@ -3,7 +3,8 @@ import {
   parsePeriodicity,
   dateIncrementer,
   parseTimestamps,
-  fetchWMSTimes
+  fetchWMSTimes,
+  Smhi
 } from './Forecast';
 
 describe('parsePeriodicity', () => {

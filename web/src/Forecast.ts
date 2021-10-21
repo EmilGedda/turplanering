@@ -124,13 +124,22 @@ export const fetchWMSTimes = async (
   return timepoints;
 };
 
-export type ForecastAPI = {
-  ValidTimes(
-    baseURL: string,
-    layers: string[]
-  ): Promise<Record<string, ForecastTimestamps>>;
-};
+export interface ForecastAPI {
+  ForecastTimes(layers: string[]): Promise<Record<string, ForecastTimestamps>>;
+}
 
-export const Smhi: ForecastAPI = {
-  ValidTimes: fetchWMSTimes
-};
+export class Smhi implements ForecastAPI {
+  baseURL = 'http://localhost:4000';
+
+  constructor(args?: Partial<Smhi>) {
+    Object.assign(this, args);
+  }
+
+  ForecastTimes(layers: string[]): Promise<Record<string, ForecastTimestamps>> {
+    return fetchWMSTimes(this.baseURL + '/forecast/', layers);
+  }
+}
+
+// export const Smhi: ForecastAPI = {
+//   ValidTimes: fetchWMSTimes
+// };

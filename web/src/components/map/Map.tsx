@@ -46,11 +46,11 @@ const onMoveEnd = (event: MapEvent) => {
   }
 };
 
+const nofunc = (_: string) => {
+  return;
+};
 type StateCallBack<T> = (text: T) => void;
 export const setTooltip = (map?: ol.Map): StateCallBack<string> => {
-  const nofunc = (_: string) => {
-    return;
-  };
   const func = map?.get('tooltip') as StateCallBack<string> | undefined;
   return func ?? nofunc;
 };

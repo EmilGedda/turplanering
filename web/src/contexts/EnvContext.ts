@@ -16,7 +16,7 @@ export const developmentDefault = {
   environment: 'development',
   tileURL:
     'http://localhost:8081/maps/trails/{z}/{x}/{y}.vector.pbf?debug=true',
-  forecastAPI: Smhi,
+  forecastAPI: new Smhi(),
   browser: {
     hasTouch: false
   }
