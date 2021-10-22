@@ -4,7 +4,8 @@ import React, {
   ReactElement,
   cloneElement,
   useEffect,
-  useContext
+  useContext,
+  useCallback
 } from 'react';
 import { styled } from '@mui/material/styles';
 import {
@@ -43,11 +44,11 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   const { active, color, layer, onClick, ...rest } = props;
 
   const renderColor = active ? 'primary' : color ?? 'default';
-  const callback = () => {
+  const callback = useCallback(() => {
     if (onClick) {
       onClick(layer);
     }
-  };
+  }, [onClick, layer]);
 
   return (
     <IconButton color={renderColor} onClick={callback} size='large' {...rest}>
@@ -98,17 +99,16 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
 
   const callback = (layer: string) => {
     if (activeLayer == layer) {
-      setActiveLayer(undefined);
       onClick(undefined);
+      setActiveLayer(undefined);
     } else {
-      setActiveLayer(layer);
       onClick([layer, forecasts[layer]]);
+      setActiveLayer(layer);
     }
   };
 
   const toggleButtons = React.Children.map(buttons, (button) => {
     return cloneElement(button, {
-      ...button.props,
       onClick: callback,
       active: button.props.layer == activeLayer,
       layer: button.props.layer
@@ -118,21 +118,30 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   useEffect(() => {
     const layers = buttons.map((btn) => btn.props.layer);
     const before = new Date();
+    let mounted = true;
 
     forecastAPI
       .ForecastTimes(layers)
       .then((forecasts) => {
-        const duration = new Date().getTime() - before.getTime();
-        console.log(
-          `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
-        );
-        setForecasts(forecasts);
-        onForecastLoad(true);
+        if (mounted) {
+          const duration = new Date().getTime() - before.getTime();
+          console.log(
+            `Fetched forecast for layers: ${layers.join(', ')} in ${duration}ms`
+          );
+          setForecasts(forecasts);
+          onForecastLoad(true);
+        }
       })
       .catch((err) => {
-        console.log('Failed fetching forecast: ', err);
-        onForecastLoad(false);
+        if (mounted) {
+          console.log('Failed fetching forecast: ', err);
+          onForecastLoad(false);
+        }
       });
+
+    return () => {
+      mounted = false;
+    };
   }, [forecastAPI]);
 
   return (

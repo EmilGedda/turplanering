@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Divider,
@@ -10,7 +10,6 @@ import {
   Typography
 } from '@mui/material';
 import { PlayCircleOutline, PauseCircleOutline } from '@mui/icons-material';
-import { common } from '@mui/material/colors';
 
 const PREFIX = 'Timeline';
 
@@ -94,15 +93,15 @@ const OuterDiv = styled('div')(({ theme }) => ({
   zIndex: 1001
 }));
 
-const StyledPaper = styled(Paper)((_) => ({
+const StyledPaper = styled(Paper)({
   width: '100%',
   paddingRight: 32
-}));
+});
 
-const StyledDivider = styled(Divider)((_) => ({
+const StyledDivider = styled(Divider)({
   height: 60,
   margin: 12
-}));
+});
 
 const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   const { timepoints, onChange } = props;
@@ -110,39 +109,43 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   const [running, setRunning] = useState(false);
   const [watchID, setWatchID] = useState(-1);
 
-  const start = (run: boolean) => {
-    if (run && currentIndex == timepoints.length - 1) {
-      setCurrentIndex(0);
-    }
-    setRunning(run);
-  };
-
-  const updateTime = (f: (timepoint: number) => void): SliderCallback => {
-    return (_, value) => {
-      const v = value as number;
-      if (v == currentIndex || v < 0 || v >= timepoints.length) return;
-
-      if (running) {
-        setRunning(false);
+  const start = useCallback(
+    (run: boolean) => {
+      if (run && currentIndex == timepoints.length - 1) {
+        setCurrentIndex(0);
       }
+      setRunning(run);
+    },
+    [currentIndex, timepoints]
+  );
 
-      if (watchID != -1) {
-        clearTimeout(watchID);
-      }
+  const updateTime = useCallback(
+    (f: (timepoint: number) => void): SliderCallback => {
+      return (_, value) => {
+        const v = value as number;
+        if (running) {
+          setRunning(false);
+        }
 
-      setCurrentIndex(v);
-      setWatchID(
-        window.setTimeout(
-          (idx: number) => {
-            setWatchID(-1);
-            f(idx);
-          },
-          300,
-          v
-        )
-      );
-    };
-  };
+        if (watchID != -1) {
+          clearTimeout(watchID);
+        }
+
+        setCurrentIndex(v);
+        setWatchID(
+          window.setTimeout(
+            (idx: number) => {
+              setWatchID(-1);
+              f(idx);
+            },
+            300,
+            v
+          )
+        );
+      };
+    },
+    [currentIndex, timepoints, watchID]
+  );
 
   useEffect(() => {
     if (running) {
@@ -194,14 +197,6 @@ const Timeline: FC<TimelineProps> = (props: TimelineProps) => {
   );
 };
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
-  colorPrimary: {
-    color:
-      theme.palette.mode == 'dark' ? common.white : theme.palette.primary.main
-  },
-  fontSize: '60px'
-}));
-
 type PlayButtonProps = {
   isplaying: boolean;
   onClick: (play: boolean) => void;
@@ -213,13 +208,19 @@ const PlayButton: FC<PlayButtonProps> = (props: PlayButtonProps) => {
   const onClick = () => callback(!isplaying);
 
   return (
-    <StyledIconButton color='primary' onClick={onClick} edge='end' size='large'>
+    <IconButton
+      color='primary'
+      onClick={onClick}
+      edge='end'
+      size='large'
+      style={{ fontSize: '60px' }}
+    >
       {isplaying ? (
         <PauseCircleOutline style={{ fontSize: '60px' }} />
       ) : (
         <PlayCircleOutline style={{ fontSize: '60px' }} />
       )}
-    </StyledIconButton>
+    </IconButton>
   );
 };
 

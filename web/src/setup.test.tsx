@@ -1,11 +1,11 @@
 /* eslint-disable */
-import React, { FC } from 'react';
+import React from 'react';
 import 'whatwg-fetch';
-import { StyledEngineProvider, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider, Theme, ThemeProvider } from '@mui/material';
 import { server } from './Mocks';
 import {render, RenderOptions} from '@testing-library/react'
-import EnvContext, { developmentDefault } from './contexts/EnvContext';
-import { theme } from './Theme';
+import EnvContext, { developmentDefault, Environment } from './contexts/EnvContext';
+import { theme as appTheme } from './Theme';
 import { Smhi } from './Forecast';
 
 
@@ -24,27 +24,44 @@ afterEach(() => server.resetHandlers());
 // Clean up after the tests are finished.
 afterAll(() => server.close());
 
-const env = {
+export const testEnv: Environment = {
   ...developmentDefault,
   forecastAPI: new Smhi({ baseURL: '' })
 }
 
-const ctxProviders: FC = ({children}) => {
-  return (
+export type RenderArgs = {
+  env: Environment,
+  theme: Theme
+}
+
+type RenderFunction = (args?: Partial<RenderArgs> | undefined) => 
+    (ui: React.ReactElement, options?: Omit<RenderOptions, "wrapper"> | undefined) => void;
+
+export const makeRender: RenderFunction = (args?: Partial<RenderArgs>) => {
+  const def = {
+    env: testEnv,
+    theme: appTheme.light
+  }
+
+  Object.assign(def, args);
+
+  const wrapper = ({children}: any) => (
     <StyledEngineProvider injectFirst>
-      <EnvContext.Provider value={env}>
-        <ThemeProvider theme={theme.light}>
-            {children}
+      <EnvContext.Provider value={def.env}>
+        <ThemeProvider theme={def.theme}>
+          {children}
         </ThemeProvider>
       </EnvContext.Provider>
     </StyledEngineProvider>
-  );
+  )
+
+  return (ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {
+    render(ui, {wrapper, ...options})
+  }
 }
 
-const customRender = (
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>,
-) => render(ui, {wrapper: ctxProviders, ...options})
+
+const customRender = makeRender();
 
 export * from '@testing-library/react'
 export {customRender as render}
