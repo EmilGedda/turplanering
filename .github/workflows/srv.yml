@@ -1,0 +1,52 @@
+on: [push]
+name: Srv
+
+defaults:
+  run:
+    working-directory: srv
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+    - uses: haskell/actions/setup@v1
+      id: haskell
+      with:
+        enable-stack: true
+
+    - name: Load cache
+      uses: actions/cache@v2
+      with:
+        path: |
+            ${{ steps.haskell.outputs.cabal-store }}
+            ${{ steps.haskell.outputs.stack-root }}
+            ${{ steps.haskell.outputs.ghc-store }}
+            ~/.stack
+            .stack-work
+        key: turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
+        restore-keys: |
+            turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
+            turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}
+            turplanering-v1-${{ runner.os }}
+
+    - name: Build tests, lib, and exe
+      run: stack build --test --no-run-tests --coverage
+
+    - name: Run tests
+      run: stack test --coverage --verbosity warning
+
+    - name: Install hpc-lcov
+      run: stack install hpc-lcov 
+    
+    - name: Generate LCOV file 
+      run: stack exec -- hpc-lcov --file $(find $(stack path --local-hpc-root) -type f -name '*.tix') --main-package test
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v2
+      with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./srv/lcov.info
+          fail_ci_if_error: true

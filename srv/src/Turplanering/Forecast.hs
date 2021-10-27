@@ -26,6 +26,7 @@ import qualified Data.ByteString.Lazy    as LB
 import qualified Data.Map.Strict         as M
 import qualified Data.Text               as T
 import qualified Xeno.DOM                as XML
+import Control.Exception (Exception)
 
 
 type Layer = T.Text
@@ -55,6 +56,19 @@ newtype Forecast = Forecast {forecast :: M.Map Layer WMSTime}
 makeFieldLabelsWith noPrefixFieldLabels ''Forecast
 
 
+data ForecastError = ParseError
+    { xml :: B.ByteString
+    , context :: String
+    }
+
+
+instance Show ForecastError where
+    show (ParseError _ ctx) = "forecast parsing error: " <> ctx
+
+
+instance Exception ForecastError
+
+
 class MonadForecast m where
     getForecast :: Layers -> m Forecast
     default getForecast :: MonadIO m => Layers -> m Forecast
@@ -63,12 +77,13 @@ class MonadForecast m where
         req <- parseRequest $ wtsURL layers
         res <- httpLbs req mgr
 
+        let xml = LB.toStrict $ responseBody res
+        let err = ParseError xml
+
         return
             . over #forecast (M.filterWithKey (\k _ -> k `elem` layers))
             . parseXML
-            . skipDoctype
-            . LB.toStrict
-            $ responseBody res
+            $ skipDoctype xml
 
 
 wtsURL :: [Layer] -> String
@@ -92,22 +107,6 @@ parseXML =
         . XML.parse
 
 
-getWMSLayers :: XML.Node -> Maybe [XML.Node]
-getWMSLayers node = do
-    cap <- getChild find "Capability" node
-    layers <- getChild find "Layer" cap
-    return $ XML.children layers
-
-
-getText :: XML.Node -> Maybe T.Text
-getText (XML.contents -> [XML.Text txt]) = Just $ decodeUtf8 txt
-getText _ = Nothing
-
-
-layerName :: XML.Node -> Maybe T.Text
-layerName node = getText =<< getChild find "Name" node
-
-
 nodeToForecast :: XML.Node -> Maybe (Layer, WMSTime)
 nodeToForecast node = do
     name <- layerName node
@@ -116,11 +115,27 @@ nodeToForecast node = do
     return (name, WMSTime refTime validTime)
 
 
+layerName :: XML.Node -> Maybe T.Text
+layerName node = getText =<< getChild find "Name" node
+
+
 extent :: B.ByteString -> XML.Node -> Maybe T.Text
 extent ref parent = getText =<< find (\n -> ("name", ref) `elem` XML.attributes n) extents
     where
         extents = getChild filter "Extent" parent
 
 
+getWMSLayers :: XML.Node -> Maybe [XML.Node]
+getWMSLayers node = do
+    cap <- getChild find "Capability" node
+    layers <- getChild find "Layer" cap
+    return $ XML.children layers
+
+
 getChild :: ((XML.Node -> Bool) -> [XML.Node] -> a) -> B.ByteString -> XML.Node -> a
 getChild f tag = f (\n -> XML.name n == tag) . XML.children
+
+
+getText :: XML.Node -> Maybe T.Text
+getText (XML.contents -> [XML.Text txt]) = Just $ decodeUtf8 txt
+getText _ = Nothing
