@@ -20,6 +20,7 @@ export type Props = {
     zoom: number;
     center: Coordinate;
   };
+  onMount?: (map: ol.Map) => void;
   className?: string;
   children?: React.ReactNode;
   setTooltipText: React.Dispatch<React.SetStateAction<string>>;
@@ -49,14 +50,16 @@ const onMoveEnd = (event: MapEvent) => {
 const nofunc = (_: string) => {
   return;
 };
+
 type StateCallBack<T> = (text: T) => void;
+
 export const setTooltip = (map?: ol.Map): StateCallBack<string> => {
   const func = map?.get('tooltip') as StateCallBack<string> | undefined;
   return func ?? nofunc;
 };
 
 const MemoMap: React.FC<Props> = React.memo(
-  ({ children, view, className, setTooltipText }) => {
+  ({ children, view, className, setTooltipText, onMount }) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<ol.Map>();
 
@@ -85,6 +88,10 @@ const MemoMap: React.FC<Props> = React.memo(
       setMap(mapObject);
       mapObject.on('moveend', onMoveEnd);
       mapObject.set('tooltip', setTooltipText, true);
+
+      if (onMount) {
+        onMount(mapObject);
+      }
 
       return () => {
         mapObject.setTarget(undefined);
@@ -115,11 +122,11 @@ MemoMap.displayName = 'MemoMap';
 
 const LargeTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
-))((_) => ({
+))({
   [`& .${tooltipClasses.tooltip}`]: {
     fontSize: 16
   }
-}));
+});
 
 const Map = React.memo((props: Omit<Props, 'setTooltipText'>) => {
   const [tooltip, setTooltip] = useState<string>('');

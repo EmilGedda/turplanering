@@ -23,6 +23,7 @@
         "@emotion/react": "^11.4.1",
         "@emotion/styled": "^11.3.0",
         "@lingui/react": "^3.11.1",
+        "@mdi/js": "^6.4.95",
         "@mdi/svg": "^6.1.95",
         "@mitch528/mdi-material-ui": "^7.0.0",
         "@mui/icons-material": "^5.0.0",

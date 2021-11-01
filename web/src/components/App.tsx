@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import LayerSelector from './LayerSelector';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import LayerSelector, { BaseLayers, Layer } from './LayerSelector';
 import { styled } from '@mui/material/styles';
 import Searchbar from './Searchbar';
 import { Slide } from '@mui/material';
@@ -10,11 +10,17 @@ import {
   TemperatureToggleButton
 } from './Overlaybar';
 import Map from './map/Map';
-import TileLayer, { topowebbSource } from './map/TileLayer';
+import TileLayer, {
+  satelliteSource,
+  topowebbBWSource,
+  topowebbSource
+} from './map/TileLayer';
 import Timeline from './Timeline';
 import Feature from 'ol/Feature';
+import View from 'ol/View';
 import { MVT } from 'ol/format';
 import { TrailLayer } from './map/VectorLayer';
+import { UrlTile, TileImage } from 'ol/source';
 import { VectorTile as VectorSource } from 'ol/source';
 import { fromLonLat } from 'ol/proj';
 import { CoordURL, currentURLState } from '../URL';
@@ -22,6 +28,8 @@ import { ForecastTimestamps } from '../Forecast';
 import { SmhiLayer } from './map/WeatherOverlays';
 import { Layers, Overlays } from './map/Layers';
 import EnvContext from '../contexts/EnvContext';
+import { Events, MoveEnd } from './map/Events';
+import * as ol from 'ol';
 
 const PREFIX = 'App';
 
@@ -84,13 +92,42 @@ const trailSource = new VectorSource({
   })
 });
 
-export const App: React.FC = () => {
+const centerTileURL = (source: UrlTile, view: View, offset: number) => {
+  const center = view.getCenter();
+  const zoom = view.getZoom();
+  if (!center || !zoom) return;
+
+  const coord = source
+    .getTileGrid()
+    .getTileCoordForCoordAndZ(center, Math.min(Math.ceil(zoom + offset), 14));
+  return source.getTileUrlFunction()(coord, 1, source.getProjection());
+};
+
+const getPreviews = (view: View) => {
+  return {
+    topo: centerTileURL(topowebbSource, view, 1),
+    topoBW: centerTileURL(topowebbBWSource, view, 1),
+    satellite: centerTileURL(satelliteSource, view, -2)
+  };
+};
+
+export const App = (): JSX.Element => {
   const env = useContext(EnvContext);
 
   const [showBar, setShowBar] = useState(false);
   const [displayIndex, setDisplayIndex] = useState<number>(0);
   const [hasForecast, setHasForecast] = useState<boolean>(false);
   const [forecast, setForecast] = useState<[string, ForecastTimestamps]>();
+  const [mapSource, setMapSource] = useState<TileImage>(topowebbSource);
+  const [layerPreview, setLayerPreview] = useState<{
+    topo?: string;
+    topoBW?: string;
+    satellite?: string;
+  }>({});
+
+  const mapMount = useCallback((map: ol.Map) => {
+    setLayerPreview(getPreviews(map.getView()));
+  }, []);
 
   useEffect(() => {
     console.log('Running in ' + env.environment);
@@ -114,9 +151,9 @@ export const App: React.FC = () => {
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map view={initialView} className={classes.fullscreen}>
+      <Map view={initialView} className={classes.fullscreen} onMount={mapMount}>
         <Layers>
-          <TileLayer source={topowebbSource} />
+          <TileLayer source={mapSource} />
           <TrailLayer source={trailSource} />
         </Layers>
 
@@ -139,6 +176,15 @@ export const App: React.FC = () => {
             </>
           )}
         </Overlays>
+
+        <Events>
+          <MoveEnd
+            callback={(event) => {
+              const view = event.map.getView();
+              setLayerPreview(getPreviews(view));
+            }}
+          />
+        </Events>
       </Map>
 
       {/*
@@ -168,7 +214,26 @@ export const App: React.FC = () => {
             onGPSDeactivate={console.log}
           />
 
-          <LayerSelector />
+          <LayerSelector>
+            <BaseLayers>
+              <Layer
+                name='Terräng'
+                defaultSelected
+                previewURL={layerPreview.topo}
+                onClick={() => setMapSource(topowebbSource)}
+              />
+              <Layer
+                name='Nedtonad'
+                previewURL={layerPreview.topoBW}
+                onClick={() => setMapSource(topowebbBWSource)}
+              />
+              <Layer
+                name='Flygfoto'
+                previewURL={layerPreview.satellite}
+                onClick={() => setMapSource(satelliteSource)}
+              />
+            </BaseLayers>
+          </LayerSelector>
         </Div>
       </Slide>
 

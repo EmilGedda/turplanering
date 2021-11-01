@@ -1,10 +1,12 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MapContext from '../../contexts/MapContext';
 import WMTS from 'ol/source/WMTS';
+import { get as getProjection } from 'ol/proj';
 import { Options } from 'ol/layer/Layer';
 import OLTileLayer from 'ol/layer/Tile';
-import TileGrid from 'ol/tilegrid/WMTS';
-import TileSource from 'ol/source/Tile';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import WMTSTileGrid from 'ol/tilegrid/WMTS';
+import { TileWMS, TileImage as TileSource } from 'ol/source';
 
 export type TileLayerProps = Options<WMTS>;
 
@@ -16,7 +18,7 @@ const lantmäterietWMTS = (layer: string) => {
     matrixSet: '3857',
     style: 'default',
     url: 'https://minkarta.lantmateriet.se/map/topowebbcache/',
-    tileGrid: new TileGrid({
+    tileGrid: new WMTSTileGrid({
       matrixIds: Array.from(Array(18).keys(), (n) => n.toString()),
       tileSize: 256,
       extent: [
@@ -37,14 +39,35 @@ const lantmäterietWMTS = (layer: string) => {
 export const topowebbSource = new WMTS(lantmäterietWMTS('topowebb'));
 export const topowebbBWSource = new WMTS(lantmäterietWMTS('topowebb_nedtonad'));
 
+export const satelliteSource = new TileWMS({
+  url: 'https://minkarta.lantmateriet.se/map/ortofoto/',
+  projection: getProjection('EPSG:3857'),
+  params: {
+    LAYERS: 'Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16',
+    VERSION: '1.1.1',
+    SRS: 'EPSG:3857',
+    TILED: 'true',
+    FORMAT: 'image/jpeg',
+    TRANSPARENT: 'false'
+  },
+  tileGrid: new TileGrid({
+    tileSize: 512,
+    extent: [-1200000, 4700000, 2600000, 8500000],
+    resolutions: [
+      4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0,
+      2.0, 1.0, 0.5, 0.25, 0.125
+    ]
+  })
+});
+
 const TileLayer = <T extends TileSource>(opts: Options<T>): JSX.Element => {
   const { map } = useContext(MapContext);
+  const [tileLayer, _] = useState(() => new OLTileLayer(opts));
 
   useEffect(() => {
     if (!map) return;
 
     console.log(`mounting tile-layer`);
-    const tileLayer = new OLTileLayer(opts);
     map.addLayer(tileLayer);
 
     return () => {
@@ -53,7 +76,11 @@ const TileLayer = <T extends TileSource>(opts: Options<T>): JSX.Element => {
         console.log(`unmounting tile-layer`);
       }
     };
-  }, [map, opts]);
+  }, [map]);
+
+  useEffect(() => {
+    if (opts.source) tileLayer.setSource(opts.source);
+  }, [opts.source]);
 
   return <div />;
 };
