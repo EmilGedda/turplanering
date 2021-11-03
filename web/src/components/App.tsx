@@ -11,6 +11,7 @@ import {
 } from './Overlaybar';
 import Map from './map/Map';
 import TileLayer, {
+  hillshadingSource,
   satelliteSource,
   topowebbBWSource,
   topowebbSource
@@ -116,6 +117,7 @@ export const App = (): JSX.Element => {
 
   const [showBar, setShowBar] = useState(false);
   const [displayIndex, setDisplayIndex] = useState<number>(0);
+  const [hillshading, setHillshading] = useState<boolean>(false);
   const [hasForecast, setHasForecast] = useState<boolean>(false);
   const [forecast, setForecast] = useState<[string, ForecastTimestamps]>();
   const [mapSource, setMapSource] = useState<TileImage>(topowebbSource);
@@ -154,6 +156,11 @@ export const App = (): JSX.Element => {
       <Map view={initialView} className={classes.fullscreen} onMount={mapMount}>
         <Layers>
           <TileLayer source={mapSource} />
+
+          {hillshading && (
+            <TileLayer source={hillshadingSource} opacity={0.25} />
+          )}
+
           <TrailLayer source={trailSource} />
         </Layers>
 
@@ -197,11 +204,6 @@ export const App = (): JSX.Element => {
           opacity={0.25}
         />
 
-        <WMSLayer // Satellite
-          url='https://minkarta.lantmateriet.se/map/ortofoto/'
-          layers='Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16'
-        />
-
       */}
 
       <Slide direction='down' in={showBar}>
@@ -214,7 +216,10 @@ export const App = (): JSX.Element => {
             onGPSDeactivate={console.log}
           />
 
-          <LayerSelector>
+          <LayerSelector
+            onHillshadingChange={setHillshading}
+            disableHillshading={mapSource == satelliteSource}
+          >
             <BaseLayers>
               <Layer
                 name='Terräng'

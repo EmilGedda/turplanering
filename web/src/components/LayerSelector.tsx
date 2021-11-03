@@ -4,7 +4,8 @@ import React, {
   useState,
   ReactElement,
   cloneElement,
-  useEffect
+  useEffect,
+  useCallback
 } from 'react';
 import { styled } from '@mui/material/styles';
 import { Layers } from '@mui/icons-material';
@@ -295,11 +296,31 @@ export const BaseLayers = (props: BaseLayersProps): JSX.Element => {
 
 type LayerSelectorProps = {
   children: ReactElement<BaseLayersProps> | ReactElement<BaseLayersProps>[];
+  disableHillshading?: boolean;
+  onHillshadingChange: (checked: boolean) => void;
 };
 
-const LayerSelector = ({ children }: LayerSelectorProps): JSX.Element => {
+const LayerSelector = (props: LayerSelectorProps): JSX.Element => {
+  const { children, onHillshadingChange, disableHillshading } = props;
+  const [hillshading, setHillshading] = useState(false);
   const [shown, setShown] = useState(false);
   const [pinned, setPinned] = useState(false);
+
+  const hillshadingCallback = useCallback(
+    (_, checked) => {
+      onHillshadingChange(checked);
+      setHillshading(checked);
+    },
+    [onHillshadingChange]
+  );
+
+  useEffect(() => {
+    if (disableHillshading) {
+      onHillshadingChange(false);
+    } else {
+      onHillshadingChange(hillshading);
+    }
+  }, [disableHillshading, onHillshadingChange]);
 
   return (
     <ClickAwayListener
@@ -331,7 +352,11 @@ const LayerSelector = ({ children }: LayerSelectorProps): JSX.Element => {
               )}
             </IconButton>
             {children}
-            <HillshaderSwitch defaultChecked />
+            <HillshaderSwitch
+              onChange={hillshadingCallback}
+              disabled={disableHillshading}
+              checked={hillshading && !disableHillshading}
+            />
             <Divider
               variant='middle'
               style={{
