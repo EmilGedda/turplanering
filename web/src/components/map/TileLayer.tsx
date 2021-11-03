@@ -40,8 +40,8 @@ export const topowebbSource = new WMTS(lantmäterietWMTS('topowebb'));
 export const topowebbBWSource = new WMTS(lantmäterietWMTS('topowebb_nedtonad'));
 
 const lantmäterietGrid = new TileGrid({
-  tileSize: 512,
-  extent: [-1200000, 4700000, 2600000, 8500000],
+  tileSize: 256,
+  extent: [703448, 7.15239e6, 3.26007e6, 1.1789e7],
   resolutions: [
     4096.0, 2048.0, 1024.0, 512.0, 256.0, 128.0, 64.0, 32.0, 16.0, 8.0, 4.0,
     2.0, 1.0, 0.5, 0.25, 0.125
