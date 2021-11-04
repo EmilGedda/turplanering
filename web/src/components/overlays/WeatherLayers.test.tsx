@@ -1,18 +1,18 @@
 import React from "react";
-import { ForecastTimestamps } from "../Forecast";
+import { ForecastTimestamps } from "../../Forecast";
 import {
-  Overlaybar,
-  WeatherToggleButton,
-  WindToggleButton,
-  TemperatureToggleButton
-} from './Overlaybar';
-import { errHandler, server, WTSURL } from '../Mocks';
-import { Environment } from '../contexts/EnvContext';
-import { fireEvent, waitFor, screen, makeRender, act, RenderArgs, testEnv } from '../setup.test';
+  WeatherLayers,
+  WeatherOverlay,
+  WindOverlay,
+  TemperatureOverlay
+} from './WeatherLayers';
+import { errHandler, server, WTSURL } from '../../Mocks';
+import { Environment } from '../../contexts/EnvContext';
+import { fireEvent, waitFor, screen, makeRender, act, RenderArgs, testEnv } from '../../setup.test';
 import '@testing-library/jest-dom';
 
 
-describe('Overlaybar', () => {
+describe('WeatherLayers', () => {
   type OverlayArgs = {
     onClick:(timestamps?: [string, ForecastTimestamps]) => void,
     onForecastLoad:(success: boolean) => void,
@@ -30,11 +30,11 @@ describe('Overlaybar', () => {
 
     act(() => {
       makeRender(renderArgs)(
-        <Overlaybar {...props}>
-          <WeatherToggleButton layer='weather-layer' title='Weather' />
-          <WindToggleButton layer='wind-layer' title='Wind'/>
-          <TemperatureToggleButton layer='temperature-layer' title='Temperature'/>
-        </Overlaybar>
+        <WeatherLayers {...props}>
+          <WeatherOverlay layer='weather-layer' title='Weather' />
+          <WindOverlay layer='wind-layer' title='Wind'/>
+          <TemperatureOverlay layer='temperature-layer' title='Temperature'/>
+        </WeatherLayers>
       );
     });
   };
@@ -44,6 +44,13 @@ describe('Overlaybar', () => {
     expect(screen.getByTitle('Weather')).toBeVisible();
     expect(screen.getByTitle('Wind')).toBeVisible();
     expect(screen.getByTitle('Temperature')).toBeVisible();
+  });
+
+  it('should not be visible with shown=false', () => {
+    render({shown: false});
+    expect(screen.queryByTitle('Weather')).toBeNull();
+    expect(screen.queryByTitle('Wind')).toBeNull();
+    expect(screen.queryByTitle('Temperature')).toBeNull();
   });
 
   it('should call callback on forecast load', async () => {
@@ -58,7 +65,6 @@ describe('Overlaybar', () => {
 
     await waitFor (() => expect(callback).toHaveBeenCalledWith(false));
   });
-
 
   it('should treat buttons as toggles', async () => {
     const forecastResult : Record<string, ForecastTimestamps> = {

@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import LayerSelector, { BaseLayers, Layer } from './LayerSelector';
+import {
+  LayerSelector,
+  BaseLayers,
+  Layer,
+  WeatherLayers,
+  TemperatureOverlay,
+  WeatherOverlay,
+  WindOverlay,
+  MapDetails
+} from './overlays';
 import { styled } from '@mui/material/styles';
 import Searchbar from './Searchbar';
-import { Slide } from '@mui/material';
-import {
-  Overlaybar,
-  WeatherToggleButton,
-  WindToggleButton,
-  TemperatureToggleButton
-} from './Overlaybar';
+import { Divider, Grid, Slide } from '@mui/material';
 import Map from './map/Map';
 import TileLayer, {
   hillshadingSource,
@@ -116,9 +119,9 @@ export const App = (): JSX.Element => {
   const env = useContext(EnvContext);
 
   const [showBar, setShowBar] = useState(false);
-  const [displayIndex, setDisplayIndex] = useState<number>(0);
-  const [hillshading, setHillshading] = useState<boolean>(false);
-  const [hasForecast, setHasForecast] = useState<boolean>(false);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [hillshading, setHillshading] = useState(false);
+  const [hasForecast, setHasForecast] = useState(false);
   const [forecast, setForecast] = useState<[string, ForecastTimestamps]>();
   const [mapSource, setMapSource] = useState<TileImage>(topowebbSource);
   const [layerPreview, setLayerPreview] = useState<{
@@ -127,8 +130,17 @@ export const App = (): JSX.Element => {
     satellite?: string;
   }>({});
 
+  const setTopo = useCallback(() => setMapSource(topowebbSource), []);
+  const setTopoBW = useCallback(() => setMapSource(topowebbBWSource), []);
+  const setSatellite = useCallback(() => setMapSource(satelliteSource), []);
+
   const mapMount = useCallback((map: ol.Map) => {
     setLayerPreview(getPreviews(map.getView()));
+  }, []);
+
+  const moveEnd = useCallback((event: ol.MapEvent) => {
+    const view = event.map.getView();
+    setLayerPreview(getPreviews(view));
   }, []);
 
   useEffect(() => {
@@ -148,8 +160,6 @@ export const App = (): JSX.Element => {
   const nextDisplayTime = forecast
     ? forecast[1].validTimes[(displayIndex + 1) % forecast[1].validTimes.length]
     : undefined;
-
-  const showSidebar = hasForecast && showBar;
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
@@ -185,12 +195,7 @@ export const App = (): JSX.Element => {
         </Overlays>
 
         <Events>
-          <MoveEnd
-            callback={(event) => {
-              const view = event.map.getView();
-              setLayerPreview(getPreviews(view));
-            }}
-          />
+          <MoveEnd callback={moveEnd} />
         </Events>
       </Map>
 
@@ -216,41 +221,55 @@ export const App = (): JSX.Element => {
             onGPSDeactivate={console.log}
           />
 
-          <LayerSelector
-            onHillshadingChange={setHillshading}
-            disableHillshading={mapSource == satelliteSource}
-          >
-            <BaseLayers>
+          <LayerSelector>
+            <BaseLayers
+              onHillshadingChange={setHillshading}
+              disableHillshading={mapSource == satelliteSource}
+            >
               <Layer
                 name='Terräng'
                 defaultSelected
                 previewURL={layerPreview.topo}
-                onClick={() => setMapSource(topowebbSource)}
+                onClick={setTopo}
               />
               <Layer
                 name='Nedtonad'
                 previewURL={layerPreview.topoBW}
-                onClick={() => setMapSource(topowebbBWSource)}
+                onClick={setTopoBW}
               />
               <Layer
                 name='Flygfoto'
                 previewURL={layerPreview.satellite}
-                onClick={() => setMapSource(satelliteSource)}
+                onClick={setSatellite}
               />
             </BaseLayers>
+
+            <Grid container>
+              <Grid item xs style={{ marginBottom: '10px' }}>
+                <WeatherLayers
+                  onClick={setForecast}
+                  shown={hasForecast}
+                  onForecastLoad={setHasForecast}
+                >
+                  <WeatherOverlay layer='pmpfrekvent:wpt-overview_n-europe__' />
+                  <WindOverlay layer='pmp:windspeed-windarrows-avg-10m_n-europe__' />
+                  <TemperatureOverlay layer='pmpfrekvent:temperature-2m_n-europe_rainbow_' />
+                </WeatherLayers>
+              </Grid>
+
+              <Divider
+                orientation='vertical'
+                style={{ marginRight: '20px' }}
+                flexItem
+              />
+
+              <Grid item xs>
+                <MapDetails />
+              </Grid>
+            </Grid>
           </LayerSelector>
         </Div>
       </Slide>
-
-      <Overlaybar
-        onClick={setForecast}
-        onForecastLoad={setHasForecast}
-        shown={showSidebar}
-      >
-        <WeatherToggleButton layer='pmpfrekvent:wpt-overview_n-europe__' />
-        <WindToggleButton layer='pmp:windspeed-windarrows-avg-10m_n-europe__' />
-        <TemperatureToggleButton layer='pmpfrekvent:temperature-2m_n-europe_rainbow_' />
-      </Overlaybar>
 
       {forecast && (
         <Timeline

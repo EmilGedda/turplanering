@@ -1,41 +1,29 @@
-import React, {
-  FC,
-  useState,
-  ReactElement,
-  cloneElement,
-  useEffect,
-  useContext,
-  useCallback
-} from 'react';
-import { styled } from '@mui/material/styles';
 import {
   WeatherPouring,
-  Thermometer,
-  WeatherWindy
+  WeatherWindy,
+  Thermometer
 } from '@mitch528/mdi-material-ui';
-import { Slide, Paper, Grid, IconButton, IconButtonProps } from '@mui/material';
-import { ForecastTimestamps } from '../Forecast';
-import EnvContext from '../contexts/EnvContext';
-
-const StyledDiv = styled('div')(({ theme }) => ({
-  pointerEvents: 'none',
-  position: 'fixed',
-  top: 0,
-  bottom: 0,
-  right: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  [theme.breakpoints.down('md')]: {
-    marginRight: 10
-  },
-  [theme.breakpoints.up('sm')]: {
-    marginRight: 25
-  },
-  zIndex: 1000
-}));
+import { Grid, IconButton, IconButtonProps } from '@mui/material';
+import React, {
+  FC,
+  useCallback,
+  ReactElement,
+  useContext,
+  useState,
+  cloneElement,
+  useEffect
+} from 'react';
+import EnvContext from '../../contexts/EnvContext';
+import { ForecastTimestamps } from '../../Forecast';
+import { SectionTitle } from './LayerSelector';
 
 export type ToggleLayerCallback = (layer: string) => void;
+
+export type LayerToggleProps = {
+  onClick?: ToggleLayerCallback;
+  active?: boolean;
+  layer: string;
+};
 
 export type ToggleButtonProps = LayerToggleProps &
   Omit<IconButtonProps, 'onClick'>;
@@ -57,23 +45,10 @@ const ToggleButton: FC<ToggleButtonProps> = (props: ToggleButtonProps) => {
   );
 };
 
-export type LayerToggleProps = {
-  onClick?: ToggleLayerCallback;
-  active?: boolean;
-  layer: string;
-};
-
-export type OverlaybarProps = {
-  shown: boolean;
-  onForecastLoad: (success: boolean) => void;
-  onClick: (timestamps?: [string, ForecastTimestamps]) => void;
-  children: ReactElement<ToggleButtonProps>[];
-};
-
 const IconToggleButton = (Icon: FC): FC<ToggleButtonProps> => {
   return Object.assign(
     (props: ToggleButtonProps) => (
-      <ToggleButton {...props}>
+      <ToggleButton style={{ padding: '10px' }} {...props}>
         <Icon />
       </ToggleButton>
     ),
@@ -81,16 +56,25 @@ const IconToggleButton = (Icon: FC): FC<ToggleButtonProps> => {
   );
 };
 
-export const WeatherToggleButton = IconToggleButton(WeatherPouring);
-export const WindToggleButton = IconToggleButton(WeatherWindy);
-export const TemperatureToggleButton = IconToggleButton(Thermometer);
+export const WeatherOverlay = IconToggleButton(WeatherPouring);
+export const WindOverlay = IconToggleButton(WeatherWindy);
+export const TemperatureOverlay = IconToggleButton(Thermometer);
 
-WeatherToggleButton.displayName = 'WeatherToggleButton';
-WindToggleButton.displayName = 'WindToggleButton';
-TemperatureToggleButton.displayName = 'TemperatureToggleButton';
+WeatherOverlay.displayName = 'WeatherToggleButton';
+WindOverlay.displayName = 'WindToggleButton';
+TemperatureOverlay.displayName = 'TemperatureToggleButton';
 
-export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
-  const { shown, onClick, onForecastLoad, children: buttons } = props;
+export type WeatherLayersProps = {
+  onForecastLoad: (success: boolean) => void;
+  onClick: (timestamps?: [string, ForecastTimestamps]) => void;
+  children: ReactElement<ToggleButtonProps>[];
+  shown?: boolean;
+};
+
+export const WeatherLayers: FC<WeatherLayersProps> = (
+  props: WeatherLayersProps
+) => {
+  const { shown, onClick, onForecastLoad, children } = props;
   const { forecastAPI } = useContext(EnvContext);
   const [activeLayer, setActiveLayer] = useState<string>();
   const [forecasts, setForecasts] = useState<
@@ -107,7 +91,7 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
     }
   };
 
-  const toggleButtons = React.Children.map(buttons, (button) => {
+  const toggleButtons = React.Children.map(children, (button) => {
     return cloneElement(button, {
       onClick: callback,
       active: button.props.layer == activeLayer,
@@ -116,7 +100,7 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
   });
 
   useEffect(() => {
-    const layers = buttons.map((btn) => btn.props.layer);
+    const layers = children.map((btn) => btn.props.layer);
     const before = new Date();
     let mounted = true;
 
@@ -144,15 +128,16 @@ export const Overlaybar: FC<OverlaybarProps> = (props: OverlaybarProps) => {
     };
   }, [forecastAPI]);
 
+  if (!shown) return null;
+
   return (
-    <Slide direction='left' in={shown}>
-      <StyledDiv>
-        <Paper elevation={5} square={false} style={{ pointerEvents: 'auto' }}>
-          <Grid container direction='column' justifyContent='space-around'>
-            {toggleButtons}
-          </Grid>
-        </Paper>
-      </StyledDiv>
-    </Slide>
+    <>
+      <SectionTitle>Väder</SectionTitle>
+      <Grid container direction='row' justifyContent='space-around'>
+        {toggleButtons}
+      </Grid>
+    </>
   );
 };
+
+export default WeatherLayers;
