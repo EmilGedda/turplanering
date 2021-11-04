@@ -164,6 +164,11 @@ export const App = (): JSX.Element => {
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
       <Map view={initialView} className={classes.fullscreen} onMount={mapMount}>
+
+        <Events>
+          <MoveEnd callback={moveEnd} />
+        </Events>
+
         <Layers>
           <TileLayer source={mapSource} />
 
@@ -193,10 +198,6 @@ export const App = (): JSX.Element => {
             </>
           )}
         </Overlays>
-
-        <Events>
-          <MoveEnd callback={moveEnd} />
-        </Events>
       </Map>
 
       {/*

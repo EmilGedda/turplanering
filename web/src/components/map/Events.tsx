@@ -22,7 +22,7 @@ const event = <T extends BaseEvent>(name: EventNames) => {
       map?.on(name, callback);
       // @ts-expect-error: argument forwarding to multiple overloads is hard
       return () => map?.un(name, callback);
-    }, [callback]);
+    }, [callback, map]);
 
     return null;
   };
