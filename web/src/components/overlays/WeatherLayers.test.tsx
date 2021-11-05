@@ -5,7 +5,7 @@ import {
   WeatherOverlay,
   WindOverlay,
   TemperatureOverlay
-} from './WeatherLayers';
+} from '.';
 import { errHandler, server, WTSURL } from '../../Mocks';
 import { Environment } from '../../contexts/EnvContext';
 import { fireEvent, waitFor, screen, makeRender, act, RenderArgs, testEnv } from '../../setup.test';
@@ -57,13 +57,13 @@ describe('WeatherLayers', () => {
     const callback = jest.fn();
 
     render({ onForecastLoad: callback });
-    await waitFor (() => expect(callback).toHaveBeenCalledWith(true));
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(true));
 
     callback.mockClear();
     server.use(errHandler(WTSURL, 500));
     render({ onForecastLoad: callback });
 
-    await waitFor (() => expect(callback).toHaveBeenCalledWith(false));
+    await waitFor(() => expect(callback).toHaveBeenCalledWith(false));
   });
 
   it('should treat buttons as toggles', async () => {

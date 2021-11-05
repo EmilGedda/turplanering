@@ -79,6 +79,7 @@ const LayerSelector: React.FC = (props): JSX.Element => {
     <ClickAwayListener
       onClickAway={() => setShown(false)}
       mouseEvent='onMouseDown'
+      touchEvent='onTouchStart'
     >
       <StyledDiv>
         <Grow in={shown || pinned} style={{ transformOrigin: 'top right' }}>
@@ -91,6 +92,7 @@ const LayerSelector: React.FC = (props): JSX.Element => {
               size='small'
               color={pinned ? 'primary' : 'default'}
               onClick={() => setPinned(!pinned)}
+              data-testid='PinIconButton'
               style={{
                 right: 0,
                 top: 0,
