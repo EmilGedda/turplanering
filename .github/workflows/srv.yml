@@ -17,6 +17,11 @@ jobs:
       with:
         enable-stack: true
 
+    - name: Add local binary directories to PATH
+      run: |
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/.cabal/bin" >> $GITHUB_PATH
+
     - name: Load cache
       uses: actions/cache@v2
       with:
@@ -26,11 +31,14 @@ jobs:
             ${{ steps.haskell.outputs.ghc-store }}
             ~/.stack
             .stack-work
-        key: turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
+        key: turplanering-v2-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
         restore-keys: |
-            turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
-            turplanering-v1-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}
-            turplanering-v1-${{ runner.os }}
+            turplanering-v2-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}-${{ hashFiles('srv/turplanering.cabal') }}
+            turplanering-v2-${{ runner.os }}-${{ hashFiles('srv/stack.yaml.lock') }}
+            turplanering-v2-${{ runner.os }}
+
+    - name: Ensure happy is installed
+      run: which happy || (sudo apt-get update && sudo apt-get install -y happy)
 
     - name: Build tests, lib, and exe
       run: stack build --test --no-run-tests --coverage
@@ -38,10 +46,10 @@ jobs:
     - name: Run tests
       run: stack test --coverage --verbosity warning
 
-    - name: Install hpc-lcov
-      run: stack install hpc-lcov 
-    
-    - name: Generate LCOV file 
+    - name: Ensure hpc-lcov is installed
+      run: which hpc-lcov || (cd && cabal install hpc-lcov)
+
+    - name: Generate LCOV file
       run: stack exec -- hpc-lcov --file $(find $(stack path --local-hpc-root) -type f -name '*.tix') --main-package test
 
     - name: Upload coverage
