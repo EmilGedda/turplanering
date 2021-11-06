@@ -2,6 +2,7 @@
 
 module Main where
 
+import           Data.IORef
 import           Data.String
 import           Database.PostgreSQL.Simple
 import           Dhall                       (auto, input)
@@ -11,11 +12,13 @@ import           Network.Wai.Middleware.Gzip
 import           System.Directory
 import           System.FilePath
 import qualified Data.ByteString             as B
+import qualified Data.Map                    as M
 import qualified Data.Text                   as T
 
 import Turplanering.API
-import Turplanering.Config hiding (Info, LogLevel, Trace, logger)
+import Turplanering.Config   hiding (Info, LogLevel, Trace, logger)
 import Turplanering.DB
+import Turplanering.Forecast
 import Turplanering.Logger
 
 
@@ -37,9 +40,10 @@ main = do
             . field "port" (dbPort dbConfig)
 
     dbConn <- connect $ getConnectionInfo dbConfig
+    forecastCache <- newIORef $ ForecastCache M.empty
 
     let httpConfig = http config
-        context = RequestContext config dbConn
+        context = RequestContext config dbConn forecastCache
         warpSettings =
             setPort (fromIntegral $ httpPort httpConfig)
                 . setHost (fromString $ httpAddr httpConfig)

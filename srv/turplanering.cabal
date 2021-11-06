@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b93423d1e95ca6c5ca108c2f6e4a81ad41394e7d78adffe1a2b98190c42c73ed
+-- hash: 5df4595cc7ccf8bcf8d628242b18599665ea3ebbeb74f5dad591b3465a46661e
 
 name:           turplanering
 version:        0.1.0.0
@@ -35,6 +35,7 @@ library
       Turplanering.Logger
       Turplanering.Map
       Turplanering.PostGIS
+      Turplanering.Time
   other-modules:
       Paths_turplanering
   hs-source-dirs:
@@ -66,27 +67,28 @@ library
   build-depends:
       aeson ==1.5.*
     , ansi-terminal ==0.11.*
-    , attoparsec ==0.13.*
+    , attoparsec ==0.14.*
     , base >=4.7 && <5
     , bytestring ==0.10.*
     , containers ==0.6.*
-    , dhall ==1.39.*
+    , dhall ==1.40.*
     , exceptions ==0.10.*
     , genvalidity ==0.11.*
     , genvalidity-bytestring ==0.6.*
     , geojson ==4.0.*
-    , http-client ==0.6.*
+    , http-client ==0.7.*
     , http-client-tls ==0.3.*
     , http-types ==0.12.*
     , mtl ==2.2.*
     , opaleye ==0.7.*
-    , optics ==0.3.*
+    , optics ==0.4.*
     , postgresql-simple ==0.6.*
     , product-profunctors ==0.11.*
     , random ==1.2.*
     , servant ==0.18.*
     , servant-server ==0.18.*
     , text ==1.2.*
+    , time ==1.9.*
     , unordered-containers ==0.2.*
     , validity ==0.11.*
     , validity-bytestring ==0.4.*
@@ -127,7 +129,8 @@ executable turplanering
   build-depends:
       base >=4.7 && <5
     , bytestring ==0.10.*
-    , dhall ==1.39.*
+    , containers ==0.6.*
+    , dhall ==1.40.*
     , directory ==1.3.*
     , filepath ==1.4.*
     , http-types ==0.12.*
@@ -177,7 +180,7 @@ executable turplanering-prepare-sql
     , bytestring ==0.10.*
     , containers ==0.6.*
     , geojson ==4.0.*
-    , optics ==0.3.*
+    , optics ==0.4.*
     , text ==1.2.*
     , turplanering
   default-language: Haskell2010
@@ -217,7 +220,7 @@ executable turplanering-scrape
     , containers ==0.6.*
     , deepseq ==1.4.*
     , geojson ==4.0.*
-    , http-client ==0.6.*
+    , http-client ==0.7.*
     , http-client-tls ==0.3.*
     , streamly ==0.8.*
     , timeit ==2.0.*
@@ -260,9 +263,9 @@ test-suite test
     , genvalidity ==0.11.*
     , genvalidity-hspec ==0.7.*
     , genvalidity-text ==0.7.*
-    , hspec ==2.7.*
+    , hspec ==2.8.*
     , hspec-expectations ==0.8.*
-    , optics ==0.3.*
+    , optics ==0.4.*
     , text ==1.2.*
     , turplanering
     , validity ==0.11.*

@@ -24,10 +24,12 @@ import qualified Data.Text.Encoding         as T
 import qualified Data.Vault.Lazy            as V
 
 import           Control.Monad.Except
+import           Control.Monad.State   (MonadState (..))
 import           Turplanering.DB
 import           Turplanering.Forecast
 import           Turplanering.Logger
 import           Turplanering.Map
+import           Turplanering.Time
 import qualified Turplanering.Config   as Config
 
 
@@ -41,6 +43,7 @@ data Routes route = Routes
 data RequestContext = RequestContext
     { config :: Config.App
     , dbConn :: Connection
+    , forecastCache :: IORef ForecastCache
     , requestID :: RequestID
     }
 
@@ -52,13 +55,13 @@ newtype RequestID = RequestID {getID :: Word16}
     deriving (ToJSON)
 
 
-newtype ContextM a = ContextM
-    -- drop Handler for IO and use MonadThrow and MonadCatch
-    {runContext :: ReaderT RequestContext IO a}
+newtype ContextM m a = ContextM
+    {runContext :: ReaderT RequestContext m a}
     deriving
         ( Functor
         , Applicative
         , Monad
+        , MonadTrans
         , MonadReader RequestContext
         , MonadIO
         , MonadThrow
@@ -66,11 +69,20 @@ newtype ContextM a = ContextM
         )
 
 
-instance MonadStorage ContextM where
+type App = ContextM IO
+
+
+instance MonadStorage App where
     getDetails box = withConnection (getDetails box) =<< asks dbConn
 
 
-instance MonadForecast ContextM
+instance MonadState ForecastCache App where
+    state f = do
+        ref <- asks forecastCache
+        lift $ atomicModifyIORef' ref (swap . f)
+
+
+instance MonadTime App
 
 
 {-# NOINLINE requestIDKey #-}
@@ -101,7 +113,7 @@ routes =
         }
 
 
-toHandler :: RequestContext -> ContextM a -> Handler a
+toHandler :: RequestContext -> App a -> Handler a
 toHandler ctx handler = handleErrors $ runReaderT (runContext handler) ctx
 
 
@@ -114,7 +126,8 @@ handleErrors action =
 
 exceptionHandlers :: Monad m => [Exception.Handler m ServerError]
 exceptionHandlers =
-    [ Exception.Handler (\(_ :: SomeException) -> return err500)
+    [ Exception.Handler (\(e :: ServerError) -> return e)
+    , Exception.Handler (\(_ :: SomeException) -> return err500)
     ]
 
 
