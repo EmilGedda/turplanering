@@ -8,33 +8,33 @@
 
 module Turplanering.API where
 
-import           Control.Monad.Except
-import           Control.Monad.State        (MonadState (..))
-import           Control.Monad.Catch        hiding (Handler)
-import           Control.Monad.Reader
 import           Colog.Core                 hiding (Debug, Info)
+import           Control.Monad.Catch        hiding (Handler)
+import           Control.Monad.Except
+import           Control.Monad.Reader
+import           Control.Monad.State        (MonadState (..))
 import           Data.Aeson
 import           Data.IORef
 import           Data.Tuple
 import           Data.Word
 import           Database.PostgreSQL.Simple
-import           Network.Wai
+import           GHC.IO                     (unsafePerformIO)
 import           Network.HTTP.Types
+import           Network.Wai                hiding (Middleware)
+import           Optics                     hiding ((&))
 import           Servant
 import           Servant.API.Generic
 import           Servant.Server.Generic
 import           System.Random
-import           GHC.IO (unsafePerformIO)
-import           Optics                     hiding ((&))
 import qualified Control.Monad.Catch        as Exception (Handler (Handler))
 import qualified Data.Vault.Lazy            as V
 
 import           Turplanering.DB
 import           Turplanering.Forecast
+import           Turplanering.Log
 import           Turplanering.Map
 import           Turplanering.Time
-import           Turplanering.Log
-import qualified Turplanering.Config   as Config
+import qualified Turplanering.Config     as Config
 import qualified Turplanering.Log.Fields as Fields
 
 data Routes route = Routes
@@ -56,7 +56,6 @@ data RequestContext = RequestContext
     , dbConn :: Connection
     , forecastCache :: IORef ForecastCache
     , logAction :: LogAction IO FieldMessage
-    , request :: Request
     }
 
 
@@ -80,7 +79,9 @@ logInNamespace "http"
 
 type App = ContextM IO
 
-type Hook = forall a. App a -> App a
+instance HasLog RequestContext FieldMessage IO where
+    getLogAction = view #logAction
+    setLogAction = set #logAction
 
 instance HasLog RequestContext FieldMessage (ContextM IO) where
     getLogAction = hoistLogAction liftIO . view #logAction
@@ -103,6 +104,7 @@ instance MonadState ForecastCache App where
 
 instance MonadTime App
 
+type Middleware = (RequestContext -> Application) -> RequestContext -> Application
 
 {-# NOINLINE responseLoggerKey #-}
 responseLoggerKey :: V.Key Response
@@ -153,51 +155,34 @@ exceptionHandlers =
     , Exception.Handler (\(_ :: SomeException) -> return err500)
     ]
 
+withRequestID :: IDGen -> Middleware
+withRequestID rng app ctx req res = do
+    reqID <- nextID rng
+    let ctx' = modifyLogWith (field "reqID" reqID) ctx
+    app ctx' req res
 
-withRequest :: (Request -> Application) -> Application
-withRequest app req res = do
-    let res' response = do
-            res response
-    app req req res'
+logRequest :: Middleware
+logRequest app ctx req res = do
+    let log lvl msg fields = getLogAction ctx <& fields (newMsg "http" lvl msg)
 
-api :: Hook -> RequestContext -> Application
-api hook ctx req res = do
-    ref <- newIORef (void . return)
-    let res' r = do
-            f <- readIORef ref
-            f r
-            res r
-    genericServeT (toHandler ctx . hook . requestLogger ref) routes req res'
-
-
-logInjectRequestID :: (MonadIO m, MonadReader RequestContext m) => IDGen -> m a -> m a
-logInjectRequestID rng app = do
-    id <- nextID rng
-    local (modifyLogWith $ field "reqID" id) app
-
-requestLogger :: (MonadIO m, MonadTime m, WithLog RequestContext m) => IORef (Response -> IO ()) -> m a -> m a
-requestLogger ref app = do
-    req <- asks request
-    logger <- asks logAction
-
-    log' Debug "serving http request"
+    log Debug "serving http request"
         Fields.do
             field "method" $ requestMethod req
             field "path"   $ rawPathInfo req
             field "from"   . show $ remoteHost req
 
     start <- getCurrentTime
-    ret <- app
-    end <- getCurrentTime
+    app ctx req
+        $ \response -> do
+            end <- getCurrentTime
+            log Trace "served http request"
+                Fields.do
+                    field "elapsed" $ diffTimestamp end start
+                    field "status"  . statusCode $ responseStatus response
+            res response
 
-    let action res =
-            logger <&
-                (newMsg "http" Trace "served http request"
-                    & Fields.do
-                        field "elapsed" $ diffTimestamp end start
-                        field "status"  . statusCode $ responseStatus res)
 
-    liftIO . writeIORef ref $ action
 
-    return ret
+api :: RequestContext -> Application
+api ctx = genericServeT (toHandler ctx) routes
 

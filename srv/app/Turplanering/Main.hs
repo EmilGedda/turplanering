@@ -70,10 +70,12 @@ main = do
             field "url"  $ httpAddr httpConfig
             field "port" $ httpPort httpConfig
 
+    let middlewares = [ withRequestID (SequentialID `orInProd` RandomID)
+                      , logRequest
+                      ]
+
     runSettings warpSettings
-        . withRequest
         $ gzip def
             . simpleCors
-            . api
-                (logInjectRequestID (SequentialID `orInProd` RandomID))
-            . context
+            . foldr ($) api middlewares
+            $ context
