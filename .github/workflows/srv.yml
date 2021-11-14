@@ -47,7 +47,7 @@ jobs:
       run: stack test --coverage --verbosity warning
 
     - name: Ensure hpc-lcov is installed
-      run: which hpc-lcov || (cd && cabal install hpc-lcov)
+      run: which hpc-lcov || (cd && stack install hpc-lcov)
 
     - name: Generate LCOV file
       run: stack exec -- hpc-lcov --file $(find $(stack path --local-hpc-root) -type f -name '*.tix') --main-package test
