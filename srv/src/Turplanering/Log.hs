@@ -53,6 +53,7 @@ import           System.IO               (stdout)
 import           Text.Colour
 import           Turplanering.Time
 import           Language.Haskell.TH
+import           Turplanering.Log.Types ()
 import qualified Data.Function
 import qualified Data.ByteString.Builder as Bldr
 import qualified Data.Sequence           as Seq

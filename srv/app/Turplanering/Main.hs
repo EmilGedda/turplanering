@@ -75,7 +75,5 @@ main = do
         $ gzip def
             . simpleCors
             . api
-                ( logInjectRequestID (SequentialID `orInProd` RandomID)
-                . requestLogger
-                )
+                (logInjectRequestID (SequentialID `orInProd` RandomID))
             . context

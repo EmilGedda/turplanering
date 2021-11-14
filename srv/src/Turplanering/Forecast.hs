@@ -122,7 +122,7 @@ instance ( Monad (t m)
     getForecast :: Layers -> t m Forecast
     getForecast (Layers layers) = do
         (miss, hits) <- partitionEithers <$> traverse inCache layers
-        log' Trace "getting cached forecast"
+        log' Trace "forecast cache lookup"
             Fields.do
                 field "hits" $ length hits
                 field "miss" $ length miss

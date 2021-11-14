@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f0a10a924084f2062880fa419b3cc9523574db2da3068a1d914ff660718ccd39
+-- hash: 4681e7368848ee5fbff50d753c92d988200ef98f569cd32fb020e3a4698f2d1f
 
 name:           turplanering
 version:        0.1.0.0
@@ -34,6 +34,7 @@ library
       Turplanering.Forecast
       Turplanering.Log
       Turplanering.Log.Fields
+      Turplanering.Log.Types
       Turplanering.Map
       Turplanering.PostGIS
       Turplanering.Time
