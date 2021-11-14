@@ -16,15 +16,15 @@ packages:
     git: https://github.com/zellige/wkt-geom.git
     commit: 8f794ff37f491b1af6e28471d0666d60cee3d7a2
 - completed:
-    hackage: streamly-0.8.0@sha256:9784c80ee1ada51477520cabc4e92a0c76a6bb265f968a188f2fce818e7398e0,19654
+    hackage: co-log-core-0.3.0.0@sha256:cd5fde04475ae6926bb3cdb071180b399652c30583263f823c41fb1f34b038ef,3520
     pantry-tree:
-      size: 21676
-      sha256: 42c3843e920955b647a25a125c090efa72e024d1ef73d8e3ccf5710dc9217940
+      size: 584
+      sha256: 3278fd22a482ea5351c354b44f49498466ac46129dd51939e7b569f5994b7619
   original:
-    hackage: streamly-0.8.0@sha256:9784c80ee1ada51477520cabc4e92a0c76a6bb265f968a188f2fce818e7398e0,19654
+    hackage: co-log-core-0.3.0.0@sha256:cd5fde04475ae6926bb3cdb071180b399652c30583263f823c41fb1f34b038ef,3520
 snapshots:
 - completed:
-    size: 594195
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2021/10/29.yaml
-    sha256: 6eca2192c85fa4df1f93ac039285d960db6ccad2a786729ef10df4f0537ae929
-  original: nightly-2021-10-29
+    size: 594850
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2021/11/6.yaml
+    sha256: b5d7eef8b8b34d08a9604179e2594a9a5025d872146556b51f9d2f7bfead834b
+  original: nightly-2021-11-06

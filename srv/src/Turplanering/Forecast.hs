@@ -10,7 +10,12 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ViewPatterns #-}
 
-module Turplanering.Forecast where
+module Turplanering.Forecast
+    ( MonadForecast(..)
+    , ForecastCache(..)
+    , Forecast
+    , Layers
+    ) where
 
 import           Control.Exception
 import           Control.Monad.State.Strict
@@ -25,6 +30,8 @@ import           Network.HTTP.Client.TLS
 import           Optics
 import           Servant
 import           Turplanering.Time
+import           Turplanering.Log
+import qualified Turplanering.Log.Fields    as Fields
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Char8      as B8
 import qualified Data.ByteString.Lazy       as LB
@@ -32,6 +39,8 @@ import qualified Data.Map.Strict            as M
 import qualified Data.Text                  as T
 import qualified Xeno.DOM                   as XML
 
+
+logInNamespace "forecast"
 
 type Layer = T.Text
 
@@ -58,13 +67,11 @@ newtype Forecast = Forecast {forecast :: M.Map Layer WMSTime}
     deriving anyclass (ToJSON)
 
 
-makeFieldLabelsWith noPrefixFieldLabels ''Forecast
+newtype ForecastCache = ForecastCache {cache :: M.Map Layer (Timestamp, WMSTime)}
 
 
-newtype ForecastCache = ForecastCache {cache :: M.Map Layer (UTCTime, WMSTime)}
-
-
-makeFieldLabelsWith noPrefixFieldLabels ''ForecastCache
+makeFieldLabelsNoPrefix ''Forecast
+makeFieldLabelsNoPrefix ''ForecastCache
 
 
 data ForecastError = ParseError
@@ -110,14 +117,19 @@ instance ( Monad (t m)
          , MonadTime (t m)
          , MonadForecast m
          , MonadTrans t
+         , WithLog env (t m)
          ) => MonadForecast (t m) where
     getForecast :: Layers -> t m Forecast
     getForecast (Layers layers) = do
-        (miss, hit) <- partitionEithers <$> traverse inCache layers
+        (miss, hits) <- partitionEithers <$> traverse inCache layers
+        log' Trace "getting cached forecast"
+            Fields.do
+                field "hits" $ length hits
+                field "miss" $ length miss
+
         freshForecast <- lift (getForecast (Layers miss))
         insertIntoCache freshForecast
-        return $ freshForecast <> Forecast (M.fromList hit)
-
+        return $ freshForecast <> Forecast (M.fromList hits)
 
 inCache ::
     (MonadTime m, MonadState ForecastCache m) =>
@@ -128,7 +140,7 @@ inCache layer = do
     cache <- use #cache
     return $ case M.lookup layer cache of
         Just (cachedTime, wmsTime)
-            | diffUTCTime now cachedTime < 3600 -> Right (layer, wmsTime)
+            | diffTimestamp now cachedTime < 3600 -> Right (layer, wmsTime)
         _ -> Left layer
 
 insertIntoCache :: (MonadTime m, MonadState ForecastCache m) => Forecast -> m ()

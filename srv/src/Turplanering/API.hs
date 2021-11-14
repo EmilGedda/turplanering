@@ -1,24 +1,27 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Turplanering.API where
 
 import           Control.Monad.Catch        hiding (Handler)
 import           Control.Monad.Reader
+import           Colog.Core                 hiding (Debug, Info)
 import           Data.Aeson
 import           Data.IORef
 import           Data.Tuple
 import           Data.Word
 import           Database.PostgreSQL.Simple
-import           GHC.IO
 import           Network.Wai
 import           Servant
 import           Servant.API.Generic
 import           Servant.Server.Generic
 import           System.Random
+import           Optics
 import qualified Control.Monad.Catch        as Exception (Handler (Handler))
 import qualified Data.Text.Encoding         as T
 import qualified Data.Vault.Lazy            as V
@@ -27,11 +30,12 @@ import           Control.Monad.Except
 import           Control.Monad.State   (MonadState (..))
 import           Turplanering.DB
 import           Turplanering.Forecast
-import           Turplanering.Logger
 import           Turplanering.Map
 import           Turplanering.Time
+import           Turplanering.Log
 import qualified Turplanering.Config   as Config
-
+import qualified Turplanering.Log.Fields as Fields
+import GHC.IO (unsafePerformIO)
 
 data Routes route = Routes
     { _getDetails :: route :- "trails" :> Capture "area" Box :> Get '[JSON] Details
@@ -40,24 +44,25 @@ data Routes route = Routes
     deriving (Generic)
 
 
-data RequestContext = RequestContext
-    { config :: Config.App
-    , dbConn :: Connection
-    , forecastCache :: IORef ForecastCache
-    , requestID :: RequestID
-    }
-
-
 data IDGen = RandomID | SequentialID
 
 
 newtype RequestID = RequestID {getID :: Word16}
-    deriving (ToJSON)
+    deriving ToJSON
+
+
+data RequestContext = RequestContext
+    { config :: Config.App
+    , dbConn :: Connection
+    , forecastCache :: IORef ForecastCache
+    , logAction :: LogAction IO FieldMessage
+    , request :: Request
+    }
 
 
 newtype ContextM m a = ContextM
     {runContext :: ReaderT RequestContext m a}
-    deriving
+    deriving newtype
         ( Functor
         , Applicative
         , Monad
@@ -69,7 +74,21 @@ newtype ContextM m a = ContextM
         )
 
 
+makeFieldLabelsNoPrefix ''RequestContext
+logInNamespace "http"
+
+
 type App = ContextM IO
+
+type Hook = forall a. App a -> App a
+
+instance HasLog RequestContext FieldMessage (ContextM IO) where
+    getLogAction = hoistLogAction liftIO . view #logAction
+    setLogAction action = set #logAction =<< flip unliftAction action
+
+
+unliftAction :: RequestContext -> LogAction (ContextM m) a -> LogAction m a
+unliftAction ctx = hoistLogAction (flip runReaderT ctx . runContext)
 
 
 instance MonadStorage App where
@@ -100,9 +119,9 @@ randomIDRef :: IORef StdGen
 randomIDRef = unsafePerformIO $ newIORef =<< newStdGen
 
 
-nextID :: IDGen -> IO Word16
-nextID SequentialID = atomicModifyIORef' sequentialIDRef $ \id -> (id + 1, id)
-nextID RandomID = atomicModifyIORef' randomIDRef $ swap . genWord16
+nextID :: MonadIO m => IDGen -> m Word16
+nextID SequentialID = liftIO $ atomicModifyIORef' sequentialIDRef $ \id -> (id + 1, id)
+nextID RandomID = liftIO $ atomicModifyIORef' randomIDRef $ swap . genWord16
 
 
 routes :: (MonadForecast m, MonadStorage m) => Routes (AsServerT m)
@@ -113,8 +132,12 @@ routes =
         }
 
 
-toHandler :: RequestContext -> App a -> Handler a
-toHandler ctx handler = handleErrors $ runReaderT (runContext handler) ctx
+modifyLogWith :: (FieldMessage -> FieldMessage) -> RequestContext -> RequestContext
+modifyLogWith mod = over #logAction (cmap mod)
+
+
+toHandler :: RequestContext -> Hook -> App a -> Handler a
+toHandler ctx hooks handler = handleErrors $ runReaderT (runContext $ hooks handler) ctx
 
 
 handleErrors :: IO a -> Handler a
@@ -131,30 +154,37 @@ exceptionHandlers =
     ]
 
 
-api :: RequestContext -> Application
-api ctx = genericServeT (toHandler ctx) routes
+withRequest :: (Request -> Application) -> Application
+withRequest app req = app req req
 
 
-getRequestID :: Request -> Maybe RequestID
-getRequestID = V.lookup requestIDKey . vault
+api :: Hook -> RequestContext -> Application
+api hook ctx = genericServeT (toHandler ctx hook) routes
 
 
-requestLogger :: Middleware
-requestLogger app req resp = do
-    logger Debug "serving http request"
-        & field "method" (T.decodeUtf8 $ requestMethod req)
-            . field "path" (T.decodeUtf8 $ rawPathInfo req)
-            . field "from" (show $ remoteHost req)
-            . fieldMaybe "reqID" (getRequestID req)
-    app req resp
-    where
-        logger = consoleLogger Trace "http"
+logInjectRequestID :: (MonadIO m, MonadReader RequestContext m) => IDGen -> m a -> m a
+logInjectRequestID rng app = do
+    id <- nextID rng
+    local (modifyLogWith $ field "reqID" id) app
 
 
-withRequestID :: IDGen -> (RequestID -> Application) -> Application
-withRequestID rng app req resp = do
-    number <- nextID rng
-    let id' = RequestID number
-        vault' = V.insert requestIDKey id' $ vault req
-        req' = req{vault = vault'}
-    app id' req' resp
+requestLogger :: (MonadReader RequestContext m, MonadTime m, WithLog RequestContext m) => m a -> m a
+requestLogger app = do
+    req <- asks request
+
+    log' Debug "serving http request"
+        Fields.do
+            field "method" (T.decodeUtf8 $ requestMethod req)
+            field "path"   (T.decodeUtf8 $ rawPathInfo req)
+            field "from"   (show $ remoteHost req)
+
+    start <- getCurrentTime
+    ret <- app
+    end <- getCurrentTime
+
+    log' Trace "served http request"
+        Fields.do
+            field "elapsed" (diffTimestamp end start)
+
+    return ret
+
