@@ -199,18 +199,6 @@ export const App = (): JSX.Element => {
         </Overlays>
       </Map>
 
-      {/*
-
-        <WMSLayer // Hillshading layer
-          url='https://minkarta.lantmateriet.se/map/hojdmodell/'
-          layers='terrangskuggning'
-          format='image/png'
-          transparent={true}
-          opacity={0.25}
-        />
-
-      */}
-
       <Slide direction='down' in={showBar}>
         <Div className={classes.topbar}>
           <Div className={classes.hiddenBox} />

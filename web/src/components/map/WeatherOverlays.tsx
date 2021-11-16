@@ -13,7 +13,7 @@ type SmhiLayerProps = OverlayProps & { layer: string };
 
 const shortISO = (d: Date): string => d.toISOString().slice(0, -5) + 'Z';
 
-export const SmhiLayer = (props: SmhiLayerProps): JSX.Element | null => {
+export const SmhiLayer = React.memo((props: SmhiLayerProps): JSX.Element | null => {
   const { displayTime, referenceTime, layer, ...opts } = props;
 
   useEffect(() => {
@@ -54,4 +54,4 @@ export const SmhiLayer = (props: SmhiLayerProps): JSX.Element | null => {
   });
 
   return <TileLayer {...opts} source={wmsSource} />;
-};
+});
