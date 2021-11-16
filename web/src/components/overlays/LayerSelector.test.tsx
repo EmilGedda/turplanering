@@ -1,26 +1,22 @@
 import React from "react";
 import { LayerSelector, SectionTitle } from '.';
-import { render as domRender, fireEvent, screen } from '../../setup.test';
+import { render, fireEvent, screen } from '../../setup.test';
 import '@testing-library/jest-dom';
 
 
 describe('SectionTitle', () => {
   it('should show text', () => {
-    domRender(<SectionTitle>some text</SectionTitle>);
+    render(<SectionTitle>some text</SectionTitle>);
     expect(screen.getByText("some text")).toBeVisible();
   });
 });
 
 describe('LayerSelector', () => {
 
-  const render = (): void => {
-    domRender(<LayerSelector>layer selector</LayerSelector>);
-    jest.runOnlyPendingTimers();
-  }
-
   beforeEach(() => {
     jest.useFakeTimers();
-    render();
+    render(<LayerSelector>layer selector</LayerSelector>);
+    jest.runOnlyPendingTimers();
   });
 
   afterEach(() => {
@@ -29,6 +25,7 @@ describe('LayerSelector', () => {
 
   const open = () => fireEvent.click(screen.getByTestId('LayersIcon'));
   const close = () => fireEvent.mouseDown(document.body);
+
   it('should only show icon by default', () => {
     expect(screen.getByText('layer selector')).not.toBeVisible();
   });
@@ -50,14 +47,13 @@ describe('LayerSelector', () => {
   });
 
   it('should stay open when hovered', async () => {
-    open();
-    fireEvent.mouseEnter(screen.getByText('layer selector'));
+    fireEvent.mouseEnter(screen.getByTestId('SelectorBox'));
     expect(screen.getByText('layer selector')).toBeVisible();
   });
 
   it('should close when mouse leave', async () => {
     fireEvent.mouseEnter(screen.getByTestId('LayersIcon'));
-    fireEvent.mouseLeave(screen.getByText('layer selector'));
+    fireEvent.mouseLeave(screen.getByTestId('SelectorBox'));
     expect(screen.getByText('layer selector')).not.toBeVisible();
   });
 

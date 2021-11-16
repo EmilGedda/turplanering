@@ -87,6 +87,7 @@ const LayerSelector: React.FC = (props): JSX.Element => {
             elevation={4}
             onMouseLeave={() => setShown(false)}
             onMouseEnter={() => setShown(true)}
+            data-testid='SelectorBox'
           >
             <IconButton
               size='small'
