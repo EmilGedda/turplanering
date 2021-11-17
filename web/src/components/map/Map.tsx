@@ -8,11 +8,7 @@ import { Global } from '@emotion/react';
 import { toLonLat } from 'ol/proj';
 import type MapEvent from 'ol/MapEvent';
 import { updateURL, CoordURL } from '../../URL';
-import {
-  defaults as defaultControls,
-  MousePosition,
-  ScaleLine
-} from 'ol/control';
+import { MousePosition, ScaleLine } from 'ol/control';
 import * as ol from 'ol';
 
 export type Props = {
@@ -26,7 +22,7 @@ export type Props = {
   setTooltipText: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const mapControls = defaultControls().extend([
+const mapControls = [
   new MousePosition({
     className: 'ol-coord-pos',
     coordinateFormat: (coord) => {
@@ -35,7 +31,7 @@ const mapControls = defaultControls().extend([
     }
   }),
   new ScaleLine()
-]);
+];
 
 const onMoveEnd = (event: MapEvent) => {
   const view = event.map.getView();
