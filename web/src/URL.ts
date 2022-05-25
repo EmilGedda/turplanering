@@ -198,5 +198,8 @@ export const updateURL = (base: string, givenState: URLPart): void => {
 
   const newState = new URLState(givenState, overlays);
 
+  const url = base + newState.toURL();
+  url.replace('//', '/');
+
   updateState.bind(window.history)({}, '', base + newState.toURL());
 };

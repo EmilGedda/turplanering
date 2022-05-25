@@ -9,7 +9,7 @@ export default merge(commonConfig, {
     output: {
         filename: 'bundle.[contenthash:8].min.js',
         path: resolve(__dirname, '../dist'),
-        publicPath: './',
+        publicPath: '/turplanering/',
     },
     devtool: 'source-map',
 });
