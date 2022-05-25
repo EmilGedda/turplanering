@@ -37,14 +37,11 @@ const env: Environment = (() => {
   };
 
   if (process.env.NODE_ENV == 'production') {
-    const appBase = window.location.pathname;
-    appBase.replace(/\/+$/, '');
-
     return {
       ...developmentDefault,
       environment: 'production',
       tileURL: '',
-      base: appBase,
+      base: '/turplanering/',
       browser
     };
   }

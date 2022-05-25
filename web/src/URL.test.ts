@@ -11,10 +11,10 @@ import {
 
 describe('TrailURL', () => {
   it('toURL()', () => {
-    const url = new TrailURL('footrail', 'sectionbar').toURL();
-    expect(url).toContain('/trail/');
-    expect(url).toContain('footrail');
-    expect(url).toContain('sectionbar');
+    const url = new TrailURL('foo', 'bar').toURL();
+    expect(url).toContain('trail/');
+    expect(url).toContain('foo');
+    expect(url).toContain('bar');
   });
 });
 
@@ -32,7 +32,7 @@ describe('CoordURL', () => {
 
 describe('AttributionsURL', () => {
   it('toURL()', () => {
-    expect(new AttributionsURL().toURL()).toEqual('/attributions');
+    expect(new AttributionsURL().toURL()).toEqual('attributions');
   });
 });
 
@@ -48,7 +48,7 @@ describe('URLState', () => {
     expect(urlState.toURL()).toContain(attribution.toURL());
     expect(urlState.toURL()).toContain(overlays.toURL());
 
-    expect(new URLState(undefined, new OverlayState()).toURL()).toEqual('/');
+    expect(new URLState(undefined, new OverlayState()).toURL()).toEqual('');
   });
 });
 
@@ -146,15 +146,15 @@ describe('currentURLState', () => {
   });
 
   it('from invalid CoordURL', () => {
-    var url = urlState('/coord');
+    var url = urlState('coord');
     expect(url.toURL()).toEqual(new URLState(undefined, overlays).toURL());
     expect(url.state).toBeUndefined();
 
-    var url = urlState('/coord/12');
+    var url = urlState('coord/12');
     expect(url.toURL()).toEqual(new URLState(undefined, overlays).toURL());
     expect(url.state).toBeUndefined();
 
-    var url = urlState('/coord/1,2:foo');
+    var url = urlState('coord/1,2:foo');
     expect(url.state).toMatchObject({
       lat: 1,
       lon: 2,
@@ -199,11 +199,11 @@ describe('updateURL', () => {
   it('pushes new state', () => {
     // @ts-ignore
     jsdom.reconfigure({
-      url: `${window.location.protocol}//${window.location.host}/`
+      url: `${window.location.protocol}//${window.location.host}`
     });
     const attr = new AttributionsURL();
-    updateURL('', attr);
-    expect(window.history.pushState).toHaveBeenCalledWith({}, '', attr.toURL());
+    updateURL('/', attr);
+    expect(window.history.pushState).toHaveBeenCalledWith({}, '', '/' + attr.toURL());
     expect(window.history.replaceState).toHaveBeenCalledTimes(0);
   });
 
@@ -213,13 +213,13 @@ describe('updateURL', () => {
     jsdom.reconfigure({
       url: `${window.location.protocol}//${
         window.location.host
-      }${coord.toURL()}`
+      }/${coord.toURL()}`
     });
-    updateURL('', coord);
+    updateURL('/', coord);
     expect(window.history.replaceState).toHaveBeenCalledWith(
       {},
       '',
-      coord.toURL()
+      '/' + coord.toURL()
     );
     expect(window.history.pushState).toHaveBeenCalledTimes(1);
   });

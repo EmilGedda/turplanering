@@ -36,7 +36,7 @@ export class TrailURL implements URLPart {
 
   readonly toURL = (): string => {
     return (
-      '/trail/' + (this.section ? `${this.trail}:${this.section}` : this.trail)
+      'trail/' + (this.section ? `${this.trail}:${this.section}` : this.trail)
     );
   };
 }
@@ -55,7 +55,7 @@ export class CoordURL implements URLPart {
 
   readonly toURL = (): string => {
     return (
-      `/coord/${this.lat.toFixed(4)},${this.lon.toFixed(4)}` +
+      `coord/${this.lat.toFixed(4)},${this.lon.toFixed(4)}` +
       (this.zoom ? `:${this.zoom.toFixed(1)}` : '')
     );
   };
@@ -64,7 +64,7 @@ export class CoordURL implements URLPart {
 export class AttributionsURL implements URLPart {
   type = URLStateType.Coord;
   readonly toURL = (): string => {
-    return '/attributions';
+    return 'attributions';
   };
 }
 
@@ -122,7 +122,7 @@ export class URLState implements URLSegment {
 
   readonly toURL = (): string => {
     if (!this.state) {
-      return '/';
+      return '';
     }
     return `${this.state.toURL()}${this.overlays.toURL()}`;
   };
@@ -197,9 +197,6 @@ export const updateURL = (base: string, givenState: URLPart): void => {
       : window.history.pushState;
 
   const newState = new URLState(givenState, overlays);
-
-  const url = base + newState.toURL();
-  url.replace('//', '/');
 
   updateState.bind(window.history)({}, '', base + newState.toURL());
 };

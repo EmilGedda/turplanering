@@ -53,7 +53,9 @@ jobs:
 
         - name: Get short SHA
           id: scratch
-          run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+          run: |
+            echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+            cp static/* dist
 
         - name: Deploy
           if: github.ref == 'refs/heads/main'
