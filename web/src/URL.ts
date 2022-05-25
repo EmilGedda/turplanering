@@ -188,7 +188,7 @@ export const currentURLState = (
   return new URLState(state, overlays);
 };
 
-export const updateURL = (givenState: URLPart): void => {
+export const updateURL = (base: string, givenState: URLPart): void => {
   const { state, overlays } = currentURLState();
   /* eslint-disable @typescript-eslint/unbound-method */
   const updateState =
@@ -197,5 +197,5 @@ export const updateURL = (givenState: URLPart): void => {
       : window.history.pushState;
 
   const newState = new URLState(givenState, overlays);
-  updateState.bind(window.history)({}, '', newState.toURL());
+  updateState.bind(window.history)({}, '', base + newState.toURL());
 };

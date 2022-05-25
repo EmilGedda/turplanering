@@ -40,6 +40,7 @@ const env: Environment = (() => {
       ...developmentDefault,
       environment: 'production',
       tileURL: '',
+      base: window.location.pathname,
       browser
     };
   }

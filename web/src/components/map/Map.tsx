@@ -18,6 +18,7 @@ export type Props = {
   };
   onMount?: (map: ol.Map) => void;
   className?: string;
+  base?: string;
   children?: React.ReactNode;
   setTooltipText: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -33,14 +34,16 @@ const mapControls = [
   new ScaleLine()
 ];
 
-const onMoveEnd = (event: MapEvent) => {
-  const view = event.map.getView();
-  const center = view.getCenter();
-  const zoom = view.getZoom();
-  if (center) {
-    const [lon, lat] = toLonLat(center);
-    updateURL(new CoordURL(lat, lon, zoom));
-  }
+const onMoveEnd = (base: string) => {
+    return (event: MapEvent) => {
+    const view = event.map.getView();
+    const center = view.getCenter();
+    const zoom = view.getZoom();
+    if (center) {
+      const [lon, lat] = toLonLat(center);
+      updateURL(base, new CoordURL(lat, lon, zoom));
+    }
+  };
 };
 
 const nofunc = (_: string) => {
@@ -55,7 +58,7 @@ export const setTooltip = (map?: ol.Map): StateCallBack<string> => {
 };
 
 const MemoMap: React.FC<Props> = React.memo(
-  ({ children, view, className, setTooltipText, onMount }) => {
+  ({ children, view, className, setTooltipText, onMount, base }) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<ol.Map>();
 
@@ -82,7 +85,7 @@ const MemoMap: React.FC<Props> = React.memo(
       }
 
       setMap(mapObject);
-      mapObject.on('moveend', onMoveEnd);
+      mapObject.on('moveend', onMoveEnd(base!));
       mapObject.set('tooltip', setTooltipText, true);
 
       if (onMount) {

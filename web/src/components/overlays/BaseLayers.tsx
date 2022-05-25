@@ -221,7 +221,7 @@ export const BaseLayers = (props: BaseLayersProps): JSX.Element => {
   });
 
   const hillshadingCallback = useCallback(
-    (_, checked: boolean) => {
+     (_:any, checked: boolean) => {
       onHillshadingChange(checked);
       setHillshading(checked);
     },

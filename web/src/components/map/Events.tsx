@@ -3,7 +3,11 @@ import MapContext from '../../contexts/MapContext';
 import BaseEvent from 'ol/events/Event';
 import * as ol from 'ol';
 
-export const Events: FC = ({ children }): JSX.Element => {
+export type EventProps = {
+  children: React.ReactNode;
+};
+
+export const Events: FC<EventProps> = ({ children }): JSX.Element => {
   return <>{children}</>;
 };
 

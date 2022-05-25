@@ -4,6 +4,7 @@ import { ForecastAPI, Smhi } from '../Forecast';
 export type Environment = {
   apiURL: string;
   environment: string;
+  base: string;
   tileURL: string;
   forecastAPI: ForecastAPI;
   browser: {
@@ -14,6 +15,7 @@ export type Environment = {
 export const developmentDefault = {
   apiURL: 'http://localhost:4000',
   environment: 'development',
+  base: '',
   tileURL:
     'http://localhost:8081/maps/trails/{z}/{x}/{y}.vector.pbf?debug=true',
   forecastAPI: new Smhi(),

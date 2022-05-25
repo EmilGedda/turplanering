@@ -70,8 +70,11 @@ export const SectionTitle: FC<TypographyProps> = (props) => {
   );
 };
 
-const LayerSelector: React.FC = (props): JSX.Element => {
-  const { children } = props;
+type Props = {
+  children: React.ReactNode
+};
+
+const LayerSelector: React.FC<Props> = ({children}: Props): JSX.Element => {
   const [shown, setShown] = useState(false);
   const [pinned, setPinned] = useState(false);
 

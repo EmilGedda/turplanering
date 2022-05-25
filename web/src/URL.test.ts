@@ -202,7 +202,7 @@ describe('updateURL', () => {
       url: `${window.location.protocol}//${window.location.host}/`
     });
     const attr = new AttributionsURL();
-    updateURL(attr);
+    updateURL('', attr);
     expect(window.history.pushState).toHaveBeenCalledWith({}, '', attr.toURL());
     expect(window.history.replaceState).toHaveBeenCalledTimes(0);
   });
@@ -215,7 +215,7 @@ describe('updateURL', () => {
         window.location.host
       }${coord.toURL()}`
     });
-    updateURL(coord);
+    updateURL('', coord);
     expect(window.history.replaceState).toHaveBeenCalledWith(
       {},
       '',

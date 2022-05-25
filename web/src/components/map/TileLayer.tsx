@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import MapContext from '../../contexts/MapContext';
 import WMTS from 'ol/source/WMTS';
 import { get as getProjection } from 'ol/proj';
-import { Options } from 'ol/layer/Layer';
+import { Options } from 'ol/layer/BaseTile';
 import OLTileLayer from 'ol/layer/Tile';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import WMTSTileGrid from 'ol/tilegrid/WMTS';
@@ -50,7 +50,7 @@ const lantmäterietGrid = new TileGrid({
 
 export const satelliteSource = new TileWMS({
   url: 'https://minkarta.lantmateriet.se/map/ortofoto/',
-  projection: getProjection('EPSG:3857'),
+  projection: getProjection('EPSG:3857')!,
   params: {
     LAYERS: 'Ortofoto_0.5,Ortofoto_0.4,Ortofoto_0.25,Ortofoto_0.16',
     VERSION: '1.1.1',
@@ -64,7 +64,7 @@ export const satelliteSource = new TileWMS({
 
 export const hillshadingSource = new TileWMS({
   url: 'https://minkarta.lantmateriet.se/map/hojdmodell/',
-  projection: getProjection('EPSG:3857'),
+  projection: getProjection('EPSG:3857')!,
   params: {
     LAYERS: 'terrangskuggning',
     VERSION: '1.1.1',

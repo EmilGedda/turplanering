@@ -1,10 +1,10 @@
 import { rest } from 'msw';
-import type { DefaultRequestBody } from 'msw';
+import type { DefaultBodyType } from 'msw';
 import { setupServer } from 'msw/native';
 import { ForecastResponse } from './Forecast';
 
 export const mockForecastResponse = (mock: ForecastResponse) => {
-  return rest.get<DefaultRequestBody, {}, WTSLayersParams>(WTSURL, (req, res, ctx) => {
+  return rest.get<DefaultBodyType, WTSLayersParams>(WTSURL, (req, res, ctx) => {
     const { layers } = req.params;
     const response: ForecastResponse = { forecast: {} };
 
@@ -24,7 +24,7 @@ type WTSLayersParams = {
 };
 
 export const handlers = [
-  rest.get<DefaultRequestBody, {}, WTSLayersParams>(WTSURL, (req, res, ctx) => {
+  rest.get<DefaultBodyType, WTSLayersParams>(WTSURL, (req, res, ctx) => {
     const { layers } = req.params;
     const response: ForecastResponse = { forecast: {} };
     for(const layer of layers.split(',')) {

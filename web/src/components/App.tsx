@@ -102,7 +102,7 @@ const centerTileURL = (source: UrlTile, view: View, offset: number) => {
   if (!center || !zoom) return;
 
   const coord = source
-    .getTileGrid()
+    .getTileGrid()!
     .getTileCoordForCoordAndZ(center, Math.min(Math.ceil(zoom + offset), 14));
   return source.getTileUrlFunction()(coord, 1, source.getProjection());
 };
@@ -163,7 +163,7 @@ export const App = (): JSX.Element => {
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map view={initialView} className={classes.fullscreen} onMount={mapMount}>
+      <Map view={initialView} className={classes.fullscreen} onMount={mapMount} base={env.base}>
         <Events>
           <MoveEnd callback={moveEnd} />
         </Events>
