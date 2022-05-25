@@ -32,7 +32,6 @@ import * as ol from 'ol/proj/proj4';
 import { theme } from './Theme';
 
 const env: Environment = (() => {
-
   const browser = {
     hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
   };
@@ -54,7 +53,6 @@ const env: Environment = (() => {
     ...developmentDefault,
     browser
   };
-
 })();
 
 // Opt-in to Webpack hot module replacement
