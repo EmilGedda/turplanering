@@ -18,7 +18,7 @@ type Props<T> = {
 };
 
 const event = <T extends BaseEvent>(name: EventNames) => {
-  return ({ callback }: Props<T>): null => {
+  const EventComponent = ({ callback }: Props<T>): null => {
     const { map } = useContext(MapContext);
 
     useEffect(() => {
@@ -30,6 +30,9 @@ const event = <T extends BaseEvent>(name: EventNames) => {
 
     return null;
   };
+
+  EventComponent.displayName = `Event<${name}>`;
+  return EventComponent;
 };
 
 export const MoveEnd = event<ol.MapEvent>('moveend');

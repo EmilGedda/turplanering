@@ -163,7 +163,12 @@ export const App = (): JSX.Element => {
 
   return (
     <Div className={`${classes.padded} ${classes.fullscreen}`}>
-      <Map view={initialView} className={classes.fullscreen} onMount={mapMount} base={env.base}>
+      <Map
+        view={initialView}
+        className={classes.fullscreen}
+        onMount={mapMount}
+        base={env.base}
+      >
         <Events>
           <MoveEnd callback={moveEnd} />
         </Events>

@@ -57,3 +57,5 @@ export const SmhiLayer = React.memo(
     return <TileLayer {...opts} source={wmsSource} />;
   }
 );
+
+SmhiLayer.displayName = 'SmhiLayer';

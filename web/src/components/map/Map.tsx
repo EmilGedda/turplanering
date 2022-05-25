@@ -35,7 +35,7 @@ const mapControls = [
 ];
 
 const onMoveEnd = (base: string) => {
-    return (event: MapEvent) => {
+  return (event: MapEvent) => {
     const view = event.map.getView();
     const center = view.getCenter();
     const zoom = view.getZoom();

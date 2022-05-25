@@ -1,4 +1,5 @@
 import React, {
+  ChangeEvent,
   cloneElement,
   createRef,
   ReactElement,
@@ -221,7 +222,7 @@ export const BaseLayers = (props: BaseLayersProps): JSX.Element => {
   });
 
   const hillshadingCallback = useCallback(
-     (_:any, checked: boolean) => {
+    (_: ChangeEvent<HTMLInputElement>, checked: boolean) => {
       onHillshadingChange(checked);
       setHillshading(checked);
     },
