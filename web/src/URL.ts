@@ -197,5 +197,6 @@ export const updateURL = (base: string, givenState: URLPart): void => {
       : window.history.pushState;
 
   const newState = new URLState(givenState, overlays);
+
   updateState.bind(window.history)({}, '', base + newState.toURL());
 };

@@ -32,22 +32,29 @@ import * as ol from 'ol/proj/proj4';
 import { theme } from './Theme';
 
 const env: Environment = (() => {
+
   const browser = {
     hasTouch: 'ontouchstart' in window || navigator.maxTouchPoints > 0
   };
+
   if (process.env.NODE_ENV == 'production') {
+    const appBase = window.location.pathname;
+    appBase.replace(/\/+$/, '');
+
     return {
       ...developmentDefault,
       environment: 'production',
       tileURL: '',
-      base: window.location.pathname,
+      base: appBase,
       browser
     };
   }
+
   return {
     ...developmentDefault,
     browser
   };
+
 })();
 
 // Opt-in to Webpack hot module replacement

@@ -4,12 +4,11 @@ import TileLayer from './TileLayer';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import type { TileLayerProps } from './TileLayer';
 
-type OverlayProps = Omit<TileLayerProps, 'source'> & {
+export type SmhiLayerProps = Omit<TileLayerProps, 'source'> & {
   referenceTime: Date;
+  layer: string;
   displayTime?: Date;
 };
-
-type SmhiLayerProps = OverlayProps & { layer: string };
 
 const shortISO = (d: Date): string => d.toISOString().slice(0, -5) + 'Z';
 
