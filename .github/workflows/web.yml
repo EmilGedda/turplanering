@@ -55,7 +55,7 @@ jobs:
           id: scratch
           run: |
             echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
-            cp static/* dist
+            cp assets/404.html dist
 
         - name: Deploy
           if: github.ref == 'refs/heads/main'
