@@ -151,6 +151,8 @@ export const currentURLState = (
   const overlays = OverlayState.fromQueryArgs(parseQueryArgs(queryArgs));
   let state: URLPart | undefined = undefined;
 
+  if (path[0] == 'turplanering') path.shift();
+
   switch (path[0]) {
     case 'coord': {
       if (path.length < 2) {
